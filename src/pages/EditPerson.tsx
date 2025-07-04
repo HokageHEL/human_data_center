@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const EditPerson = () => {
   const { name } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
     fullName: decodeURIComponent(name || ""),
@@ -24,8 +26,20 @@ const EditPerson = () => {
     militaryService: "",
     position: "",
     militaryRank: "",
+    rank: "",
+    additionalInfo1: "",
+    additionalInfo2: "",
     photo: ""
   });
+
+  // Load existing data on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(`person_${decodeURIComponent(name || "")}`);
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setFormData(parsedData);
+    }
+  }, [name]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -35,14 +49,61 @@ const EditPerson = () => {
   };
 
   const handleSave = () => {
-    console.log("Saving person data:", formData);
-    // Here you would typically save to a database
-    navigate("/");
+    try {
+      // Save to localStorage
+      localStorage.setItem(`person_${formData.fullName}`, JSON.stringify(formData));
+      
+      toast({
+        title: "Дані збережено",
+        description: `Інформація про ${formData.fullName} успішно збережена`,
+      });
+      
+      // Navigate back after a short delay
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: "Помилка",
+        description: "Не вдалося зберегти дані",
+        variant: "destructive",
+      });
+    }
   };
+
+  const formFields = [
+    // Basic Information
+    { section: "Основна інформація", fields: [
+      { label: "П.І.Б.", field: "fullName", type: "text" },
+      { label: "Дата народження", field: "birthDate", type: "date" },
+      { label: "Номер телефону", field: "phoneNumber", type: "text" },
+    ]},
+    
+    // General Information
+    { section: "Загальні відомості", fields: [
+      { label: "Місце реєстрації", field: "registrationPlace", type: "text" },
+      { label: "Номер та серія паспорта", field: "passportNumber", type: "text" },
+      { label: "ІПН", field: "taxId", type: "text" },
+      { label: "Адреса проживання", field: "address", type: "text" },
+      { label: "Сімейний стан", field: "familyStatus", type: "text" },
+      { label: "Родичі", field: "relatives", type: "textarea" },
+      { label: "Освіта", field: "education", type: "text" },
+      { label: "Закінчений НЗ", field: "militaryService", type: "text" },
+    ]},
+    
+    // Military Information
+    { section: "Військові відомості", fields: [
+      { label: "Посада", field: "position", type: "text" },
+      { label: "ВОС", field: "militaryRank", type: "text" },
+      { label: "Звання", field: "rank", type: "text" },
+      { label: "Додаткова інформація 1", field: "additionalInfo1", type: "text" },
+      { label: "Додаткова інформація 2", field: "additionalInfo2", type: "text" },
+    ]},
+  ];
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <Button 
             variant="outline" 
@@ -52,16 +113,31 @@ const EditPerson = () => {
             ← Назад до списку
           </Button>
           <h1 className="text-2xl font-bold text-foreground">
-            Редагування особи
+            Редагування особи: {formData.fullName}
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Photo Section */}
           <div className="lg:col-span-1">
-            <Card className="p-4 bg-secondary">
+            <Card className="p-4 bg-secondary h-fit">
               <div className="aspect-square bg-muted rounded-lg flex items-center justify-center mb-4">
-                <span className="text-muted-foreground">ФОТО</span>
+                {formData.photo ? (
+                  <img 
+                    src={formData.photo} 
+                    alt="Фото особи" 
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (nextSibling) {
+                        nextSibling.style.display = 'flex';
+                      }
+                    }}
+                  />
+                ) : (
+                  <span className="text-muted-foreground">ФОТО</span>
+                )}
               </div>
               <Input
                 placeholder="URL фото"
@@ -71,221 +147,49 @@ const EditPerson = () => {
             </Card>
           </div>
 
-          {/* Form Section */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Basic Info */}
-            <Card className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <Label className="text-sm font-medium">П.І.Б.</Label>
-                  <Input
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange("fullName", e.target.value)}
-                    className="mt-1"
-                  />
+          {/* Form Section - 2 Column Layout */}
+          <div className="lg:col-span-4 space-y-6">
+            {formFields.map((section, sectionIndex) => (
+              <Card key={sectionIndex} className="p-6">
+                <div className="bg-primary text-primary-foreground p-3 rounded-lg mb-6">
+                  <h3 className="font-semibold text-center">{section.section}</h3>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium">ДАТА НАРОДЖЕННЯ</Label>
-                  <Input
-                    type="date"
-                    value={formData.birthDate}
-                    onChange={(e) => handleInputChange("birthDate", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">НОМЕР ТЕЛЕФОНУ</Label>
-                  <Input
-                    value={formData.phoneNumber}
-                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-            </Card>
-
-            {/* General Information */}
-            <Card className="p-6">
-              <div className="bg-primary text-primary-foreground p-3 rounded-lg mb-4">
-                <h3 className="font-semibold text-center">ЗАГАЛЬНІ ВІДОМОСТІ</h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Місце реєстрації
-                    </Label>
-                    <Input
-                      value={formData.registrationPlace}
-                      onChange={(e) => handleInputChange("registrationPlace", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="row-span-6">
-                    <div className="h-full bg-muted rounded-lg"></div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Номер та серія паспорта
-                    </Label>
-                    <Input
-                      value={formData.passportNumber}
-                      onChange={(e) => handleInputChange("passportNumber", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      ІПН
-                    </Label>
-                    <Input
-                      value={formData.taxId}
-                      onChange={(e) => handleInputChange("taxId", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Адреса проживання
-                    </Label>
-                    <Input
-                      value={formData.address}
-                      onChange={(e) => handleInputChange("address", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Сімейний стан
-                    </Label>
-                    <Input
-                      value={formData.familyStatus}
-                      onChange={(e) => handleInputChange("familyStatus", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Родичі
-                    </Label>
-                    <Textarea
-                      value={formData.relatives}
-                      onChange={(e) => handleInputChange("relatives", e.target.value)}
-                      className="mt-1"
-                      rows={3}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Освіта
-                    </Label>
-                    <Input
-                      value={formData.education}
-                      onChange={(e) => handleInputChange("education", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Закінчений НЗ
-                    </Label>
-                    <Input
-                      value={formData.militaryService}
-                      onChange={(e) => handleInputChange("militaryService", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Military Information */}
-            <Card className="p-6">
-              <div className="bg-primary text-primary-foreground p-3 rounded-lg mb-4">
-                <h3 className="font-semibold text-center">ВІЙСЬКОВІ ВІДОМОСТІ</h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Посада
-                    </Label>
-                    <Input
-                      value={formData.position}
-                      onChange={(e) => handleInputChange("position", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      ВОС
-                    </Label>
-                    <Input
-                      value={formData.militaryRank}
-                      onChange={(e) => handleInputChange("militaryRank", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                      Звання
-                    </Label>
-                    <Input
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                {/* Additional empty fields as shown in the reference */}
-                <div className="space-y-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                        Додаткова інформація 1
-                      </Label>
-                      <Input className="mt-1" />
+                
+                <div className="space-y-4">
+                  {section.fields.map((fieldConfig, fieldIndex) => (
+                    <div key={fieldIndex} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                      {/* Description Column */}
+                      <div className="flex items-center">
+                        <Label className="bg-accent text-accent-foreground px-4 py-2 rounded text-sm font-medium w-full text-center">
+                          {fieldConfig.label}
+                        </Label>
+                      </div>
+                      
+                      {/* Input Column */}
+                      <div>
+                        {fieldConfig.type === "textarea" ? (
+                          <Textarea
+                            value={formData[fieldConfig.field as keyof typeof formData]}
+                            onChange={(e) => handleInputChange(fieldConfig.field, e.target.value)}
+                            className="w-full"
+                            rows={3}
+                            placeholder={`Введіть ${fieldConfig.label.toLowerCase()}`}
+                          />
+                        ) : (
+                          <Input
+                            type={fieldConfig.type}
+                            value={formData[fieldConfig.field as keyof typeof formData]}
+                            onChange={(e) => handleInputChange(fieldConfig.field, e.target.value)}
+                            className="w-full"
+                            placeholder={fieldConfig.type === "date" ? "" : `Введіть ${fieldConfig.label.toLowerCase()}`}
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="bg-accent text-accent-foreground px-3 py-2 rounded text-sm font-medium">
-                        Додаткова інформація 2
-                      </Label>
-                      <Input className="mt-1" />
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </div>
-            </Card>
+              </Card>
+            ))}
 
             {/* Save Button */}
             <div className="flex justify-end space-x-4">
@@ -293,7 +197,7 @@ const EditPerson = () => {
                 Скасувати
               </Button>
               <Button onClick={handleSave} className="bg-primary text-primary-foreground">
-                Зберегти
+                Зберегти дані
               </Button>
             </div>
           </div>
