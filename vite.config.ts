@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/human-data-center/",  // Make sure this matches your GitHub repository name exactly
+  base: "/", // Change this for Vercel deployment
   server: {
     host: "::",
     port: 8080,
