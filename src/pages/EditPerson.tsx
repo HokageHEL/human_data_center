@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { PhotoUpload } from "@/components/PhotoUpload";
+import { addPerson, getPerson } from "@/lib/data";
 
 const EditPerson = () => {
   const { name } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isNewPerson = name === 'new';
   
   const [formData, setFormData] = useState({
-    fullName: decodeURIComponent(name || ""),
+    fullName: isNewPerson ? "" : decodeURIComponent(name || ""),
     birthDate: "",
     phoneNumber: "",
     registrationPlace: "",
@@ -34,12 +37,16 @@ const EditPerson = () => {
 
   // Load existing data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem(`person_${decodeURIComponent(name || "")}`);
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setFormData(parsedData);
-    }
-  }, [name]);
+    const loadPerson = async () => {
+      if (!isNewPerson && name) {
+        const person = await getPerson(decodeURIComponent(name));
+        if (person) {
+          setFormData(person);
+        }
+      }
+    };
+    loadPerson();
+  }, [name, isNewPerson]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -48,10 +55,26 @@ const EditPerson = () => {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      // Save to localStorage
-      localStorage.setItem(`person_${formData.fullName}`, JSON.stringify(formData));
+      if (!formData.fullName.trim()) {
+        toast({
+          title: "Помилка",
+          description: "Будь ласка, введіть П.І.Б.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Prepare data for saving
+      const dataToSave = {
+        ...formData,
+        photo: formData.photo || '', // Ensure photo is never undefined
+      };
+
+      // Save to IndexedDB with original name for handling name changes
+      const originalName = isNewPerson ? undefined : decodeURIComponent(name || "");
+      await addPerson(dataToSave, originalName);
       
       toast({
         title: "Дані збережено",
@@ -63,6 +86,7 @@ const EditPerson = () => {
         navigate("/");
       }, 1000);
     } catch (error) {
+      console.error('Error saving person:', error);
       toast({
         title: "Помилка",
         description: "Не вдалося зберегти дані",
@@ -113,7 +137,7 @@ const EditPerson = () => {
             ← Назад до списку
           </Button>
           <h1 className="text-2xl font-bold text-foreground">
-            Редагування особи: {formData.fullName}
+            {isNewPerson ? "Додавання нової особи" : `Редагування особи: ${formData.fullName}`}
           </h1>
         </div>
 
@@ -121,28 +145,9 @@ const EditPerson = () => {
           {/* Photo Section */}
           <div className="lg:col-span-1">
             <Card className="p-4 bg-secondary h-fit">
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center mb-4">
-                {formData.photo ? (
-                  <img 
-                    src={formData.photo} 
-                    alt="Фото особи" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (nextSibling) {
-                        nextSibling.style.display = 'flex';
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-muted-foreground">ФОТО</span>
-                )}
-              </div>
-              <Input
-                placeholder="URL фото"
-                value={formData.photo}
-                onChange={(e) => handleInputChange("photo", e.target.value)}
+              <PhotoUpload
+                currentPhoto={formData.photo}
+                onPhotoChange={(photo) => handleInputChange("photo", photo)}
               />
             </Card>
           </div>
