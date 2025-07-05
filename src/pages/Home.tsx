@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type SortField = "fullName" | "birthDate" | "militaryRank" | "position";
+type SortField = "fullName" | "birthDate" | "militaryRank" | "position" | "shpoNumber";
 type SortOrder = "asc" | "desc";
 
 const calculateAge = (birthDate: string): number => {
@@ -88,6 +88,39 @@ const Home = () => {
       const order = sortConfig.order === "asc" ? 1 : -1;
       const field = sortConfig.field;
 
+      // Special handling for shpoNumber field
+      if (field === "shpoNumber") {
+        const aValue = a[field] || "";
+        const bValue = b[field] || "";
+        return aValue.localeCompare(bValue) * order;
+      }
+
+      // Special handling for militaryRank field
+      if (field === "militaryRank") {
+        const militaryRanks = [
+          "солдат",
+          "старший солдат",
+          "молодший сержант",
+          "сержант",
+          "старший сержант",
+          "головний сержант",
+          "штаб-сержант",
+          "майстер-сержант",
+          "старший майстер-сержант",
+          "головний майстер-сержант",
+          "молодший лейтенант",
+          "лейтенант",
+          "старший лейтенант",
+          "капітан",
+          "майор",
+          "підполковник",
+          "полковник"
+        ];
+        const aIndex = militaryRanks.indexOf(a[field]);
+        const bIndex = militaryRanks.indexOf(b[field]);
+        return (aIndex - bIndex) * order;
+      }
+
       if (a[field] < b[field]) return -1 * order;
       if (a[field] > b[field]) return 1 * order;
       return 0;
@@ -146,44 +179,87 @@ const Home = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[80px]">№ШПО</TableHead>
-                    <TableHead 
+                    <TableHead
+                      className="cursor-pointer w-[80px]"
+                      onClick={() => handleSort("shpoNumber")}
+                    >
+                      <div className="flex items-center gap-2">
+                        №ШПО
+                        <ArrowUpDown
+                          className={`h-4 w-4 ${
+                            sortConfig.field === "shpoNumber" &&
+                            sortConfig.order === "desc"
+                              ? "transform rotate-180"
+                              : ""
+                          }`}
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("fullName")}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-[200px]">
                         ПІБ
-                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "fullName" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                        <ArrowUpDown
+                          className={`h-4 w-4 ${
+                            sortConfig.field === "fullName" &&
+                            sortConfig.order === "desc"
+                              ? "transform rotate-180"
+                              : ""
+                          }`}
+                        />
                       </div>
                     </TableHead>
                     <TableHead>Стать</TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("birthDate")}
                     >
                       <div className="flex items-center gap-2">
                         Дата народження
-                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "birthDate" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                        <ArrowUpDown
+                          className={`h-4 w-4 ${
+                            sortConfig.field === "birthDate" &&
+                            sortConfig.order === "desc"
+                              ? "transform rotate-180"
+                              : ""
+                          }`}
+                        />
                       </div>
                     </TableHead>
                     <TableHead>Вік</TableHead>
                     <TableHead>Номер телефону</TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("militaryRank")}
                     >
                       <div className="flex items-center gap-2">
                         Військове звання
-                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "militaryRank" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                        <ArrowUpDown
+                          className={`h-4 w-4 ${
+                            sortConfig.field === "militaryRank" &&
+                            sortConfig.order === "desc"
+                              ? "transform rotate-180"
+                              : ""
+                          }`}
+                        />
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("position")}
                     >
                       <div className="flex items-center gap-2">
                         Посада
-                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "position" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                        <ArrowUpDown
+                          className={`h-4 w-4 ${
+                            sortConfig.field === "position" &&
+                            sortConfig.order === "desc"
+                              ? "transform rotate-180"
+                              : ""
+                          }`}
+                        />
                       </div>
                     </TableHead>
                     <TableHead className="w-[100px]">Дії</TableHead>
@@ -196,25 +272,15 @@ const Home = () => {
                       className="cursor-pointer hover:bg-accent"
                       onClick={() => handlePersonClick(person)}
                     >
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{person.shpoNumber}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            {person.photo ? (
-                              <AvatarImage
-                                src={person.photo}
-                                alt={person.fullName}
-                              />
-                            ) : (
-                              <AvatarFallback>
-                                <User className="h-4 w-4" />
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
                           {person.fullName}
                         </div>
                       </TableCell>
-                      <TableCell>{person.gender || "Ч"}</TableCell>
+                      <TableCell className="flex items-center justify-center">
+                        {person.gender || "Ч"}
+                      </TableCell>
                       <TableCell>{person.birthDate}</TableCell>
                       <TableCell>{calculateAge(person.birthDate)}</TableCell>
                       <TableCell>{person.phoneNumber}</TableCell>

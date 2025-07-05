@@ -1,28 +1,49 @@
 export interface Person {
+  // Загальні дані
   fullName: string;
-  birthDate: string;
-  phoneNumber: string;
-  registrationPlace: string;
   passportNumber: string;
   taxId: string;
+  registrationPlace: string;
   address: string;
   familyStatus: string;
   relatives: string;
   education: string;
-  militaryService: string;
+  gender: "Ч" | "Ж";
+  birthDate: string;
+  phoneNumber: string;
+  photo: string;
+
+  // Військові дані
   position: string;
   militaryRank: string;
-  rank: string;
-  gender: "Ч" | "Ж";
-  additionalInfo1: string;
-  additionalInfo2: string;
-  photo: string;
+  positionRank: string;
+  fitnessStatus: "придатний" | "обмежено придатний";
+  medicalCommissionNumber?: string;
+  medicalCommissionDate?: string;
+  unit: "Управління" | "Основні підрозділи" | "Підрозділи забезпечення";
+  department: string;
+  militarySpecialty: string;
+  tariffCategory: number;
+  salary: number;
+  serviceType: "мобілізація" | "контракт";
+  serviceStartDate: string;
+  servicePeriods: string;
+  unitStartDate: string;
+  previousServicePlaces: string;
+  contractEndDate?: string;
+  militaryDocumentNumber: string;
+  shpoNumber: string;
+  combatExperienceStatus: boolean;
+  combatExperienceNumber?: string;
+  combatPeriods: string;
+  isInPPD: boolean;
+  
   deleted?: boolean;
 }
 
 const DB_NAME = 'militaryDB';
 const STORE_NAME = 'people';
-const DB_VERSION = 2; // Increment version to trigger store recreation
+const DB_VERSION = 7; // Increment version to trigger store recreation
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -87,7 +108,7 @@ async function writePerson(person: Person): Promise<void> {
     // Ensure we're storing a clean copy of the person object
     const personToStore = {
       ...person,
-      deleted: false,
+      deleted: person.deleted || false,
       photo: person.photo || ''
     };
     
@@ -117,7 +138,7 @@ export async function addPerson(person: Person, oldName?: string): Promise<void>
       // Ensure we're storing a clean copy of the person object
       const personToStore = {
         ...person,
-        deleted: false,
+        deleted: person.deleted || false,
         photo: person.photo || ''
       };
 

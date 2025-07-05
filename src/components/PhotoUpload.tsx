@@ -6,9 +6,11 @@ import { Camera, Upload } from "lucide-react";
 interface PhotoUploadProps {
   currentPhoto: string;
   onPhotoChange: (photo: string) => void;
+  isInPPD: boolean;
+  onIsInPPDChange: (isInPPD: boolean) => void;
 }
 
-export function PhotoUpload({ currentPhoto, onPhotoChange }: PhotoUploadProps) {
+export function PhotoUpload({ currentPhoto, onPhotoChange, isInPPD, onIsInPPDChange }: PhotoUploadProps) {
   const [previewUrl, setPreviewUrl] = useState(currentPhoto);
 
   // Update preview when currentPhoto changes
@@ -59,22 +61,33 @@ export function PhotoUpload({ currentPhoto, onPhotoChange }: PhotoUploadProps) {
         )}
       </div>
       
-      <div className="flex gap-2">
-        <Input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleCameraClick}
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          Завантажити фото
-        </Button>
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <Input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleCameraClick}
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Завантажити фото
+          </Button>
+        </div>
+        <label className="flex items-center space-x-2 cursor-pointer">
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            checked={isInPPD}
+            onChange={(e) => onIsInPPDChange(e.target.checked)}
+          />
+          <span>Знаходиться в ППД</span>
+        </label>
       </div>
     </div>
   );
