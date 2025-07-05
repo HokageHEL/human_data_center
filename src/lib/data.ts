@@ -21,6 +21,7 @@ export interface Person {
   phoneNumber: string;
   photo: string;
   documents: Document[];
+  additionalInfo?: string;
 
   // Військові дані
   position: string;

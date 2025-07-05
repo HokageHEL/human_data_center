@@ -93,6 +93,7 @@ const EditPerson = () => {
     phoneNumber: "",
     photo: "",
     documents: [] as Document[],
+    additionalInfo: "",
 
     // Військові дані
     position: "",
@@ -422,6 +423,12 @@ const EditPerson = () => {
   };
 
   const formFields = [
+    {
+      section: "Додаткова інформація",
+      fields: [
+        { label: "Додаткова інформація", field: "additionalInfo", type: "textarea" }
+      ]
+    },
     {
       section: "Загальні дані",
       fields: [
@@ -815,6 +822,18 @@ const EditPerson = () => {
             <h2 className="text-lg font-semibold mb-4">Військові дані</h2>
             <div className="space-y-4">
               {formFields[1].fields.map((field) => renderField(field))}
+            </div>
+          </Card>
+
+          <Card className="p-4 md:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Додаткова інформація</h2>
+            <div className="space-y-4">
+              <Textarea
+                value={formData.additionalInfo}
+                onChange={(e) => handleInputChange("additionalInfo", e.target.value)}
+                placeholder="Введіть додаткову інформацію"
+                className="min-h-[150px]"
+              />
             </div>
           </Card>
 
