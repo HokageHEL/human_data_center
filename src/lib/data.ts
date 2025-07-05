@@ -20,7 +20,7 @@ export interface Person {
   fitnessStatus: "придатний" | "обмежено придатний";
   medicalCommissionNumber?: string;
   medicalCommissionDate?: string;
-  unit: "Управління" | "Основні підрозділи" | "Підрозділи забезпечення";
+  unit: string;
   department: string;
   militarySpecialty: string;
   tariffCategory: number;

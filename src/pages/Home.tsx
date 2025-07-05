@@ -1,32 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, User, Filter, ArrowUpDown } from "lucide-react";
 import { getActivePeople, deletePerson, Person } from "@/lib/data";
-import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FilterSection } from "@/components/FilterSection";
+import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 
-type SortField = "fullName" | "birthDate" | "militaryRank" | "position" | "shpoNumber";
-type SortOrder = "asc" | "desc";
+type SortField =
+  | "fullName"
+  | "birthDate"
+  | "militaryRank"
+  | "position"
+  | "shpoNumber"
+  | "gender";
+type SortOrder = "asc" | "desc" | null;
 
 const calculateAge = (birthDate: string): number => {
   const today = new Date();
@@ -44,17 +30,21 @@ const Home = () => {
   const [filters, setFilters] = useState({
     birthDate: "",
     militaryRank: "",
+    unit: "all",
+    gender: "all",
+    fitnessStatus: "all",
+    isInPPD: false,
+    combatExperienceStatus: false,
   });
   const [sortConfig, setSortConfig] = useState<{
     field: SortField;
     order: SortOrder;
   }>({
     field: "fullName",
-    order: "asc",
+    order: null,
   });
   const [people, setPeople] = useState<Array<Person>>([]);
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const loadPeople = async () => {
@@ -81,10 +71,38 @@ const Home = () => {
         person.militaryRank
           .toLowerCase()
           .includes(filters.militaryRank.toLowerCase());
+      const matchesUnit =
+        !filters.unit ||
+        filters.unit === "all" ||
+        person.unit.toLowerCase().includes(filters.unit.toLowerCase());
+      const matchesGender =
+        !filters.gender ||
+        filters.gender === "all" ||
+        person.gender === filters.gender;
+      const matchesFitnessStatus =
+        !filters.fitnessStatus ||
+        filters.fitnessStatus === "all" ||
+        person.fitnessStatus === filters.fitnessStatus;
+      const matchesIsInPPD =
+        !filters.isInPPD || person.isInPPD === filters.isInPPD;
+      const matchesCombatExperience =
+        !filters.combatExperienceStatus ||
+        person.combatExperienceStatus === filters.combatExperienceStatus;
 
-      return matchesSearch && matchesBirthDate && matchesMilitaryRank;
+      return (
+        matchesSearch &&
+        matchesBirthDate &&
+        matchesMilitaryRank &&
+        matchesUnit &&
+        matchesGender &&
+        matchesFitnessStatus &&
+        matchesIsInPPD &&
+        matchesCombatExperience
+      );
     })
     .sort((a, b) => {
+      if (sortConfig.order === null) return 0;
+      
       const order = sortConfig.order === "asc" ? 1 : -1;
       const field = sortConfig.field;
 
@@ -114,7 +132,7 @@ const Home = () => {
           "капітан",
           "майор",
           "підполковник",
-          "полковник"
+          "полковник",
         ];
         const aIndex = militaryRanks.indexOf(a[field]);
         const bIndex = militaryRanks.indexOf(b[field]);
@@ -126,12 +144,19 @@ const Home = () => {
       return 0;
     });
 
-  const handlePersonClick = (person: { fullName: string }) => {
-    navigate(`/edit/${encodeURIComponent(person.fullName)}`);
-  };
-
-  const handleAddPerson = () => {
-    navigate("/edit/new");
+  const handleSort = (field: SortField) => {
+    setSortConfig((prev) => {
+      if (prev.field !== field) {
+        return { field, order: "asc" };
+      }
+      if (prev.order === "asc") {
+        return { field, order: "desc" };
+      }
+      if (prev.order === "desc") {
+        return { field, order: null };
+      }
+      return { field, order: "asc" };
+    });
   };
 
   const handleDelete = async (personName: string) => {
@@ -144,235 +169,47 @@ const Home = () => {
     }
   };
 
-  const handleSort = (field: SortField) => {
-    setSortConfig((prev) => ({
-      field,
-      order: prev.field === field && prev.order === "asc" ? "desc" : "asc",
-    }));
+  const handleResetFilters = () => {
+    setFilters({
+      birthDate: "",
+      militaryRank: "",
+      unit: "all",
+      gender: "all",
+      fitnessStatus: "all",
+      isInPPD: false,
+      combatExperienceStatus: false,
+    });
+    setSearchTerm("");
+  };
+
+  const isAnyFilterActive = () => {
+    return searchTerm !== "";
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Filters Section */}
+          <div className="space-y-4">
+            <FilterSection
+              filters={filters}
+              setFilters={setFilters}
+              people={people}
+              handleResetFilters={handleResetFilters}
+            />
+          </div>
+
           {/* Search and Table Section */}
-          <div className="lg:col-span-2">
-            <div className="mb-6 flex gap-4">
-              <Input
-                type="text"
-                placeholder="Пошук..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-12 text-lg border-2 border-border focus:border-primary"
-              />
-              <Button
-                onClick={handleAddPerson}
-                className="h-12 px-6 text-lg hover:bg-green-300"
-                size="lg"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                Додати
-              </Button>
-            </div>
-
-            <Card className="p-6 bg-card border-border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead
-                      className="cursor-pointer w-[80px]"
-                      onClick={() => handleSort("shpoNumber")}
-                    >
-                      <div className="flex items-center gap-2">
-                        №ШПО
-                        <ArrowUpDown
-                          className={`h-4 w-4 ${
-                            sortConfig.field === "shpoNumber" &&
-                            sortConfig.order === "desc"
-                              ? "transform rotate-180"
-                              : ""
-                          }`}
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer"
-                      onClick={() => handleSort("fullName")}
-                    >
-                      <div className="flex items-center gap-2 w-[200px]">
-                        ПІБ
-                        <ArrowUpDown
-                          className={`h-4 w-4 ${
-                            sortConfig.field === "fullName" &&
-                            sortConfig.order === "desc"
-                              ? "transform rotate-180"
-                              : ""
-                          }`}
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead>Стать</TableHead>
-                    <TableHead
-                      className="cursor-pointer"
-                      onClick={() => handleSort("birthDate")}
-                    >
-                      <div className="flex items-center gap-2">
-                        Дата народження
-                        <ArrowUpDown
-                          className={`h-4 w-4 ${
-                            sortConfig.field === "birthDate" &&
-                            sortConfig.order === "desc"
-                              ? "transform rotate-180"
-                              : ""
-                          }`}
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead>Вік</TableHead>
-                    <TableHead>Номер телефону</TableHead>
-                    <TableHead
-                      className="cursor-pointer"
-                      onClick={() => handleSort("militaryRank")}
-                    >
-                      <div className="flex items-center gap-2">
-                        Військове звання
-                        <ArrowUpDown
-                          className={`h-4 w-4 ${
-                            sortConfig.field === "militaryRank" &&
-                            sortConfig.order === "desc"
-                              ? "transform rotate-180"
-                              : ""
-                          }`}
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer"
-                      onClick={() => handleSort("position")}
-                    >
-                      <div className="flex items-center gap-2">
-                        Посада
-                        <ArrowUpDown
-                          className={`h-4 w-4 ${
-                            sortConfig.field === "position" &&
-                            sortConfig.order === "desc"
-                              ? "transform rotate-180"
-                              : ""
-                          }`}
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[100px]">Дії</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPeople.map((person, index) => (
-                    <TableRow
-                      key={person.fullName}
-                      className="cursor-pointer hover:bg-accent"
-                      onClick={() => handlePersonClick(person)}
-                    >
-                      <TableCell>{person.shpoNumber}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          {person.fullName}
-                        </div>
-                      </TableCell>
-                      <TableCell className="flex items-center justify-center">
-                        {person.gender || "Ч"}
-                      </TableCell>
-                      <TableCell>{person.birthDate}</TableCell>
-                      <TableCell>{calculateAge(person.birthDate)}</TableCell>
-                      <TableCell>{person.phoneNumber}</TableCell>
-                      <TableCell>{person.militaryRank}</TableCell>
-                      <TableCell>{person.position}</TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(person.fullName);
-                          }}
-                        >
-                          Видалити
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          </div>
-
-          {/* Right Panel */}
-          <div className="space-y-6">
-            <Card className="p-6 bg-card">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Dark Mode</span>
-                <Switch
-                  checked={theme === "dark"}
-                  onCheckedChange={(checked) =>
-                    setTheme(checked ? "dark" : "light")
-                  }
-                  className="border-1px"
-                />
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-card">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Filter className="h-4 w-4" />
-                  <h3 className="font-medium">Фільтри</h3>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Дата народження</Label>
-                  <Input
-                    type="date"
-                    value={filters.birthDate}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        birthDate: e.target.value,
-                      }))
-                    }
-                    className="w-full"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>ВОС</Label>
-                  <Input
-                    type="text"
-                    value={filters.militaryRank}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        militaryRank: e.target.value,
-                      }))
-                    }
-                    placeholder="Введіть ВОС"
-                    className="w-full"
-                  />
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() =>
-                    setFilters({
-                      birthDate: "",
-                      militaryRank: "",
-                    })
-                  }
-                >
-                  Скинути фільтри
-                </Button>
-              </div>
-            </Card>
-          </div>
+          <SearchAndTableSection
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            sortConfig={sortConfig}
+            setSortConfig={setSortConfig}
+            filteredPeople={filteredPeople}
+            handleSort={handleSort}
+            handleDelete={handleDelete}
+          />
         </div>
       </div>
     </div>
