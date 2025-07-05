@@ -7,6 +7,28 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Plus, User, ArrowUpDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Person, addPerson } from "@/lib/data";
+
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('uk-UA', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+const calculateAge = (birthDate: string): number => {
+  if (!birthDate) return 0;
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
 import {
   Table,
   TableBody,
@@ -221,6 +243,7 @@ export const SearchAndTableSection = ({
                   )}
                 </div>
               </TableHead>
+              <TableHead>Вік</TableHead>
               <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort("militaryRank")}
@@ -366,7 +389,16 @@ export const SearchAndTableSection = ({
                     {person.fullName}
                   </div>
                 </TableCell>
-                <TableCell>{person.birthDate}</TableCell>
+                <TableCell>
+                  <span>{formatDate(person.birthDate)}</span>
+                </TableCell>
+                <TableCell>
+                  {person.birthDate && (
+                    <span className={calculateAge(person.birthDate) >= 55 ? "text-red-500 font-medium" : ""}>
+                      {calculateAge(person.birthDate)} р.
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>{person.militaryRank}</TableCell>
                 <TableCell>{person.position}</TableCell>
                 <TableCell>{person.gender}</TableCell>

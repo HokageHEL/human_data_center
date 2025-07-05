@@ -152,24 +152,26 @@ const EditPerson = () => {
           />
         )}
         {field.type === "date" && (
-          <Input
-            type="date"
-            value={formData[field.field as keyof typeof formData] as string}
-            onChange={(e) => handleInputChange(field.field, e.target.value)}
-            readOnly={field.readonly}
-          />
+          <div className="flex gap-2 items-center">
+            <Input
+              type="date"
+              value={formData[field.field as keyof typeof formData] as string}
+              onChange={(e) => handleInputChange(field.field, e.target.value)}
+              readOnly={field.readonly}
+            />
+            {formData[field.field as keyof typeof formData] && (
+              <span className="text-sm text-muted-foreground">
+                {formatDate(formData[field.field as keyof typeof formData] as string)}
+              </span>
+            )}
+          </div>
         )}
         {field.type === "number" && (
           <Input
             type="number"
-            min={field.field === "tariffCategory" ? 1 : undefined}
-            max={field.field === "tariffCategory" ? 60 : undefined}
             value={formData[field.field as keyof typeof formData] as number}
             onChange={(e) => {
-              let value = parseInt(e.target.value) || 0;
-              if (field.field === "tariffCategory") {
-                value = Math.max(1, Math.min(60, value));
-              }
+              const value = parseInt(e.target.value) || 0;
               handleInputChange(field.field, value);
               field.onChange?.(value);
             }}
@@ -588,76 +590,41 @@ const EditPerson = () => {
     },
   ];
 
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('uk-UA', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  // Функція для розрахунку віку на основі дати народження
+  const calculateAge = (birthDate: string): number => {
+    if (!birthDate) return 0;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
   // Функція для розрахунку окладу на основі тарифного розряду
   const calculateSalary = (tariffCategory: number): number => {
-    const tariffToSalary: Record<number, number> = {
-      60: 10150,
-      59: 10010,
-      58: 9870,
-      57: 9730,
-      56: 9590,
-      55: 9440,
-      54: 9300,
-      53: 9160,
-      52: 9020,
-      51: 8880,
-      50: 8740,
-      49: 8600,
-      48: 8460,
-      47: 8320,
-      46: 8180,
-      45: 8030,
-      44: 7890,
-      43: 7750,
-      42: 7610,
-      41: 7470,
-      40: 7330,
-      39: 7190,
-      38: 7050,
-      37: 6910,
-      36: 6770,
-      35: 6630,
-      34: 6480,
-      33: 6340,
-      32: 6200,
-      31: 6060,
-      30: 5920,
-      29: 5780,
-      28: 5640,
-      27: 5500,
-      26: 5360,
-      25: 5220,
-      24: 5070,
-      23: 4930,
-      22: 4790,
-      21: 4650,
-      20: 4510,
-      19: 4370,
-      18: 4230,
-      17: 4090,
-      16: 3950,
-      15: 3810,
-      14: 3660,
-      13: 3520,
-      12: 3440,
-      11: 3350,
-      10: 3260,
-      9: 3170,
-      8: 3080,
-      7: 3000,
-      6: 2910,
-      5: 2820,
-      4: 2730,
-      3: 2640,
-      2: 2550,
-      1: 2470,
-    };
-    return tariffToSalary[tariffCategory] || 0;
+    // Тут можна додати логіку розрахунку окладу
+    return tariffCategory * 1000; // Приклад формули
   };
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-4">
+      <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
             <Button variant="outline" onClick={handleNavigateBack}>
@@ -721,7 +688,107 @@ const EditPerson = () => {
             <Button onClick={handleSave}>Зберегти</Button>
           </div>
         </div>
-
+        <Card className="p-6 w-full">
+          <div className="text-xl font-semibold mb-4">Основна інформація</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>Прізвище, ім'я, по-батькові</Label>
+              <Input
+                value={formData.fullName}
+                onChange={(e) => handleInputChange("fullName", e.target.value)}
+                placeholder="Введіть ПІБ"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>№ ШПО</Label>
+              <Input
+                value={formData.shpoNumber}
+                onChange={(e) =>
+                  handleInputChange("shpoNumber", e.target.value)
+                }
+                placeholder="Введіть номер ШПО"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Стать</Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => handleInputChange("gender", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Оберіть стать" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ч">Чоловіча</SelectItem>
+                  <SelectItem value="Ж">Жіноча</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Дата народження</Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  type="date"
+                  value={formData.birthDate}
+                  onChange={(e) =>
+                    handleInputChange("birthDate", e.target.value)
+                  }
+                  className={
+                    calculateAge(formData.birthDate) >= 55
+                      ? "border-red-500"
+                      : ""
+                  }
+                />
+                <span
+                  className={`w-64 ${
+                    calculateAge(formData.birthDate) >= 55 ? "text-red-500" : ""
+                  }
+                  `}
+                >
+                  {calculateAge(formData.birthDate)} років
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Номер телефону</Label>
+              <Input
+                value={formData.phoneNumber}
+                onChange={(e) =>
+                  handleInputChange("phoneNumber", e.target.value)
+                }
+                placeholder="Введіть номер телефону"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Військове звання</Label>
+              <Select
+                value={formData.militaryRank}
+                onValueChange={(value) =>
+                  handleInputChange("militaryRank", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Оберіть звання" />
+                </SelectTrigger>
+                <SelectContent>
+                  {militaryRanks.map(({ rank, color }) => (
+                    <SelectItem key={rank} value={rank} className={color}>
+                      {rank}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Посада</Label>
+              <Input
+                value={formData.position}
+                onChange={(e) => handleInputChange("position", e.target.value)}
+                placeholder="Введіть посаду"
+              />
+            </div>
+          </div>
+        </Card>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="p-4">
             <h2 className="text-lg font-semibold mb-4">Загальні дані</h2>
