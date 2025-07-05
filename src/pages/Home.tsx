@@ -10,6 +10,14 @@ import { Plus, User, Filter, ArrowUpDown } from "lucide-react";
 import { getActivePeople, deletePerson, Person } from "@/lib/data";
 import { Label } from "@/components/ui/label";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -17,8 +25,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type SortField = "fullName" | "birthDate" | "militaryRank";
+type SortField = "fullName" | "birthDate" | "militaryRank" | "position";
 type SortOrder = "asc" | "desc";
+
+const calculateAge = (birthDate: string): number => {
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,9 +120,9 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Search and List Section */}
+          {/* Search and Table Section */}
           <div className="lg:col-span-2">
             <div className="mb-6 flex gap-4">
               <Input
@@ -115,7 +134,7 @@ const Home = () => {
               />
               <Button
                 onClick={handleAddPerson}
-                className="h-12 px-6 text-lg  hover:bg-green-300"
+                className="h-12 px-6 text-lg hover:bg-green-300"
                 size="lg"
               >
                 <Plus className="mr-2 h-5 w-5" />
@@ -124,77 +143,99 @@ const Home = () => {
             </div>
 
             <Card className="p-6 bg-card border-border">
-              <div className="flex items-center gap-4 mb-4">
-                Сортувати за:
-                <Select
-                  value={sortConfig.field}
-                  onValueChange={(value: SortField) => handleSort(value)}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Сортувати за" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fullName">Ім'я</SelectItem>
-                    <SelectItem value="birthDate">Дата народження</SelectItem>
-                    <SelectItem value="militaryRank">ВОС</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleSort(sortConfig.field)}
-                >
-                  <ArrowUpDown
-                    className={`h-4 w-4 ${
-                      sortConfig.order === "desc" ? "transform rotate-180" : ""
-                    }`}
-                  />
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                {filteredPeople.map((person, index) => (
-                  <div
-                    key={person.fullName}
-                    onClick={() => handlePersonClick(person)}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex gap-4 items-center">
-                        <span className="text-foreground font-medium mr-3">
-                          {index + 1}.
-                        </span>
-
-                        <Avatar className="h-10 w-10">
-                          {person.photo ? (
-                            <AvatarImage
-                              src={person.photo}
-                              alt={person.fullName}
-                            />
-                          ) : (
-                            <AvatarFallback>
-                              <User className="h-6 w-6" />
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-
-                        <span className="text-foreground">
-                          {person.fullName}
-                        </span>
-                      </div>
-                    </div>
-                    <Button
-                      className="h-12 px-6 text-sm hover:bg-red-400"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(person.fullName);
-                      }}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px]">№ШПО</TableHead>
+                    <TableHead 
+                      className="cursor-pointer"
+                      onClick={() => handleSort("fullName")}
                     >
-                      Видалити
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                      <div className="flex items-center gap-2">
+                        ПІБ
+                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "fullName" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                      </div>
+                    </TableHead>
+                    <TableHead>Стать</TableHead>
+                    <TableHead 
+                      className="cursor-pointer"
+                      onClick={() => handleSort("birthDate")}
+                    >
+                      <div className="flex items-center gap-2">
+                        Дата народження
+                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "birthDate" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                      </div>
+                    </TableHead>
+                    <TableHead>Вік</TableHead>
+                    <TableHead>Номер телефону</TableHead>
+                    <TableHead 
+                      className="cursor-pointer"
+                      onClick={() => handleSort("militaryRank")}
+                    >
+                      <div className="flex items-center gap-2">
+                        Військове звання
+                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "militaryRank" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer"
+                      onClick={() => handleSort("position")}
+                    >
+                      <div className="flex items-center gap-2">
+                        Посада
+                        <ArrowUpDown className={`h-4 w-4 ${sortConfig.field === "position" && sortConfig.order === "desc" ? "transform rotate-180" : ""}`} />
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[100px]">Дії</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPeople.map((person, index) => (
+                    <TableRow
+                      key={person.fullName}
+                      className="cursor-pointer hover:bg-accent"
+                      onClick={() => handlePersonClick(person)}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            {person.photo ? (
+                              <AvatarImage
+                                src={person.photo}
+                                alt={person.fullName}
+                              />
+                            ) : (
+                              <AvatarFallback>
+                                <User className="h-4 w-4" />
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          {person.fullName}
+                        </div>
+                      </TableCell>
+                      <TableCell>{person.gender || "Ч"}</TableCell>
+                      <TableCell>{person.birthDate}</TableCell>
+                      <TableCell>{calculateAge(person.birthDate)}</TableCell>
+                      <TableCell>{person.phoneNumber}</TableCell>
+                      <TableCell>{person.militaryRank}</TableCell>
+                      <TableCell>{person.position}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(person.fullName);
+                          }}
+                        >
+                          Видалити
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </Card>
           </div>
 

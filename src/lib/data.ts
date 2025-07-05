@@ -13,6 +13,7 @@ export interface Person {
   position: string;
   militaryRank: string;
   rank: string;
+  gender: "Ч" | "Ж";
   additionalInfo1: string;
   additionalInfo2: string;
   photo: string;
