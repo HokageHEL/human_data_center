@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useTheme } from "next-themes";
 import {
   Select,
   SelectContent,
@@ -34,6 +35,7 @@ export function PhotoUpload({
   onStatusChange,
 }: PhotoUploadProps) {
   const [previewUrl, setPreviewUrl] = useState(currentPhoto);
+  const { theme } = useTheme();
 
   // Update preview when currentPhoto changes
   useEffect(() => {
@@ -88,10 +90,11 @@ export function PhotoUpload({
             onError={() => setPreviewUrl("")}
           />
         ) : (
-          <div className="text-muted-foreground flex flex-col items-center">
-            <Camera className="w-12 h-12 mb-2" />
-            <span>Додати фото</span>
-          </div>
+          <img
+            src={theme === "dark" ? "/photo-placeholder-dark.jpeg" : "/photo-placeholder-light.png"}
+            alt="Додати фото"
+            className="w-full h-full object-cover"
+          />
         )}
       </div>
 
