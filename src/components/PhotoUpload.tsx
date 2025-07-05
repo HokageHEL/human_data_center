@@ -112,6 +112,17 @@ export function PhotoUpload({
             <Upload className="w-4 h-4 mr-2" />
             Завантажити фото
           </Button>
+          {previewUrl && (
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setPreviewUrl("");
+                onPhotoChange("");
+              }}
+            >
+              Видалити
+            </Button>
+          )}
         </div>
       </div>
       <div className="space-y-4 mt-2">
