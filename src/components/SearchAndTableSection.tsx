@@ -205,14 +205,6 @@ export const SearchAndTableSection = ({
           <Plus className="mr-2 h-5 w-5" />
           Додати
         </Button>
-        <Button
-          onClick={resetColumnOrder}
-          className="h-12 px-6 text-lg hover:bg-yellow-300"
-          variant="outline"
-          size="lg"
-        >
-          Скинути порядок колонок
-        </Button>
       </div>
 
       <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
