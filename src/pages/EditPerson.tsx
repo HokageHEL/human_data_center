@@ -98,6 +98,7 @@ const EditPerson = () => {
     // Військові дані
     position: "",
     militaryRank: "",
+    lastRankDate: "",
     positionRank: "",
     fitnessStatus: "придатний" as "придатний" | "обмежено придатний",
     medicalCommissionNumber: "",
@@ -174,10 +175,12 @@ const EditPerson = () => {
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            value={formData[field.field as keyof typeof formData] as number || ''}
+            value={
+              (formData[field.field as keyof typeof formData] as number) || ""
+            }
             onChange={(e) => {
-              const numericValue = e.target.value.replace(/[^0-9]/g, '');
-              const value = numericValue === '' ? 0 : parseInt(numericValue);
+              const numericValue = e.target.value.replace(/[^0-9]/g, "");
+              const value = numericValue === "" ? 0 : parseInt(numericValue);
               handleInputChange(field.field, value);
               field.onChange?.(value);
             }}
@@ -470,6 +473,11 @@ const EditPerson = () => {
             label: rank,
             className: color,
           })),
+        },
+        {
+          label: "Дата присвоєння останнього звання",
+          field: "lastRankDate",
+          type: "date",
         },
         {
           label: "Військове звання (за посадою)",
@@ -811,7 +819,7 @@ const EditPerson = () => {
                   }
                   `}
                 >
-                  {calculateAge(formData.birthDate)} років
+                  Вік: {calculateAge(formData.birthDate)}
                 </span>
               </div>
             </div>
@@ -873,9 +881,7 @@ const EditPerson = () => {
                   handleInputChange("absenceStatus", status)
                 }
                 status={formData.status || formData.absenceStatus}
-                onStatusChange={(status) =>
-                  handleInputChange("status", status)
-                }
+                onStatusChange={(status) => handleInputChange("status", status)}
               />
               {formFields[0].fields.map((field) => renderField(field))}
             </div>

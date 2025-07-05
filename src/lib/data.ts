@@ -28,6 +28,7 @@ export interface Person {
   // Військові дані
   position: string;
   militaryRank: string;
+  lastRankDate?: string;
   positionRank: string;
   fitnessStatus: "придатний" | "обмежено придатний";
   medicalCommissionNumber?: string;
@@ -55,7 +56,7 @@ export interface Person {
 
 const DB_NAME = 'militaryDB';
 const STORE_NAME = 'people';
-const DB_VERSION = 10; // Increment version to trigger store recreation and fix potential data corruption
+const DB_VERSION = 11; // Increment version to trigger store recreation and fix potential data corruption
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
