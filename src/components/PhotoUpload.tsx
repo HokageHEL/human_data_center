@@ -4,12 +4,21 @@ import { Input } from "@/components/ui/input";
 import { Camera, Upload } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PhotoUploadProps {
   currentPhoto: string;
   onPhotoChange: (photo: string) => void;
   isInPPD: boolean;
   onIsInPPDChange: (isInPPD: boolean) => void;
+  absenceStatus: string;
+  onAbsenceStatusChange: (status: string) => void;
 }
 
 export function PhotoUpload({
@@ -17,6 +26,8 @@ export function PhotoUpload({
   onPhotoChange,
   isInPPD,
   onIsInPPDChange,
+  absenceStatus,
+  onAbsenceStatusChange,
 }: PhotoUploadProps) {
   const [previewUrl, setPreviewUrl] = useState(currentPhoto);
 
@@ -25,6 +36,17 @@ export function PhotoUpload({
     setPreviewUrl(currentPhoto);
   }, [currentPhoto]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const absenceStatusOptions = [
+    { value: "не_вказано", label: "Не вказано" },
+    { value: "відпустка", label: "Відпустка" },
+    { value: "короткострокове лікування", label: "Короткострокове лікування" },
+    { value: "довгострокове лікування", label: "Довгострокове лікування" },
+    { value: "відрядження", label: "Відрядження" },
+    { value: "декрет", label: "Декрет" },
+    { value: "РВБД", label: "РВБД" },
+    { value: "навчання", label: "Навчання" },
+  ];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -88,13 +110,33 @@ export function PhotoUpload({
           </Button>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="isInPPD"
-          checked={isInPPD}
-          onCheckedChange={onIsInPPDChange}
-        />
-        <Label htmlFor="isInPPD">Знаходиться в ППД</Label>
+      <div className="space-y-4 mt-2">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="isInPPD"
+            checked={isInPPD}
+            onCheckedChange={onIsInPPDChange}
+          />
+          <Label htmlFor="isInPPD">В ППД</Label>
+        </div>
+
+        {!isInPPD && (
+          <div className="space-y-2">
+            <Label htmlFor="absenceStatus">Причина відсутності</Label>
+            <Select value={absenceStatus} onValueChange={onAbsenceStatusChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Оберіть статус відсутності" />
+              </SelectTrigger>
+              <SelectContent>
+                {absenceStatusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
     </div>
   );

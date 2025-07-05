@@ -1,3 +1,11 @@
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  data: string;
+  uploadDate: string;
+}
+
 export interface Person {
   // Загальні дані
   fullName: string;
@@ -12,6 +20,7 @@ export interface Person {
   birthDate: string;
   phoneNumber: string;
   photo: string;
+  documents: Document[];
 
   // Військові дані
   position: string;
@@ -43,7 +52,7 @@ export interface Person {
 
 const DB_NAME = 'militaryDB';
 const STORE_NAME = 'people';
-const DB_VERSION = 8; // Increment version to trigger store recreation and fix potential data corruption
+const DB_VERSION = 9; // Increment version to trigger store recreation and fix potential data corruption
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

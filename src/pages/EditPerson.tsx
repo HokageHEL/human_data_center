@@ -7,9 +7,34 @@ import { generatePersonDocument } from "@/lib/docx-generator";
 import { Packer } from "docx";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import * as Select from "@radix-ui/react-select";
-import { ChevronDown as ChevronDownIcon, Check } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { DocumentUpload } from '@/components/DocumentUpload';
+import { useToast } from "@/hooks/use-toast";
+import { PhotoUpload } from "@/components/PhotoUpload";
+import { addPerson, getPerson, Document } from "@/lib/data";
+
+interface FieldOption {
+  value: string;
+  label: string;
+  className?: string;
+}
+
+interface FieldConfig {
+  label: string;
+  field: string;
+  type: "text" | "textarea" | "date" | "number" | "select" | "switch";
+  options?: FieldOption[];
+  show?: boolean;
+  readonly?: boolean;
+  onChange?: (value: any) => void;
+}
+
+interface FormSection {
+  section: string;
+  fields: FieldConfig[];
+}
 
 const SelectField = ({
   value,
@@ -22,53 +47,23 @@ const SelectField = ({
   options: FieldOption[];
   placeholder?: string;
 }) => (
-  <Select.Root value={value} onValueChange={onChange}>
-    <Select.Trigger className="w-full inline-flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-10">
-      <Select.Value placeholder={placeholder} />
-      <Select.Icon>
-        <ChevronDownIcon />
-      </Select.Icon>
-    </Select.Trigger>
-    <Select.Portal>
-      <Select.Content className="relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2">
-        <Select.Viewport className="p-1">
-          {options.map((option) => (
-            <Select.Item
-              key={option.value}
-              value={option.value}
-              className={`relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${option.className || ""}`}
-            >
-              <Select.ItemText>{option.label}</Select.ItemText>
-              <Select.ItemIndicator className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-                <Check className="h-4 w-4" />
-              </Select.ItemIndicator>
-            </Select.Item>
-          ))}
-        </Select.Viewport>
-      </Select.Content>
-    </Select.Portal>
-  </Select.Root>
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="w-full">
+      <SelectValue placeholder={placeholder} />
+    </SelectTrigger>
+    <SelectContent>
+      {options.map((option) => (
+        <SelectItem
+          key={option.value}
+          value={option.value}
+          className={option.className}
+        >
+          {option.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 );
-
-const ChevronDownIcon = () => (
-  <svg
-    width="12"
-    height="8"
-    viewBox="0 0 12 8"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M1 1L6 6L11 1"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-import { useToast } from "@/hooks/use-toast";
-import { PhotoUpload } from "@/components/PhotoUpload";
-import { addPerson, getPerson } from "@/lib/data";
 
 const EditPerson = () => {
   const { name } = useParams();
@@ -91,15 +86,17 @@ const EditPerson = () => {
     birthDate: "",
     phoneNumber: "",
     photo: "",
+    documents: [] as Document[],
 
     // Військові дані
     position: "",
     militaryRank: "",
     positionRank: "",
     fitnessStatus: "придатний" as "придатний" | "обмежено придатний",
-    medicalCommissionInfo: "",
+    medicalCommissionNumber: "",
+    medicalCommissionDate: "",
     unit: "",
-    department: "",
+    department: "не_вибрано",
     militarySpecialty: "",
     tariffCategory: 0,
     salary: 0,
@@ -115,21 +112,89 @@ const EditPerson = () => {
     combatExperienceNumber: "",
     combatPeriods: "",
     isInPPD: false,
+    absenceStatus: "не_вказано" as "не_вказано" | "відпустка" | "короткострокове лікування" | "довгострокове лікування" | "відрядження" | "декрет" | "РВБД" | "навчання",
   });
+
+  const renderField = (field: FieldConfig) => {
+    if (field.show === false) return null;
+
+    return (
+      <div key={field.field} className="space-y-2">
+        <Label>{field.label}</Label>
+        {field.type === "text" && (
+          <Input
+            value={formData[field.field as keyof typeof formData] as string}
+            onChange={(e) => handleInputChange(field.field, e.target.value)}
+            placeholder={`Введіть ${field.label.toLowerCase()}`}
+            readOnly={field.readonly}
+          />
+        )}
+        {field.type === "textarea" && (
+          <Textarea
+            value={formData[field.field as keyof typeof formData] as string}
+            onChange={(e) => handleInputChange(field.field, e.target.value)}
+            placeholder={`Введіть ${field.label.toLowerCase()}`}
+            readOnly={field.readonly}
+          />
+        )}
+        {field.type === "date" && (
+          <Input
+            type="date"
+            value={formData[field.field as keyof typeof formData] as string}
+            onChange={(e) => handleInputChange(field.field, e.target.value)}
+            readOnly={field.readonly}
+          />
+        )}
+        {field.type === "number" && (
+          <Input
+            type="number"
+            value={formData[field.field as keyof typeof formData] as number}
+            onChange={(e) => {
+              const value = parseInt(e.target.value) || 0;
+              handleInputChange(field.field, value);
+              field.onChange?.(value);
+            }}
+            readOnly={field.readonly}
+          />
+        )}
+        {field.type === "select" && field.options && (
+          <SelectField
+            value={formData[field.field as keyof typeof formData] as string}
+            onChange={(value) => {
+              handleInputChange(field.field, value);
+              field.onChange?.(value);
+            }}
+            options={field.options}
+            placeholder={`Оберіть ${field.label.toLowerCase()}`}
+          />
+        )}
+        {field.type === "switch" && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id={field.field}
+              checked={formData[field.field as keyof typeof formData] as boolean}
+              onCheckedChange={(checked) => handleInputChange(field.field, checked)}
+            />
+            <Label htmlFor={field.field}>Наявний</Label>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Load existing data on component mount
   useEffect(() => {
     const loadPerson = async () => {
       if (!isNewPerson && name) {
-        console.log('Route parameter name:', name);
         try {
-          const person = await getPerson(name); // No need to decode here, getPerson handles it
-          console.log('Loaded person data:', person);
+          const person = await getPerson(name);
           if (person) {
-            setFormData(person);
+            setFormData({
+              ...person,
+              documents: person.documents || [],
+            });
             setHasUnsavedChanges(false);
           } else {
-            console.log('Person not found in database');
             toast({
               title: "Помилка",
               description: "Особу не знайдено",
@@ -150,6 +215,30 @@ const EditPerson = () => {
     };
     loadPerson();
   }, [name, isNewPerson, navigate, toast]);
+
+  const handleDocumentAdd = (document: Document) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: [...prev.documents, document]
+    }));
+    setHasUnsavedChanges(true);
+    toast({
+      title: "Документ додано",
+      description: `Документ "${document.name}" успішно додано`,
+    });
+  };
+
+  const handleDocumentRemove = (documentId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: prev.documents.filter(doc => doc.id !== documentId)
+    }));
+    setHasUnsavedChanges(true);
+    toast({
+      title: "Документ видалено",
+      description: "Документ успішно видалено",
+    });
+  };
 
   useBeforeUnload(
     useCallback(
@@ -173,32 +262,20 @@ const EditPerson = () => {
     }
   };
 
-  interface FieldOption {
-    value: string;
-    label: string;
-    className?: string;
-  }
-
-  interface FieldConfig {
-    label: string;
-    field: string;
-    type: "text" | "textarea" | "date" | "number" | "select" | "switch";
-    options?: FieldOption[];
-    show?: boolean;
-    readonly?: boolean;
-    onChange?: (value: any) => void;
-  }
-
-  interface FormSection {
-    section: string;
-    fields: FieldConfig[];
-  }
-
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [field]: value,
+      };
+
+      // Скидаємо статус відсутності, якщо особа в ППД
+      if (field === 'isInPPD' && value === true) {
+        newData.absenceStatus = 'не_вказано';
+      }
+
+      return newData;
+    });
     setHasUnsavedChanges(true);
   };
 
@@ -244,6 +321,8 @@ const EditPerson = () => {
       });
     }
   };
+
+
 
   // Список військових звань з кольорами
   const militaryRanks = [
@@ -319,6 +398,7 @@ const EditPerson = () => {
       section: "Військові дані",
       fields: [
         { label: "Посада", field: "position", type: "text" },
+
         {
           label: "Військове звання",
           field: "militaryRank",
@@ -369,7 +449,7 @@ const EditPerson = () => {
             label: unit,
           })),
           onChange: (value) => {
-            handleInputChange("department", ""); // Скидаємо відділ при зміні підрозділу
+            handleInputChange("department", "не_вибрано"); // Скидаємо відділ при зміні підрозділу
           },
         },
         {
@@ -517,91 +597,39 @@ const EditPerson = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Photo Section */}
-          <Card className="p-4 bg-secondary h-fit">
-            <PhotoUpload
-              currentPhoto={formData.photo}
-              onPhotoChange={(photo) => handleInputChange("photo", photo)}
-              isInPPD={formData.isInPPD}
-              onIsInPPDChange={(isInPPD) => handleInputChange("isInPPD", isInPPD)}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Загальні дані</h2>
+            <div className="space-y-4">
+              <PhotoUpload
+                currentPhoto={formData.photo}
+                onPhotoChange={(photoData) => handleInputChange("photo", photoData)}
+                isInPPD={formData.isInPPD}
+                onIsInPPDChange={(isInPPD) => handleInputChange("isInPPD", isInPPD)}
+                absenceStatus={formData.absenceStatus}
+                onAbsenceStatusChange={(status) => handleInputChange("absenceStatus", status)}
+              />
+              {formFields[0].fields.map((field) =>
+                renderField(field)
+              )}
+            </div>
           </Card>
 
-          {/* Form Section */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {formFields.map(({ section, fields }) => (
-                <Card key={section} className="p-6 space-y-4">
-                  <h2 className="text-2xl font-bold">{section}</h2>
-                  {fields
-                    .filter((field) => field.show !== false)
-                    .map((field) => (
-                      <div key={field.field} className="space-y-2">
-                        <Label>{field.label}</Label>
-                        {field.type === "text" && (
-                          <Input
-                            value={formData[field.field as keyof typeof formData] as string}
-                            onChange={(e) => handleInputChange(field.field, e.target.value)}
-                            placeholder={`Введіть ${field.label.toLowerCase()}`}
-                            readOnly={field.readonly}
-                          />
-                        )}
-                        {field.type === "textarea" && (
-                          <Textarea
-                            value={formData[field.field as keyof typeof formData] as string}
-                            onChange={(e) => handleInputChange(field.field, e.target.value)}
-                            placeholder={`Введіть ${field.label.toLowerCase()}`}
-                            readOnly={field.readonly}
-                          />
-                        )}
-                        {field.type === "date" && (
-                          <Input
-                            type="date"
-                            value={formData[field.field as keyof typeof formData] as string}
-                            onChange={(e) => handleInputChange(field.field, e.target.value)}
-                            readOnly={field.readonly}
-                          />
-                        )}
-                        {field.type === "number" && (
-                          <Input
-                            type="number"
-                            value={formData[field.field as keyof typeof formData] as number}
-                            onChange={(e) => {
-                              const value = parseInt(e.target.value) || 0;
-                              handleInputChange(field.field, value);
-                              field.onChange?.(value);
-                            }}
-                            readOnly={field.readonly}
-                          />
-                        )}
-                        {field.type === "select" && field.options && (
-                          <SelectField
-                            value={formData[field.field as keyof typeof formData] as string}
-                            onChange={(value) => {
-                              handleInputChange(field.field, value);
-                              field.onChange?.(value);
-                            }}
-                            options={field.options}
-                            placeholder={`Оберіть ${field.label.toLowerCase()}`}
-                          />
-                        )}
-                        {field.type === "switch" && (
-                          <div className="flex items-center space-x-2">
-                            <Switch
-                              id={field.field}
-                              checked={formData[field.field as keyof typeof formData] as boolean}
-                              onCheckedChange={(checked) => handleInputChange(field.field, checked)}
-                            />
-                            <Label htmlFor={field.field}>Наявний</Label>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                </Card>
-              ))}
+          <Card className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Військові дані</h2>
+            <div className="space-y-4">
+              {formFields[1].fields.map((field) => renderField(field))}
             </div>
-          </div>
+          </Card>
+
+          <Card className="p-4 md:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Документи</h2>
+            <DocumentUpload
+              onDocumentAdd={handleDocumentAdd}
+              onDocumentRemove={handleDocumentRemove}
+              documents={formData.documents}
+            />
+          </Card>
         </div>
       </div>
     </div>

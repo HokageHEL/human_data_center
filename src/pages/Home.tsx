@@ -208,6 +208,7 @@ const Home = () => {
             filteredPeople={filteredPeople}
             handleSort={handleSort}
             handleDelete={handleDelete}
+            setPeople={setPeople}
           />
         </div>
       </div>

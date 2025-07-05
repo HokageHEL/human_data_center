@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Plus, User, ArrowUpDown } from "lucide-react";
-import { Person } from "@/lib/data";
+import { Switch } from "@/components/ui/switch";
+import { Person, addPerson } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -40,6 +41,7 @@ interface SearchAndTableSectionProps {
   filteredPeople: Person[];
   handleSort: (field: SortField) => void;
   handleDelete: (personName: string) => void;
+  setPeople: Dispatch<SetStateAction<Person[]>>;
 }
 
 export const SearchAndTableSection = ({
@@ -50,6 +52,7 @@ export const SearchAndTableSection = ({
   filteredPeople,
   handleSort,
   handleDelete,
+  setPeople,
 }: SearchAndTableSectionProps) => {
   const navigate = useNavigate();
 
@@ -347,6 +350,7 @@ export const SearchAndTableSection = ({
                   )}
                 </div>
               </TableHead>
+              <TableHead>ППД</TableHead>
               <TableHead className="w-[100px]">Дії</TableHead>
             </TableRow>
           </TableHeader>
@@ -367,6 +371,21 @@ export const SearchAndTableSection = ({
                 <TableCell>{person.militaryRank}</TableCell>
                 <TableCell>{person.position}</TableCell>
                 <TableCell>{person.gender}</TableCell>
+                <TableCell>
+                  <Switch
+                    checked={person.isInPPD}
+                    onCheckedChange={async (checked) => {
+                      const updatedPerson = { ...person, isInPPD: checked };
+                      await addPerson(updatedPerson);
+                      setPeople(prevPeople =>
+                        prevPeople.map(p =>
+                          p.fullName === person.fullName ? updatedPerson : p
+                        )
+                      );
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </TableCell>
                 <TableCell>
                   <Button
                     variant="ghost"
