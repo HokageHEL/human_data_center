@@ -15,7 +15,8 @@ import { Person } from "@/lib/data";
 interface FilterSectionProps {
   filters: {
     birthDate: string;
-    militaryRank: string;
+    militaryRank: string[];
+    positionRank: string[];
     unit: string;
     gender: string;
     fitnessStatus: string;
@@ -25,7 +26,8 @@ interface FilterSectionProps {
   setFilters: Dispatch<
     SetStateAction<{
       birthDate: string;
-      militaryRank: string;
+      militaryRank: string[];
+      positionRank: string[];
       unit: string;
       gender: string;
       fitnessStatus: string;
@@ -46,7 +48,8 @@ export const FilterSection = ({
   const isAnyFilterActive = () => {
     return (
       filters.birthDate !== "" ||
-      filters.militaryRank !== "" ||
+      filters.militaryRank.length > 0 ||
+      filters.positionRank.length > 0 ||
       filters.unit !== "all" ||
       filters.gender !== "all" ||
       filters.fitnessStatus !== "all" ||
@@ -148,6 +151,57 @@ export const FilterSection = ({
               </SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Військове звання</Label>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="officers"
+                checked={filters.militaryRank.includes("Офіцери")}
+                onCheckedChange={(checked) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    militaryRank: checked
+                      ? [...prev.militaryRank, "Офіцери"]
+                      : prev.militaryRank.filter((rank) => rank !== "Офіцери"),
+                  }))
+                }
+              />
+              <Label htmlFor="officers">Офіцери</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="sergeants"
+                checked={filters.militaryRank.includes("Сержанти")}
+                onCheckedChange={(checked) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    militaryRank: checked
+                      ? [...prev.militaryRank, "Сержанти"]
+                      : prev.militaryRank.filter((rank) => rank !== "Сержанти"),
+                  }))
+                }
+              />
+              <Label htmlFor="sergeants">Сержанти</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="soldiers"
+                checked={filters.militaryRank.includes("Солдати")}
+                onCheckedChange={(checked) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    militaryRank: checked
+                      ? [...prev.militaryRank, "Солдати"]
+                      : prev.militaryRank.filter((rank) => rank !== "Солдати"),
+                  }))
+                }
+              />
+              <Label htmlFor="soldiers">Солдати</Label>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center space-x-2">
