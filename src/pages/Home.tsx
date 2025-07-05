@@ -5,13 +5,44 @@ import { getActivePeople, deletePerson, Person } from "@/lib/data";
 import { FilterSection } from "@/components/FilterSection";
 import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 
+const calculateCompletionPercentage = (person: Person): number => {
+  const requiredFields = [
+    'fullName', 'passportNumber', 'taxId', 'registrationPlace', 'address',
+    'familyStatus', 'relatives', 'education', 'gender', 'birthDate',
+    'phoneNumber', 'photo', 'position', 'militaryRank', 'positionRank',
+    'fitnessStatus', 'unit', 'department', 'militarySpecialty',
+    'tariffCategory', 'salary', 'serviceType', 'serviceStartDate',
+    'servicePeriods', 'unitStartDate', 'previousServicePlaces',
+    'militaryDocumentNumber', 'shpoNumber'
+  ];
+
+  const optionalFields = [
+    'medicalCommissionNumber', 'medicalCommissionDate', 'contractEndDate',
+    'combatExperienceNumber', 'combatPeriods', 'additionalInfo'
+  ];
+
+  let filledRequiredFields = requiredFields.filter(field => 
+    person[field as keyof Person] && 
+    person[field as keyof Person].toString().trim() !== ''
+  ).length;
+
+  // Documents count as a field if there are any
+  if (person.documents && person.documents.length > 0) {
+    filledRequiredFields++;
+  }
+
+  const totalFields = requiredFields.length + 1; // +1 for documents
+  return Math.round((filledRequiredFields / totalFields) * 100);
+};
+
 type SortField =
   | "fullName"
   | "birthDate"
   | "militaryRank"
   | "position"
   | "shpoNumber"
-  | "gender";
+  | "gender"
+  | "completionPercentage";
 type SortOrder = "asc" | "desc" | null;
 
 const calculateAge = (birthDate: string): number => {
@@ -60,6 +91,10 @@ const Home = () => {
   }, []);
 
   const filteredPeople = people
+    .map(person => ({
+      ...person,
+      completionPercentage: calculateCompletionPercentage(person)
+    }))
     .filter((person) => {
       const matchesSearch = person.fullName
         .toLowerCase()
@@ -136,6 +171,11 @@ const Home = () => {
         const aIndex = militaryRanks.indexOf(a[field]);
         const bIndex = militaryRanks.indexOf(b[field]);
         return (aIndex - bIndex) * order;
+      }
+
+      // Special handling for completionPercentage field
+      if (field === "completionPercentage") {
+        return (a.completionPercentage - b.completionPercentage) * order;
       }
 
       if (a[field] < b[field]) return -1 * order;
