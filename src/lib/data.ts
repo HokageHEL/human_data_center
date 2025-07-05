@@ -43,39 +43,38 @@ export interface Person {
 
 const DB_NAME = 'militaryDB';
 const STORE_NAME = 'people';
-const DB_VERSION = 7; // Increment version to trigger store recreation
+const DB_VERSION = 8; // Increment version to trigger store recreation and fix potential data corruption
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
+    console.log('Opening database:', DB_NAME, 'version:', DB_VERSION);
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      console.error('Error opening database:', request.error);
+      console.error('Database error:', request.error);
       reject(request.error);
     };
 
     request.onsuccess = () => {
-      const db = request.result;
-      db.onerror = (event) => {
-        console.error('Database error:', (event.target as IDBDatabase).onerror);
-      };
-      resolve(db);
+      console.log('Database opened successfully');
+      resolve(request.result);
     };
 
     request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      
-      // Delete the old object store if it exists
-      if (db.objectStoreNames.contains(STORE_NAME)) {
-        db.deleteObjectStore(STORE_NAME);
+      console.log('Database upgrade needed. Old version:', event.oldVersion, 'New version:', DB_VERSION);
+      const db = request.result;
+
+      if (event.oldVersion < DB_VERSION) {
+        console.log('Deleting old object store if exists');
+        if (db.objectStoreNames.contains(STORE_NAME)) {
+          db.deleteObjectStore(STORE_NAME);
+        }
+        console.log('Creating new object store:', STORE_NAME);
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'fullName' });
+        store.createIndex('fullName', 'fullName', { unique: true });
+        store.createIndex('deleted', 'deleted', { unique: false });
+        console.log('Object store created successfully');
       }
-      
-      // Create a new object store
-      const store = db.createObjectStore(STORE_NAME, { keyPath: 'fullName', autoIncrement: false });
-      
-      // Create indexes for better querying
-      store.createIndex('fullName_idx', 'fullName', { unique: true });
-      store.createIndex('deleted_idx', 'deleted', { unique: false });
     };
   });
 }
@@ -100,6 +99,7 @@ async function readPeopleData(): Promise<{ people: Person[] }> {
 
 // Write person data
 async function writePerson(person: Person): Promise<void> {
+  console.log('Writing person to database:', person.fullName);
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_NAME, 'readwrite');
@@ -112,15 +112,20 @@ async function writePerson(person: Person): Promise<void> {
       photo: person.photo || ''
     };
     
+    console.log('Person data to store:', personToStore);
     const request = store.put(personToStore);
 
-    request.onsuccess = () => resolve();
+    request.onsuccess = () => {
+      console.log('Successfully wrote person to database:', person.fullName);
+      resolve();
+    };
     request.onerror = () => {
       console.error('Error in writePerson:', request.error);
       reject(request.error);
     };
 
     transaction.oncomplete = () => {
+      console.log('Transaction completed for:', person.fullName);
       db.close();
     };
   });
@@ -130,25 +135,36 @@ async function writePerson(person: Person): Promise<void> {
 export async function addPerson(person: Person, oldName?: string): Promise<void> {
   let db: IDBDatabase | null = null;
   try {
+    console.log('Adding/updating person. New name:', person.fullName);
+    console.log('Old name (if changing):', oldName);
+    
+    // Ensure names are properly decoded for database operations
+    const decodedNewName = decodeURIComponent(person.fullName);
+    const decodedOldName = oldName ? decodeURIComponent(oldName) : undefined;
+    
+    console.log('Decoded new name:', decodedNewName);
+    console.log('Decoded old name:', decodedOldName);
+    
+    const personToStore = {
+      ...person,
+      fullName: decodedNewName, // Use decoded name for storage
+      deleted: person.deleted || false,
+      photo: person.photo || ''
+    };
+    
     db = await openDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(STORE_NAME, 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
 
-      // Ensure we're storing a clean copy of the person object
-      const personToStore = {
-        ...person,
-        deleted: person.deleted || false,
-        photo: person.photo || ''
-      };
-
-      // Handle name change
-      if (oldName && oldName !== person.fullName) {
-        const deleteRequest = store.delete(oldName);
+      if (decodedOldName && decodedOldName !== decodedNewName) {
+        console.log('Handling name change from', decodedOldName, 'to', decodedNewName);
+        const deleteRequest = store.delete(decodedOldName);
         deleteRequest.onsuccess = () => {
+          console.log('Successfully deleted old record:', decodedOldName);
           const addRequest = store.put(personToStore);
           addRequest.onsuccess = () => {
-            // Both delete and add operations completed successfully
+            console.log('Successfully added new record:', decodedNewName);
             resolve();
           };
           addRequest.onerror = () => {
@@ -161,9 +177,10 @@ export async function addPerson(person: Person, oldName?: string): Promise<void>
           reject(deleteRequest.error);
         };
       } else {
-        // If no name change, just add/update the record
+        console.log('Adding/updating record without name change:', decodedNewName);
         const addRequest = store.put(personToStore);
         addRequest.onsuccess = () => {
+          console.log('Successfully added/updated record:', decodedNewName);
           resolve();
         };
         addRequest.onerror = () => {
@@ -193,14 +210,18 @@ export async function addPerson(person: Person, oldName?: string): Promise<void>
 export async function getPerson(fullName: string): Promise<Person | null> {
   let db: IDBDatabase | null = null;
   try {
+    console.log('Getting person with fullName:', fullName);
+    console.log('URL-decoded fullName:', decodeURIComponent(fullName));
+    const decodedName = decodeURIComponent(fullName);
     db = await openDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(STORE_NAME, 'readonly');
       const store = transaction.objectStore(STORE_NAME);
-      const request = store.get(fullName);
+      const request = store.get(decodedName);
 
       request.onsuccess = () => {
         const person = request.result;
+        console.log('getPerson result for', decodedName, ':', person);
         resolve(person && !person.deleted ? person : null);
       };
       request.onerror = () => {
@@ -215,7 +236,7 @@ export async function getPerson(fullName: string): Promise<Person | null> {
   } catch (error) {
     console.error('Error getting person:', error);
     if (db) db.close();
-    return null;
+    throw error;
   }
 }
 
@@ -230,9 +251,14 @@ export async function getActivePeople(): Promise<Person[]> {
       const request = store.getAll();
 
       request.onsuccess = () => {
-        const people = request.result || [];
-        resolve(people.filter(person => !person.deleted));
+        const allPeople = request.result;
+        console.log('Total records found:', allPeople.length);
+        const activePeople = allPeople.filter(person => !person.deleted);
+        console.log('Active (non-deleted) records:', activePeople.length);
+        console.log('Active people names:', activePeople.map(p => p.fullName));
+        resolve(activePeople);
       };
+
       request.onerror = () => {
         console.error('Error in getActivePeople:', request.error);
         reject(request.error);
@@ -245,7 +271,7 @@ export async function getActivePeople(): Promise<Person[]> {
   } catch (error) {
     console.error('Error getting active people:', error);
     if (db) db.close();
-    return [];
+    throw error;
   }
 }
 

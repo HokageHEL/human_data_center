@@ -84,10 +84,9 @@ const Home = () => {
         filters.fitnessStatus === "all" ||
         person.fitnessStatus === filters.fitnessStatus;
       const matchesIsInPPD =
-        !filters.isInPPD || person.isInPPD === filters.isInPPD;
+        !filters.isInPPD || (filters.isInPPD && person.isInPPD);
       const matchesCombatExperience =
-        !filters.combatExperienceStatus ||
-        person.combatExperienceStatus === filters.combatExperienceStatus;
+        !filters.combatExperienceStatus || (filters.combatExperienceStatus && person.combatExperienceStatus);
 
       return (
         matchesSearch &&

@@ -5,15 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDown as ChevronDownIcon, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 const SelectField = ({
   value,
   onChange,
   options,
   placeholder = "Оберіть...",
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: FieldOption[];
+  placeholder?: string;
 }) => (
   <Select.Root value={value} onValueChange={onChange}>
     <Select.Trigger className="w-full inline-flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-10">
@@ -29,9 +34,7 @@ const SelectField = ({
             <Select.Item
               key={option.value}
               value={option.value}
-              className={`relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${
-                option.className || ""
-              }`}
+              className={`relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${option.className || ""}`}
             >
               <Select.ItemText>{option.label}</Select.ItemText>
               <Select.ItemIndicator className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -74,7 +77,7 @@ const EditPerson = () => {
 
   const [formData, setFormData] = useState({
     // Загальні дані
-    fullName: isNewPerson ? "" : decodeURIComponent(name || ""),
+    fullName: isNewPerson ? "" : name ? decodeURIComponent(name) : "",
     passportNumber: "",
     taxId: "",
     registrationPlace: "",
@@ -116,15 +119,35 @@ const EditPerson = () => {
   useEffect(() => {
     const loadPerson = async () => {
       if (!isNewPerson && name) {
-        const person = await getPerson(decodeURIComponent(name));
-        if (person) {
-          setFormData(person);
-          setHasUnsavedChanges(false);
+        console.log('Route parameter name:', name);
+        try {
+          const person = await getPerson(name); // No need to decode here, getPerson handles it
+          console.log('Loaded person data:', person);
+          if (person) {
+            setFormData(person);
+            setHasUnsavedChanges(false);
+          } else {
+            console.log('Person not found in database');
+            toast({
+              title: "Помилка",
+              description: "Особу не знайдено",
+              variant: "destructive",
+            });
+            navigate('/');
+          }
+        } catch (error) {
+          console.error('Error loading person:', error);
+          toast({
+            title: "Помилка",
+            description: "Помилка завантаження даних",
+            variant: "destructive",
+          });
+          navigate('/');
         }
       }
     };
     loadPerson();
-  }, [name, isNewPerson]);
+  }, [name, isNewPerson, navigate, toast]);
 
   useBeforeUnload(
     useCallback(
@@ -151,16 +174,22 @@ const EditPerson = () => {
   interface FieldOption {
     value: string;
     label: string;
+    className?: string;
   }
 
   interface FieldConfig {
     label: string;
     field: string;
-    type: "text" | "textarea" | "date" | "number" | "select" | "checkbox";
+    type: "text" | "textarea" | "date" | "number" | "select" | "switch";
     options?: FieldOption[];
     show?: boolean;
     readonly?: boolean;
     onChange?: (value: any) => void;
+  }
+
+  interface FormSection {
+    section: string;
+    fields: FieldConfig[];
   }
 
   const handleInputChange = (field: string, value: any) => {
@@ -203,7 +232,7 @@ const EditPerson = () => {
       // Navigate back after a short delay
       setTimeout(() => {
         navigate("/");
-      }, 1000);
+      }, 300);
     } catch (error) {
       console.error("Error saving person:", error);
       toast({
@@ -260,16 +289,11 @@ const EditPerson = () => {
   };
 
   const formFields = [
-    // Загальні дані
     {
       section: "Загальні дані",
       fields: [
         { label: "П.І.Б.", field: "fullName", type: "text" },
-        {
-          label: "Номер та серія паспорта",
-          field: "passportNumber",
-          type: "text",
-        },
+        { label: "Номер та серія паспорта", field: "passportNumber", type: "text" },
         { label: "ІПН", field: "taxId", type: "text" },
         { label: "Місце реєстрації", field: "registrationPlace", type: "text" },
         { label: "Адреса проживання", field: "address", type: "text" },
@@ -289,8 +313,6 @@ const EditPerson = () => {
         { label: "Номер телефону", field: "phoneNumber", type: "text" },
       ],
     },
-
-    // Військові дані
     {
       section: "Військові дані",
       fields: [
@@ -413,7 +435,7 @@ const EditPerson = () => {
         {
           label: "УБД",
           field: "combatExperienceStatus",
-          type: "checkbox",
+          type: "switch",
         },
         {
           label: "№ УБД",
@@ -438,164 +460,102 @@ const EditPerson = () => {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={handleNavigateBack}
-            className="mb-4"
-          >
-            ← Назад до списку
-          </Button>
-          <h1 className="text-2xl font-bold text-foreground">
-            {isNewPerson
-              ? "Додавання нової особи"
-              : `Редагування особи: ${formData.fullName}`}
-          </h1>
+      <div className="max-w-7xl mx-auto space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <Button variant="outline" onClick={handleNavigateBack}>
+              Назад
+            </Button>
+            <h1 className="text-2xl font-bold">
+              {isNewPerson ? "Додавання нової особи" : `Редагування особи: ${formData.fullName}`}
+            </h1>
+          </div>
+          <Button onClick={handleSave}>Зберегти</Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Photo Section */}
-          <div className="lg:col-span-1">
-            <Card className="p-4 bg-secondary h-fit">
-              <PhotoUpload
-                currentPhoto={formData.photo}
-                onPhotoChange={(photo) => handleInputChange("photo", photo)}
-                isInPPD={formData.isInPPD}
-                onIsInPPDChange={(isInPPD) =>
-                  handleInputChange("isInPPD", isInPPD)
-                }
-              />
-            </Card>
-          </div>
+          <Card className="p-4 bg-secondary h-fit">
+            <PhotoUpload
+              currentPhoto={formData.photo}
+              onPhotoChange={(photo) => handleInputChange("photo", photo)}
+              isInPPD={formData.isInPPD}
+              onIsInPPDChange={(isInPPD) => handleInputChange("isInPPD", isInPPD)}
+            />
+          </Card>
 
-          {/* Form Section - 2 Column Layout */}
-          <div className="lg:col-span-4 space-y-6">
-            {formFields.map((section, sectionIndex) => (
-              <Card key={sectionIndex} className="p-6">
-                <div className="bg-primary text-primary-foreground p-3 rounded-lg mb-6">
-                  <h3 className="font-semibold text-center">
-                    {section.section}
-                  </h3>
-                </div>
-
-                <div className="space-y-4">
-                  {section.fields.map(
-                    (fieldConfig, fieldIndex) =>
-                      fieldConfig.show !== false && (
-                        <div
-                          key={fieldIndex}
-                          className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start"
-                        >
-                          {/* Description Column */}
-                          <div className="flex items-center">
-                            <Label className="bg-accent text-accent-foreground px-4 py-2 rounded text-sm font-medium w-full text-center">
-                              {fieldConfig.label}
-                            </Label>
+          {/* Form Section */}
+          <div className="lg:col-span-3 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {formFields.map(({ section, fields }) => (
+                <Card key={section} className="p-6 space-y-4">
+                  <h2 className="text-2xl font-bold">{section}</h2>
+                  {fields
+                    .filter((field) => field.show !== false)
+                    .map((field) => (
+                      <div key={field.field} className="space-y-2">
+                        <Label>{field.label}</Label>
+                        {field.type === "text" && (
+                          <Input
+                            value={formData[field.field as keyof typeof formData] as string}
+                            onChange={(e) => handleInputChange(field.field, e.target.value)}
+                            placeholder={`Введіть ${field.label.toLowerCase()}`}
+                            readOnly={field.readonly}
+                          />
+                        )}
+                        {field.type === "textarea" && (
+                          <Textarea
+                            value={formData[field.field as keyof typeof formData] as string}
+                            onChange={(e) => handleInputChange(field.field, e.target.value)}
+                            placeholder={`Введіть ${field.label.toLowerCase()}`}
+                            readOnly={field.readonly}
+                          />
+                        )}
+                        {field.type === "date" && (
+                          <Input
+                            type="date"
+                            value={formData[field.field as keyof typeof formData] as string}
+                            onChange={(e) => handleInputChange(field.field, e.target.value)}
+                            readOnly={field.readonly}
+                          />
+                        )}
+                        {field.type === "number" && (
+                          <Input
+                            type="number"
+                            value={formData[field.field as keyof typeof formData] as number}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value) || 0;
+                              handleInputChange(field.field, value);
+                              field.onChange?.(value);
+                            }}
+                            readOnly={field.readonly}
+                          />
+                        )}
+                        {field.type === "select" && field.options && (
+                          <SelectField
+                            value={formData[field.field as keyof typeof formData] as string}
+                            onChange={(value) => {
+                              handleInputChange(field.field, value);
+                              field.onChange?.(value);
+                            }}
+                            options={field.options}
+                            placeholder={`Оберіть ${field.label.toLowerCase()}`}
+                          />
+                        )}
+                        {field.type === "switch" && (
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id={field.field}
+                              checked={formData[field.field as keyof typeof formData] as boolean}
+                              onCheckedChange={(checked) => handleInputChange(field.field, checked)}
+                            />
+                            <Label htmlFor={field.field}>Наявний</Label>
                           </div>
-
-                          {/* Input Column */}
-                          <div>
-                            <>
-                              {fieldConfig.type === "textarea" && (
-                                <Textarea
-                                  value={
-                                    formData[
-                                      fieldConfig.field as keyof typeof formData
-                                    ] as string
-                                  }
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      fieldConfig.field,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full"
-                                  rows={3}
-                                  placeholder={`Введіть ${fieldConfig.label.toLowerCase()}`}
-                                />
-                              )}
-                              {(fieldConfig.type === "text" ||
-                                fieldConfig.type === "date" ||
-                                fieldConfig.type === "number") && (
-                                <Input
-                                  type={fieldConfig.type}
-                                  value={
-                                    formData[
-                                      fieldConfig.field as keyof typeof formData
-                                    ]
-                                  }
-                                  onChange={(e) => {
-                                    const value =
-                                      fieldConfig.type === "number"
-                                        ? Number(e.target.value)
-                                        : e.target.value;
-                                    handleInputChange(fieldConfig.field, value);
-                                    fieldConfig.onChange?.(value);
-                                  }}
-                                  className="w-full"
-                                  placeholder={
-                                    fieldConfig.type === "date"
-                                      ? ""
-                                      : `Введіть ${fieldConfig.label.toLowerCase()}`
-                                  }
-                                  readOnly={fieldConfig.readonly}
-                                />
-                              )}
-                              {fieldConfig.type === "select" && (
-                                <SelectField
-                                  value={
-                                    formData[
-                                      fieldConfig.field as keyof typeof formData
-                                    ] as string
-                                  }
-                                  onChange={(value) => {
-                                    handleInputChange(fieldConfig.field, value);
-                                    fieldConfig.onChange?.(value);
-                                  }}
-                                  options={fieldConfig.options || []}
-                                  placeholder={`Оберіть ${fieldConfig.label.toLowerCase()}`}
-                                />
-                              )}
-                              {fieldConfig.type === "checkbox" && (
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox
-                                    checked={
-                                      formData[
-                                        fieldConfig.field as keyof typeof formData
-                                      ] as boolean
-                                    }
-                                    onCheckedChange={(checked) => {
-                                      handleInputChange(
-                                        fieldConfig.field,
-                                        checked
-                                      );
-                                      fieldConfig.onChange?.(checked);
-                                    }}
-                                  />
-                                  <span>Наявний</span>
-                                </div>
-                              )}
-                            </>
-                          </div>
-                        </div>
-                      )
-                  )}
-                </div>
-              </Card>
-            ))}
-
-            {/* Save Button */}
-            <div className="flex justify-end space-x-4">
-              <Button variant="outline" onClick={() => navigate("/")}>
-                Скасувати
-              </Button>
-              <Button
-                onClick={handleSave}
-                className="bg-primary text-primary-foreground"
-              >
-                Зберегти дані
-              </Button>
+                        )}
+                      </div>
+                    ))}
+                </Card>
+              ))}
             </div>
           </div>
         </div>

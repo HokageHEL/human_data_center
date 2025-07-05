@@ -53,12 +53,16 @@ export const SearchAndTableSection = ({
 }: SearchAndTableSectionProps) => {
   const navigate = useNavigate();
 
-  const handlePersonClick = (person: { fullName: string }) => {
-    navigate(`/edit/${encodeURIComponent(person.fullName)}`);
+  const handlePersonClick = (person: Person) => {
+    console.log('Navigating to edit page for person:', person.fullName);
+    const encodedName = encodeURIComponent(person.fullName);
+    console.log('Encoded name for URL:', encodedName);
+    navigate(`/edit/${encodedName}`);
   };
 
   const handleAddPerson = () => {
-    navigate("/edit/new");
+    console.log('Navigating to add new person page');
+    navigate('/edit/new');
   };
 
   return (
@@ -348,12 +352,13 @@ export const SearchAndTableSection = ({
           </TableHeader>
           <TableBody>
             {filteredPeople.map((person) => (
-              <TableRow key={person.fullName}>
+              <TableRow
+                key={person.fullName}
+                className="cursor-pointer hover:bg-accent"
+                onClick={() => handlePersonClick(person)}
+              >
                 <TableCell>{person.shpoNumber}</TableCell>
-                <TableCell
-                  className="cursor-pointer"
-                  onClick={() => handlePersonClick(person)}
-                >
+                <TableCell>
                   <div className="flex items-center gap-2">
                     {person.fullName}
                   </div>
@@ -366,7 +371,10 @@ export const SearchAndTableSection = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(person.fullName)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(person.fullName);
+                    }}
                   >
                     Видалити
                   </Button>
