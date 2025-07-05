@@ -188,47 +188,48 @@ export const SearchAndTableSection = ({
   const peopleInPPD = filteredPeople.filter((person) => person.isInPPD).length;
 
   return (
-    <div className="lg:col-span-2">
-      <div className="mb-6 flex gap-4">
-        <Input
-          type="text"
-          placeholder="Пошук..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full h-12 text-lg border-2 border-border focus:border-primary"
-        />
-        <Button
-          onClick={handleAddPerson}
-          className="h-12 px-6 text-lg hover:bg-green-300"
-          size="lg"
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          Додати
-        </Button>
-      </div>
-
-      <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
-        <div className="flex gap-4">
-          <span>Всього: {totalPeople}</span>
-          <span>У ППД: {peopleInPPD}</span>
+    <div className="flex justify-center w-full">
+      <div className="lg:col-span-2">
+        <div className="mb-6 flex gap-4">
+          <Input
+            type="text"
+            placeholder="Пошук..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-12 text-lg border-2 border-border focus:border-primary"
+          />
+          <Button
+            onClick={handleAddPerson}
+            className="h-12 px-6 text-lg hover:bg-green-300"
+            size="lg"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Додати
+          </Button>
         </div>
-        <Button
-          onClick={resetColumnOrder}
-          variant="outline"
-          size="sm"
-          className="text-xs"
-        >
-          Скинути порядок
-        </Button>
-      </div>
-      <Card className="p-6 bg-card border-border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column, index) => (
-                <TableHead
-                  key={column.field}
-                  className={`cursor-move ${column.width} relative group
+
+        <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
+          <div className="flex gap-4">
+            <span>Всього: {totalPeople}</span>
+            <span>У ППД: {peopleInPPD}</span>
+          </div>
+          <Button
+            onClick={resetColumnOrder}
+            variant="outline"
+            size="sm"
+            className="text-xs"
+          >
+            Скинути порядок
+          </Button>
+        </div>
+        <Card className="p-6 bg-card border-border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {columns.map((column, index) => (
+                  <TableHead
+                    key={column.field}
+                    className={`cursor-move ${column.width} relative group
                     ${
                       dropIndicator === index ? "border-l-2 border-primary" : ""
                     }
@@ -243,89 +244,90 @@ export const SearchAndTableSection = ({
                         : ""
                     }
                   `}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragEnter={() => handleDragEnter(index)}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={(e) => e.preventDefault()}
-                  onClick={() => handleSort(column.field as SortField)}
-                >
-                  <div className="flex items-center gap-1">
-                    <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {column.label}
-                    {sortConfig.field === column.field &&
-                      (sortConfig.order === "asc" ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="m18 15-6-6-6 6" />
-                        </svg>
-                      ) : sortConfig.order === "desc" ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      ) : (
-                        <ArrowUpDown className="h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-              ))}
-              <TableHead>ППД</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredPeople.map((person) => (
-              <TableRow
-                key={person.fullName}
-                className="cursor-pointer hover:bg-accent"
-                onClick={() => handlePersonClick(person)}
-              >
-                {columns.map((column) => (
-                  <TableCell
-                    className="flex-row items-center justify-center"
-                    key={column.field}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragEnter={() => handleDragEnter(index)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => handleSort(column.field as SortField)}
                   >
-                    {renderCell(person, column.field)}
-                  </TableCell>
+                    <div className="flex items-center gap-1">
+                      <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {column.label}
+                      {sortConfig.field === column.field &&
+                        (sortConfig.order === "asc" ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="m18 15-6-6-6 6" />
+                          </svg>
+                        ) : sortConfig.order === "desc" ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4" />
+                        ))}
+                    </div>
+                  </TableHead>
                 ))}
-                <TableCell>
-                  <Switch
-                    checked={person.isInPPD}
-                    onCheckedChange={async (checked) => {
-                      const updatedPerson = { ...person, isInPPD: checked };
-                      await addPerson(updatedPerson);
-                      setPeople((prevPeople) =>
-                        prevPeople.map((p) =>
-                          p.fullName === person.fullName ? updatedPerson : p
-                        )
-                      );
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </TableCell>
+                <TableHead>ППД</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+            </TableHeader>
+            <TableBody>
+              {filteredPeople.map((person) => (
+                <TableRow
+                  key={person.fullName}
+                  className="cursor-pointer hover:bg-accent"
+                  onClick={() => handlePersonClick(person)}
+                >
+                  {columns.map((column) => (
+                    <TableCell
+                      className="flex-row items-center justify-center"
+                      key={column.field}
+                    >
+                      {renderCell(person, column.field)}
+                    </TableCell>
+                  ))}
+                  <TableCell>
+                    <Switch
+                      checked={person.isInPPD}
+                      onCheckedChange={async (checked) => {
+                        const updatedPerson = { ...person, isInPPD: checked };
+                        await addPerson(updatedPerson);
+                        setPeople((prevPeople) =>
+                          prevPeople.map((p) =>
+                            p.fullName === person.fullName ? updatedPerson : p
+                          )
+                        );
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      </div>
     </div>
   );
 };

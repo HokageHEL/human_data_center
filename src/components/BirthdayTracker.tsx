@@ -39,7 +39,9 @@ const BirthdayTracker: React.FC<Props> = ({ people, daysRange = 10 }) => {
 
   return (
     <div className="mt-4 border p-4 rounded-xl shadow bg-white">
-      <h2 className="text-lg font-bold mb-2">Наближаються дні народження</h2>
+      <h2 className="text-lg font-bold mb-2 whitespace-nowrap">
+        Наближаються дні народження
+      </h2>
       <ul className="space-y-1">
         {upcomingBirthdays.map((b, idx) => (
           <li key={idx} className="text-sm">

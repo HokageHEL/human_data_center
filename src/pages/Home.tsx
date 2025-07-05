@@ -253,31 +253,33 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">
-      <div className="max-w-8xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Filters Section */}
-          <div className="space-y-4">
-            <FilterSection
-              filters={filters}
-              setFilters={setFilters}
-              people={people}
-              handleResetFilters={handleResetFilters}
-            />
-            <BirthdayTracker people={filteredPeople} />
-          </div>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6 flex justify-center">
+      <div className="w-full max-w-8xl">
+        <div className="flex justify-center">
+          <div className="w-full max-w-7xl grid grid-cols-[auto,1fr,1fr] gap-6">
+            {/* Filters Section */}
+            <div className="space-y-4">
+              <FilterSection
+                filters={filters}
+                setFilters={setFilters}
+                people={people}
+                handleResetFilters={handleResetFilters}
+              />
+              <BirthdayTracker people={filteredPeople} />
+            </div>
 
-          {/* Search and Table Section */}
-          <SearchAndTableSection
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            sortConfig={sortConfig}
-            setSortConfig={setSortConfig}
-            filteredPeople={filteredPeople}
-            handleSort={handleSort}
-            handleDelete={handleDelete}
-            setPeople={setPeople}
-          />
+            {/* Search and Table Section */}
+            <SearchAndTableSection
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              sortConfig={sortConfig}
+              setSortConfig={setSortConfig}
+              filteredPeople={filteredPeople}
+              handleSort={handleSort}
+              handleDelete={handleDelete}
+              setPeople={setPeople}
+            />
+          </div>
         </div>
       </div>
     </div>
