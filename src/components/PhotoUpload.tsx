@@ -79,7 +79,7 @@ export function PhotoUpload({
 
   return (
     <div className="space-y-4">
-      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden max-w-[300px]">
         {previewUrl ? (
           <img
             src={previewUrl}
@@ -95,7 +95,7 @@ export function PhotoUpload({
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 max-w-[300px]">
         <div className="flex gap-2">
           <Input
             type="file"
