@@ -161,13 +161,6 @@ const EditPerson = () => {
               onChange={(e) => handleInputChange(field.field, e.target.value)}
               readOnly={field.readonly}
             />
-            {formData[field.field as keyof typeof formData] && (
-              <span className="text-sm text-muted-foreground">
-                {formatDate(
-                  formData[field.field as keyof typeof formData] as string
-                )}
-              </span>
-            )}
           </div>
         )}
         {field.type === "number" && (
