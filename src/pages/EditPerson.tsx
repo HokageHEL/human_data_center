@@ -7,10 +7,16 @@ import { generatePersonDocument } from "@/lib/docx-generator";
 import { Packer } from "docx";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { DocumentUpload } from '@/components/DocumentUpload';
+import { DocumentUpload } from "@/components/DocumentUpload";
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
@@ -112,7 +118,15 @@ const EditPerson = () => {
     combatExperienceNumber: "",
     combatPeriods: "",
     isInPPD: false,
-    absenceStatus: "не_вказано" as "не_вказано" | "відпустка" | "короткострокове лікування" | "довгострокове лікування" | "відрядження" | "декрет" | "РВБД" | "навчання",
+    absenceStatus: "не_вказано" as
+      | "не_вказано"
+      | "відпустка"
+      | "короткострокове лікування"
+      | "довгострокове лікування"
+      | "відрядження"
+      | "декрет"
+      | "РВБД"
+      | "навчання",
   });
 
   const renderField = (field: FieldConfig) => {
@@ -148,9 +162,14 @@ const EditPerson = () => {
         {field.type === "number" && (
           <Input
             type="number"
+            min={field.field === "tariffCategory" ? 1 : undefined}
+            max={field.field === "tariffCategory" ? 60 : undefined}
             value={formData[field.field as keyof typeof formData] as number}
             onChange={(e) => {
-              const value = parseInt(e.target.value) || 0;
+              let value = parseInt(e.target.value) || 0;
+              if (field.field === "tariffCategory") {
+                value = Math.max(1, Math.min(60, value));
+              }
               handleInputChange(field.field, value);
               field.onChange?.(value);
             }}
@@ -172,8 +191,12 @@ const EditPerson = () => {
           <div className="flex items-center space-x-2">
             <Switch
               id={field.field}
-              checked={formData[field.field as keyof typeof formData] as boolean}
-              onCheckedChange={(checked) => handleInputChange(field.field, checked)}
+              checked={
+                formData[field.field as keyof typeof formData] as boolean
+              }
+              onCheckedChange={(checked) =>
+                handleInputChange(field.field, checked)
+              }
             />
             <Label htmlFor={field.field}>Наявний</Label>
           </div>
@@ -200,16 +223,16 @@ const EditPerson = () => {
               description: "Особу не знайдено",
               variant: "destructive",
             });
-            navigate('/');
+            navigate("/");
           }
         } catch (error) {
-          console.error('Error loading person:', error);
+          console.error("Error loading person:", error);
           toast({
             title: "Помилка",
             description: "Помилка завантаження даних",
             variant: "destructive",
           });
-          navigate('/');
+          navigate("/");
         }
       }
     };
@@ -217,9 +240,9 @@ const EditPerson = () => {
   }, [name, isNewPerson, navigate, toast]);
 
   const handleDocumentAdd = (document: Document) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      documents: [...prev.documents, document]
+      documents: [...prev.documents, document],
     }));
     setHasUnsavedChanges(true);
     toast({
@@ -229,9 +252,9 @@ const EditPerson = () => {
   };
 
   const handleDocumentRemove = (documentId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      documents: prev.documents.filter(doc => doc.id !== documentId)
+      documents: prev.documents.filter((doc) => doc.id !== documentId),
     }));
     setHasUnsavedChanges(true);
     toast({
@@ -245,7 +268,8 @@ const EditPerson = () => {
       (event) => {
         if (hasUnsavedChanges) {
           event.preventDefault();
-          return (event.returnValue = "Ви маєте незбережені зміни. Ви впевнені, що хочете залишити сторінку?");
+          return (event.returnValue =
+            "Ви маєте незбережені зміни. Ви впевнені, що хочете залишити сторінку?");
         }
       },
       [hasUnsavedChanges]
@@ -254,7 +278,11 @@ const EditPerson = () => {
 
   const handleNavigateBack = () => {
     if (hasUnsavedChanges) {
-      if (window.confirm("Ви маєте незбережені зміни. Ви впевнені, що хочете залишити сторінку?")) {
+      if (
+        window.confirm(
+          "Ви маєте незбережені зміни. Ви впевнені, що хочете залишити сторінку?"
+        )
+      ) {
         navigate("/");
       }
     } else {
@@ -263,7 +291,11 @@ const EditPerson = () => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Ви впевнені, що хочете видалити цю особу? Дані будуть збережені в архіві протягом тижня.")) {
+    if (
+      window.confirm(
+        "Ви впевнені, що хочете видалити цю особу? Дані будуть збережені в архіві протягом тижня."
+      )
+    ) {
       try {
         await deletePerson(formData.fullName);
         toast({
@@ -290,8 +322,8 @@ const EditPerson = () => {
       };
 
       // Скидаємо статус відсутності, якщо особа в ППД
-      if (field === 'isInPPD' && value === true) {
-        newData.absenceStatus = 'не_вказано';
+      if (field === "isInPPD" && value === true) {
+        newData.absenceStatus = "не_вказано";
       }
 
       return newData;
@@ -341,8 +373,6 @@ const EditPerson = () => {
       });
     }
   };
-
-
 
   // Список військових звань з кольорами
   const militaryRanks = [
@@ -394,7 +424,11 @@ const EditPerson = () => {
       section: "Загальні дані",
       fields: [
         { label: "П.І.Б.", field: "fullName", type: "text" },
-        { label: "Номер та серія паспорта", field: "passportNumber", type: "text" },
+        {
+          label: "Номер та серія паспорта",
+          field: "passportNumber",
+          type: "text",
+        },
         { label: "ІПН", field: "taxId", type: "text" },
         { label: "Місце реєстрації", field: "registrationPlace", type: "text" },
         { label: "Адреса проживання", field: "address", type: "text" },
@@ -556,8 +590,69 @@ const EditPerson = () => {
 
   // Функція для розрахунку окладу на основі тарифного розряду
   const calculateSalary = (tariffCategory: number): number => {
-    // Тут можна додати логіку розрахунку окладу
-    return tariffCategory * 1000; // Приклад формули
+    const tariffToSalary: Record<number, number> = {
+      60: 10150,
+      59: 10010,
+      58: 9870,
+      57: 9730,
+      56: 9590,
+      55: 9440,
+      54: 9300,
+      53: 9160,
+      52: 9020,
+      51: 8880,
+      50: 8740,
+      49: 8600,
+      48: 8460,
+      47: 8320,
+      46: 8180,
+      45: 8030,
+      44: 7890,
+      43: 7750,
+      42: 7610,
+      41: 7470,
+      40: 7330,
+      39: 7190,
+      38: 7050,
+      37: 6910,
+      36: 6770,
+      35: 6630,
+      34: 6480,
+      33: 6340,
+      32: 6200,
+      31: 6060,
+      30: 5920,
+      29: 5780,
+      28: 5640,
+      27: 5500,
+      26: 5360,
+      25: 5220,
+      24: 5070,
+      23: 4930,
+      22: 4790,
+      21: 4650,
+      20: 4510,
+      19: 4370,
+      18: 4230,
+      17: 4090,
+      16: 3950,
+      15: 3810,
+      14: 3660,
+      13: 3520,
+      12: 3440,
+      11: 3350,
+      10: 3260,
+      9: 3170,
+      8: 3080,
+      7: 3000,
+      6: 2910,
+      5: 2820,
+      4: 2730,
+      3: 2640,
+      2: 2550,
+      1: 2470,
+    };
+    return tariffToSalary[tariffCategory] || 0;
   };
 
   return (
@@ -569,7 +664,9 @@ const EditPerson = () => {
               Назад
             </Button>
             <h1 className="text-2xl font-bold">
-              {isNewPerson ? "Додавання нової особи" : `Редагування особи: ${formData.fullName}`}
+              {isNewPerson
+                ? "Додавання нової особи"
+                : `Редагування особи: ${formData.fullName}`}
             </h1>
           </div>
           <div className="space-x-2">
@@ -592,20 +689,20 @@ const EditPerson = () => {
                   const doc = generatePersonDocument(formData);
                   const blob = await Packer.toBlob(doc);
                   const url = window.URL.createObjectURL(blob);
-                  const link = document.createElement('a');
+                  const link = document.createElement("a");
                   link.href = url;
                   link.download = `${formData.fullName}_картка.docx`;
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
                   window.URL.revokeObjectURL(url);
-                  
+
                   toast({
                     title: "Успішно",
                     description: "Документ Word успішно створено",
                   });
                 } catch (error) {
-                  console.error('Error generating Word document:', error);
+                  console.error("Error generating Word document:", error);
                   toast({
                     title: "Помилка",
                     description: "Не вдалося створити документ Word",
@@ -617,10 +714,7 @@ const EditPerson = () => {
               Експорт в Word
             </Button>
             {!isNewPerson && (
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-              >
+              <Button variant="destructive" onClick={handleDelete}>
                 Видалити
               </Button>
             )}
@@ -634,15 +728,19 @@ const EditPerson = () => {
             <div className="space-y-4">
               <PhotoUpload
                 currentPhoto={formData.photo}
-                onPhotoChange={(photoData) => handleInputChange("photo", photoData)}
+                onPhotoChange={(photoData) =>
+                  handleInputChange("photo", photoData)
+                }
                 isInPPD={formData.isInPPD}
-                onIsInPPDChange={(isInPPD) => handleInputChange("isInPPD", isInPPD)}
+                onIsInPPDChange={(isInPPD) =>
+                  handleInputChange("isInPPD", isInPPD)
+                }
                 absenceStatus={formData.absenceStatus}
-                onAbsenceStatusChange={(status) => handleInputChange("absenceStatus", status)}
+                onAbsenceStatusChange={(status) =>
+                  handleInputChange("absenceStatus", status)
+                }
               />
-              {formFields[0].fields.map((field) =>
-                renderField(field)
-              )}
+              {formFields[0].fields.map((field) => renderField(field))}
             </div>
           </Card>
 
