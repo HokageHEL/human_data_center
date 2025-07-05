@@ -162,7 +162,9 @@ const EditPerson = () => {
             />
             {formData[field.field as keyof typeof formData] && (
               <span className="text-sm text-muted-foreground">
-                {formatDate(formData[field.field as keyof typeof formData] as string)}
+                {formatDate(
+                  formData[field.field as keyof typeof formData] as string
+                )}
               </span>
             )}
           </div>
@@ -424,12 +426,6 @@ const EditPerson = () => {
 
   const formFields = [
     {
-      section: "Додаткова інформація",
-      fields: [
-        { label: "Додаткова інформація", field: "additionalInfo", type: "textarea" }
-      ]
-    },
-    {
       section: "Загальні дані",
       fields: [
         { label: "П.І.Б.", field: "fullName", type: "text" },
@@ -598,12 +594,12 @@ const EditPerson = () => {
   ];
 
   const formatDate = (dateString: string): string => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('uk-UA', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return date.toLocaleDateString("uk-UA", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -830,7 +826,9 @@ const EditPerson = () => {
             <div className="space-y-4">
               <Textarea
                 value={formData.additionalInfo}
-                onChange={(e) => handleInputChange("additionalInfo", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("additionalInfo", e.target.value)
+                }
                 placeholder="Введіть додаткову інформацію"
                 className="min-h-[150px]"
               />
