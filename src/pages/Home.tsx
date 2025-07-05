@@ -5,6 +5,7 @@ import { getActivePeople, deletePerson, Person } from "@/lib/data";
 import { FilterSection } from "@/components/FilterSection";
 import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 import BirthdayTracker from "@/components/BirthdayTracker";
+import ContractTracker from "@/components/ContractTracker";
 
 const calculateCompletionPercentage = (person: Person): number => {
   const requiredFields = [
@@ -266,6 +267,7 @@ const Home = () => {
                 handleResetFilters={handleResetFilters}
               />
               <BirthdayTracker people={filteredPeople} />
+              <ContractTracker people={filteredPeople} />
             </div>
 
             {/* Search and Table Section */}

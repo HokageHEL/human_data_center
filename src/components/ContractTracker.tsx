@@ -7,16 +7,16 @@ interface Props {
   daysRange?: number;
 }
 
-const BirthdayTracker: React.FC<Props> = ({ people, daysRange = 10 }) => {
+const ContractTracker: React.FC<Props> = ({ people, daysRange = 10 }) => {
   return (
     <Tracker
       people={people}
       daysRange={daysRange}
-      title="Наближаються дні народження"
-      dateField="birthDate"
-      dateLabel="через"
+      title="Наближається кінець контракту"
+      dateField="contractEndDate"
+      dateLabel="залишилось"
     />
   );
 };
 
-export default BirthdayTracker;
+export default ContractTracker;
