@@ -3,6 +3,8 @@ import { useParams, useNavigate, useBeforeUnload } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { generatePersonDocument } from "@/lib/docx-generator";
+import { Packer } from "docx";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import * as Select from "@radix-ui/react-select";
@@ -470,7 +472,49 @@ const EditPerson = () => {
               {isNewPerson ? "Додавання нової особи" : `Редагування особи: ${formData.fullName}`}
             </h1>
           </div>
-          <Button onClick={handleSave}>Зберегти</Button>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (!formData.fullName.trim()) {
+                  toast({
+                    title: "Помилка",
+                    description: "Будь ласка, введіть П.І.Б.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+
+                try {
+                  const doc = generatePersonDocument(formData);
+                  const blob = await Packer.toBlob(doc);
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = `${formData.fullName}_картка.docx`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                  
+                  toast({
+                    title: "Успішно",
+                    description: "Документ Word успішно створено",
+                  });
+                } catch (error) {
+                  console.error('Error generating Word document:', error);
+                  toast({
+                    title: "Помилка",
+                    description: "Не вдалося створити документ Word",
+                    variant: "destructive",
+                  });
+                }
+              }}
+            >
+              Експорт в Word
+            </Button>
+            <Button onClick={handleSave}>Зберегти</Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
