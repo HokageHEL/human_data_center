@@ -41,6 +41,7 @@ import {
 type SortField =
   | "fullName"
   | "birthDate"
+  | "age"
   | "militaryRank"
   | "position"
   | "shpoNumber"
@@ -87,6 +88,7 @@ export const SearchAndTableSection = ({
     { field: "shpoNumber", label: "№ШПО", width: "w-[80px]" },
     { field: "fullName", label: "ПІБ", width: "w-[200px]" },
     { field: "birthDate", label: "Дата народження", width: "w-[150px]" },
+    { field: "age", label: "Вік", width: "w-[80px]" },
     { field: "militaryRank", label: "Військове звання", width: "w-[150px]" },
     { field: "position", label: "Посада", width: "w-[150px]" },
     { field: "gender", label: "Стать", width: "w-[100px]" },
@@ -169,6 +171,8 @@ export const SearchAndTableSection = ({
         return <div className="flex items-center gap-2">{person.fullName}</div>;
       case "birthDate":
         return <span>{formatDate(person.birthDate)}</span>;
+      case "age":
+        return <span>{calculateAge(person.birthDate)}</span>;
       case "militaryRank":
         return person.militaryRank;
       case "position":
@@ -286,7 +290,10 @@ export const SearchAndTableSection = ({
                 onClick={() => handlePersonClick(person)}
               >
                 {columns.map((column) => (
-                  <TableCell key={column.field}>
+                  <TableCell
+                    className="flex-row items-center justify-center"
+                    key={column.field}
+                  >
                     {renderCell(person, column.field)}
                   </TableCell>
                 ))}
