@@ -7,23 +7,49 @@ import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 
 const calculateCompletionPercentage = (person: Person): number => {
   const requiredFields = [
-    'fullName', 'passportNumber', 'taxId', 'registrationPlace', 'address',
-    'familyStatus', 'relatives', 'education', 'gender', 'birthDate',
-    'phoneNumber', 'photo', 'position', 'militaryRank', 'positionRank',
-    'fitnessStatus', 'unit', 'department', 'militarySpecialty',
-    'tariffCategory', 'salary', 'serviceType', 'serviceStartDate',
-    'servicePeriods', 'unitStartDate', 'previousServicePlaces',
-    'militaryDocumentNumber', 'shpoNumber'
+    "fullName",
+    "passportNumber",
+    "taxId",
+    "registrationPlace",
+    "address",
+    "familyStatus",
+    "relatives",
+    "education",
+    "gender",
+    "birthDate",
+    "phoneNumber",
+    "photo",
+    "position",
+    "militaryRank",
+    "positionRank",
+    "fitnessStatus",
+    "unit",
+    "department",
+    "militarySpecialty",
+    "tariffCategory",
+    "salary",
+    "serviceType",
+    "serviceStartDate",
+    "servicePeriods",
+    "unitStartDate",
+    "previousServicePlaces",
+    "militaryDocumentNumber",
+    "shpoNumber",
   ];
 
   const optionalFields = [
-    'medicalCommissionNumber', 'medicalCommissionDate', 'contractEndDate',
-    'combatExperienceNumber', 'combatPeriods', 'additionalInfo'
+    "medicalCommissionNumber",
+    "medicalCommissionDate",
+    "contractEndDate",
+    "combatExperienceNumber",
+    "combatPeriods",
+    "additionalInfo",
   ];
 
-  let filledRequiredFields = requiredFields.filter(field => 
-    person[field as keyof Person] && 
-    person[field as keyof Person].toString().trim() !== ''
+  let filledRequiredFields = requiredFields.filter(
+    (field) =>
+      person[field as keyof Person] &&
+      person[field as keyof Person].toString().trim() !== ""
   ).length;
 
   // Documents count as a field if there are any
@@ -91,9 +117,9 @@ const Home = () => {
   }, []);
 
   const filteredPeople = people
-    .map(person => ({
+    .map((person) => ({
       ...person,
-      completionPercentage: calculateCompletionPercentage(person)
+      completionPercentage: calculateCompletionPercentage(person),
     }))
     .filter((person) => {
       const matchesSearch = person.fullName
@@ -121,7 +147,8 @@ const Home = () => {
       const matchesIsInPPD =
         !filters.isInPPD || (filters.isInPPD && person.isInPPD);
       const matchesCombatExperience =
-        !filters.combatExperienceStatus || (filters.combatExperienceStatus && person.combatExperienceStatus);
+        !filters.combatExperienceStatus ||
+        (filters.combatExperienceStatus && person.combatExperienceStatus);
 
       return (
         matchesSearch &&
@@ -136,7 +163,7 @@ const Home = () => {
     })
     .sort((a, b) => {
       if (sortConfig.order === null) return 0;
-      
+
       const order = sortConfig.order === "asc" ? 1 : -1;
       const field = sortConfig.field;
 
@@ -227,7 +254,7 @@ const Home = () => {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-8xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Filters Section */}
           <div className="space-y-4">
