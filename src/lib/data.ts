@@ -7,6 +7,8 @@ export interface Document {
 }
 
 export interface Person {
+  status?: "не_вказано" | "відпустка" | "короткострокове_лікування" | "довгострокове_лікування" | "відрядження" | "декрет" | "РВБД" | "навчання";
+
   // Загальні дані
   fullName: string;
   passportNumber: string;
@@ -53,7 +55,7 @@ export interface Person {
 
 const DB_NAME = 'militaryDB';
 const STORE_NAME = 'people';
-const DB_VERSION = 9; // Increment version to trigger store recreation and fix potential data corruption
+const DB_VERSION = 10; // Increment version to trigger store recreation and fix potential data corruption
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -83,6 +85,7 @@ function openDB(): Promise<IDBDatabase> {
         const store = db.createObjectStore(STORE_NAME, { keyPath: 'fullName' });
         store.createIndex('fullName', 'fullName', { unique: true });
         store.createIndex('deleted', 'deleted', { unique: false });
+        store.createIndex('status', 'status', { unique: false });
         console.log('Object store created successfully');
       }
     };

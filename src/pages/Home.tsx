@@ -6,6 +6,7 @@ import { FilterSection } from "@/components/FilterSection";
 import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 import BirthdayTracker from "@/components/BirthdayTracker";
 import ContractTracker from "@/components/ContractTracker";
+import StatusTracker from "@/components/StatusTracker";
 
 const calculateCompletionPercentage = (person: Person): number => {
   const requiredFields = [
@@ -266,6 +267,7 @@ const Home = () => {
                 people={people}
                 handleResetFilters={handleResetFilters}
               />
+              <StatusTracker people={filteredPeople} />
               <BirthdayTracker people={filteredPeople} />
               <ContractTracker people={filteredPeople} />
             </div>

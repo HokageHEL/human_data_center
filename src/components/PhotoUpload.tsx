@@ -19,6 +19,8 @@ interface PhotoUploadProps {
   onIsInPPDChange: (isInPPD: boolean) => void;
   absenceStatus: string;
   onAbsenceStatusChange: (status: string) => void;
+  status: string;
+  onStatusChange: (status: string) => void;
 }
 
 export function PhotoUpload({
@@ -28,6 +30,8 @@ export function PhotoUpload({
   onIsInPPDChange,
   absenceStatus,
   onAbsenceStatusChange,
+  status,
+  onStatusChange,
 }: PhotoUploadProps) {
   const [previewUrl, setPreviewUrl] = useState(currentPhoto);
 
@@ -40,11 +44,11 @@ export function PhotoUpload({
   const absenceStatusOptions = [
     { value: "не_вказано", label: "Не вказано" },
     { value: "відпустка", label: "Відпустка" },
-    { value: "короткострокове лікування", label: "Короткострокове лікування" },
-    { value: "довгострокове лікування", label: "Довгострокове лікування" },
+    { value: "короткострокове_лікування", label: "Короткострокове лікування" },
+    { value: "довгострокове_лікування", label: "Довгострокове лікування" },
     { value: "відрядження", label: "Відрядження" },
     { value: "декрет", label: "Декрет" },
-    { value: "РВБД", label: "РВБД" },
+    { value: "РВБД", label: "Район Виконання Бойових Дій" },
     { value: "навчання", label: "Навчання" },
   ];
 
@@ -123,7 +127,13 @@ export function PhotoUpload({
         {!isInPPD && (
           <div className="space-y-2">
             <Label htmlFor="absenceStatus">Причина відсутності</Label>
-            <Select value={absenceStatus} onValueChange={onAbsenceStatusChange}>
+            <Select
+              value={absenceStatus}
+              onValueChange={(value) => {
+                onAbsenceStatusChange(value);
+                onStatusChange(value);
+              }}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Оберіть статус відсутності" />
               </SelectTrigger>

@@ -872,6 +872,10 @@ const EditPerson = () => {
                 onAbsenceStatusChange={(status) =>
                   handleInputChange("absenceStatus", status)
                 }
+                status={formData.status || formData.absenceStatus}
+                onStatusChange={(status) =>
+                  handleInputChange("status", status)
+                }
               />
               {formFields[0].fields.map((field) => renderField(field))}
             </div>
