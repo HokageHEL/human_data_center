@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { getActivePeople, deletePerson, Person } from "@/lib/data";
 import { FilterSection } from "@/components/FilterSection";
 import { SearchAndTableSection } from "@/components/SearchAndTableSection";
+import BirthdayTracker from "@/components/BirthdayTracker";
 
 const calculateCompletionPercentage = (person: Person): number => {
   const requiredFields = [
@@ -101,7 +102,6 @@ const Home = () => {
     order: null,
   });
   const [people, setPeople] = useState<Array<Person>>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadPeople = async () => {
@@ -264,6 +264,7 @@ const Home = () => {
               people={people}
               handleResetFilters={handleResetFilters}
             />
+            <BirthdayTracker people={filteredPeople} />
           </div>
 
           {/* Search and Table Section */}
