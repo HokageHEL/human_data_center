@@ -184,6 +184,9 @@ export const SearchAndTableSection = ({
     }
   };
 
+  const totalPeople = filteredPeople.length;
+  const peopleInPPD = filteredPeople.filter((person) => person.isInPPD).length;
+
   return (
     <div className="lg:col-span-2">
       <div className="mb-6 flex gap-4">
@@ -212,6 +215,20 @@ export const SearchAndTableSection = ({
         </Button>
       </div>
 
+      <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
+        <div className="flex gap-4">
+          <span>Всього: {totalPeople}</span>
+          <span>У ППД: {peopleInPPD}</span>
+        </div>
+        <Button
+          onClick={resetColumnOrder}
+          variant="outline"
+          size="sm"
+          className="text-xs"
+        >
+          Скинути порядок
+        </Button>
+      </div>
       <Card className="p-6 bg-card border-border">
         <Table>
           <TableHeader>
