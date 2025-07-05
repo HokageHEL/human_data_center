@@ -547,25 +547,25 @@ const EditPerson = () => {
           type: "date",
         },
         {
-          label: "Періоди проходження служби",
-          field: "servicePeriods",
-          type: "textarea",
-        },
-        {
           label: "У військовій частині з",
           field: "unitStartDate",
           type: "date",
-        },
-        {
-          label: "Попередні місця служби",
-          field: "previousServicePlaces",
-          type: "textarea",
         },
         {
           label: "Дата закінчення контракту",
           field: "contractEndDate",
           type: "date",
           show: formData.serviceType === "контракт",
+        },
+        {
+          label: "Періоди проходження служби",
+          field: "servicePeriods",
+          type: "textarea",
+        },
+        {
+          label: "Попередні місця служби",
+          field: "previousServicePlaces",
+          type: "textarea",
         },
         {
           label: "Номер військового документа",
