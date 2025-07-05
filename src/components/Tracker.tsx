@@ -15,12 +15,12 @@ interface Props {
   dateLabel: string;
 }
 
-const Tracker: React.FC<Props> = ({ 
-  people, 
-  daysRange = 10, 
-  title, 
-  dateField, 
-  dateLabel 
+const Tracker: React.FC<Props> = ({
+  people,
+  daysRange = 10,
+  title,
+  dateField,
+  dateLabel,
 }) => {
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -41,17 +41,17 @@ const Tracker: React.FC<Props> = ({
     .filter((p) => !!p[dateField])
     .map((p) => {
       const daysLeft = getDaysUntilDate(p[dateField] as string);
-      return { 
-        fullName: p.fullName, 
-        date: p[dateField] as string, 
-        daysLeft 
+      return {
+        fullName: p.fullName,
+        date: p[dateField] as string,
+        daysLeft,
       };
     })
     .filter((b) => b.daysLeft <= daysRange)
     .sort((a, b) => a.daysLeft - b.daysLeft);
 
   return (
-    <div className="mt-4 border p-4 rounded-xl shadow bg-white">
+    <div className="mt-4 border p-4 rounded-xl shadow ">
       <h2 className="text-lg font-bold mb-2 whitespace-nowrap">{title}</h2>
       <ul className="space-y-1">
         {upcomingDates.map((item, idx) => (
@@ -59,7 +59,8 @@ const Tracker: React.FC<Props> = ({
             <span className="font-bold">{item.fullName}</span>
             <span> — {item.date} </span>
             <span>
-              ( {dateLabel} <span className="font-bold">{item.daysLeft}</span> дн.)
+              ( {dateLabel} <span className="font-bold">{item.daysLeft}</span>{" "}
+              дн.)
             </span>
           </li>
         ))}
