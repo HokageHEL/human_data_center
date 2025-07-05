@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { DocumentUpload } from '@/components/DocumentUpload';
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "@/components/PhotoUpload";
-import { addPerson, getPerson, Document } from "@/lib/data";
+import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
 
 interface FieldOption {
   value: string;
@@ -259,6 +259,26 @@ const EditPerson = () => {
       }
     } else {
       navigate("/");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Ви впевнені, що хочете видалити цю особу? Дані будуть збережені в архіві протягом тижня.")) {
+      try {
+        await deletePerson(formData.fullName);
+        toast({
+          title: "Успішно",
+          description: `${formData.fullName} видалено`,
+        });
+        navigate("/");
+      } catch (error) {
+        console.error("Error deleting person:", error);
+        toast({
+          title: "Помилка",
+          description: "Не вдалося видалити особу",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -553,6 +573,9 @@ const EditPerson = () => {
             </h1>
           </div>
           <div className="space-x-2">
+            <Button variant="outline" onClick={handleNavigateBack}>
+              Назад
+            </Button>
             <Button
               variant="outline"
               onClick={async () => {
@@ -593,6 +616,14 @@ const EditPerson = () => {
             >
               Експорт в Word
             </Button>
+            {!isNewPerson && (
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+              >
+                Видалити
+              </Button>
+            )}
             <Button onClick={handleSave}>Зберегти</Button>
           </div>
         </div>

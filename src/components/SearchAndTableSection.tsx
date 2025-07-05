@@ -351,7 +351,6 @@ export const SearchAndTableSection = ({
                 </div>
               </TableHead>
               <TableHead>ППД</TableHead>
-              <TableHead className="w-[100px]">Дії</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -386,18 +385,7 @@ export const SearchAndTableSection = ({
                     onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(person.fullName);
-                    }}
-                  >
-                    Видалити
-                  </Button>
-                </TableCell>
+
               </TableRow>
             ))}
           </TableBody>
