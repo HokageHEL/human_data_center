@@ -471,8 +471,18 @@ const EditPerson = () => {
           type: "text",
           placeholder: "одружений",
         },
-        { label: "Родичі", field: "relatives", type: "textarea" },
-        { label: "Освіта", field: "education", type: "textarea" },
+        {
+          label: "Родичі",
+          field: "relatives",
+          type: "textarea",
+          placeholder: `НТУУ "КПІ"`,
+        },
+        {
+          label: "Освіта",
+          field: "education",
+          type: "textarea",
+          placeholder: `мама, папа`,
+        },
         {
           label: "Стать",
           field: "gender",
@@ -494,7 +504,12 @@ const EditPerson = () => {
     {
       section: "Військові дані",
       fields: [
-        { label: "Посада", field: "position", type: "text" },
+        {
+          label: "Посада",
+          field: "position",
+          type: "text",
+          placeholder: "оператор",
+        },
 
         {
           label: "Військове звання",
@@ -611,11 +626,13 @@ const EditPerson = () => {
           label: "Періоди проходження служби",
           field: "servicePeriods",
           type: "textarea",
+          placeholder: "01.01.2022 - 31.12.2022",
         },
         {
           label: "Попередні місця служби",
           field: "previousServicePlaces",
           type: "textarea",
+          placeholder: "A0000",
         },
         {
           label: "Номер військового документа",
@@ -645,6 +662,7 @@ const EditPerson = () => {
           label: "Періоди участі у бойових діях",
           field: "combatPeriods",
           type: "textarea",
+          placeholder: "01.09.1939 -- 02.09.1945",
         },
       ],
     },
@@ -813,7 +831,7 @@ const EditPerson = () => {
               <Input
                 value={formData.fullName}
                 onChange={(e) => handleInputChange("fullName", e.target.value)}
-                placeholder="Введіть ПІБ"
+                placeholder="Петренко Іван Васильович"
               />
             </div>
             <div className="space-y-2">
@@ -823,7 +841,7 @@ const EditPerson = () => {
                 onChange={(e) =>
                   handleInputChange("shpoNumber", e.target.value)
                 }
-                placeholder="Введіть номер ШПО"
+                placeholder="8"
               />
             </div>
             <div className="space-y-2">
@@ -873,7 +891,7 @@ const EditPerson = () => {
                 onChange={(e) =>
                   handleInputChange("phoneNumber", e.target.value)
                 }
-                placeholder="Введіть номер телефону"
+                placeholder="1234567890"
               />
             </div>
             <div className="space-y-2">
@@ -901,7 +919,7 @@ const EditPerson = () => {
               <Input
                 value={formData.position}
                 onChange={(e) => handleInputChange("position", e.target.value)}
-                placeholder="Введіть посаду"
+                placeholder="оператор"
               />
             </div>
           </div>
