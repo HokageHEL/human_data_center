@@ -80,10 +80,10 @@ const EditPerson = () => {
   const isNewPerson = name === "new";
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  console.log('EditPerson component initialized:', {
+  console.log("EditPerson component initialized:", {
     name,
     isNewPerson,
-    decodedName: name ? decodeURIComponent(name) : undefined
+    decodedName: name ? decodeURIComponent(name) : undefined,
   });
 
   const [formData, setFormData] = useState({
@@ -370,17 +370,17 @@ const EditPerson = () => {
       const originalName = isNewPerson
         ? undefined
         : decodeURIComponent(name || "");
-      
-      console.log('handleSave called:', {
+
+      console.log("handleSave called:", {
         isNewPerson,
         name,
         originalName,
         dataToSave,
-        currentFullName: formData.fullName
+        currentFullName: formData.fullName,
       });
-      
+
       await addPerson(dataToSave, originalName);
-      
+
       toast({
         title: "Дані збережено",
         description: `Інформація про ${formData.fullName} успішно збережена`,
@@ -491,13 +491,13 @@ const EditPerson = () => {
           label: "Родичі",
           field: "relatives",
           type: "textarea",
-          placeholder: `НТУУ "КПІ"`,
+          placeholder: `мама, папа`,
         },
         {
           label: "Освіта",
           field: "education",
           type: "textarea",
-          placeholder: `мама, папа`,
+          placeholder: `НТУУ "КПІ"`,
         },
         {
           label: "Стать",
