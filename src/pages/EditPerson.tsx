@@ -694,9 +694,6 @@ const EditPerson = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
-            <Button variant="outline" onClick={handleNavigateBack}>
-              Назад
-            </Button>
             <h1 className="text-2xl font-bold">
               {isNewPerson
                 ? "Додавання нової особи"
