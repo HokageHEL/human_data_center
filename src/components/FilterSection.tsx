@@ -75,7 +75,7 @@ export const FilterSection = ({
           )}
         </div>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="space-y-2">
           <Label>Підрозділ</Label>
           <Select
@@ -154,7 +154,6 @@ export const FilterSection = ({
         </div>
 
         <div className="space-y-2">
-          <Label>Військове звання</Label>
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Switch
