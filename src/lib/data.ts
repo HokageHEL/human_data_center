@@ -54,6 +54,11 @@ export type Person = {
 
 export async function writePerson(person: Person, oldName?: string): Promise<void> {
   const url = `${API_BASE_URL}/people${oldName ? `?oldName=${encodeURIComponent(oldName)}` : ''}`;
+  console.log('writePerson called:', {
+    url,
+    oldName,
+    personFullName: person.fullName
+  });
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -67,8 +72,8 @@ export async function writePerson(person: Person, oldName?: string): Promise<voi
   }
 }
 
-export async function addPerson(person: Person): Promise<void> {
-  await writePerson(person);
+export async function addPerson(person: Person, oldName?: string): Promise<void> {
+  await writePerson(person, oldName);
 }
 
 export async function getPerson(fullName: string): Promise<Person | null> {

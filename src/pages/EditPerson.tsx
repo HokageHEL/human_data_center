@@ -73,17 +73,18 @@ const SelectField = ({
   </Select>
 );
 
-const calculateSalary = (tariffCategory: number): number => {
-  // Add your salary calculation logic here
-  return tariffCategory * 1000; // Example calculation
-};
-
 const EditPerson = () => {
   const { name } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isNewPerson = name === "new";
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  console.log('EditPerson component initialized:', {
+    name,
+    isNewPerson,
+    decodedName: name ? decodeURIComponent(name) : undefined
+  });
 
   const [formData, setFormData] = useState({
     // Загальні дані
@@ -127,16 +128,15 @@ const EditPerson = () => {
     combatExperienceNumber: "",
     combatPeriods: "",
     isInPPD: false,
-    status: "не_вказано" as
+    absenceStatus: "не_вказано" as
       | "не_вказано"
       | "відпустка"
-      | "короткострокове_лікування"
-      | "довгострокове_лікування"
+      | "короткострокове лікування"
+      | "довгострокове лікування"
       | "відрядження"
       | "декрет"
       | "РВБД"
       | "навчання",
-    deleted: false
   });
 
   const renderField = (field: FieldConfig) => {
@@ -341,7 +341,7 @@ const EditPerson = () => {
 
       // Скидаємо статус відсутності, якщо особа в ППД
       if (field === "isInPPD" && value === true) {
-        newData.status = "не_вказано";
+        newData.absenceStatus = "не_вказано";
       }
 
       return newData;
@@ -370,13 +370,23 @@ const EditPerson = () => {
       const originalName = isNewPerson
         ? undefined
         : decodeURIComponent(name || "");
+      
+      console.log('handleSave called:', {
+        isNewPerson,
+        name,
+        originalName,
+        dataToSave,
+        currentFullName: formData.fullName
+      });
+      
       await addPerson(dataToSave, originalName);
-
-      setHasUnsavedChanges(false);
+      
       toast({
         title: "Дані збережено",
         description: `Інформація про ${formData.fullName} успішно збережена`,
       });
+
+      setHasUnsavedChanges(false);
 
       // Navigate back after a short delay
       setTimeout(() => {
@@ -411,6 +421,10 @@ const EditPerson = () => {
     { rank: "майор", color: "text-red-600" },
     { rank: "підполковник", color: "text-red-600" },
     { rank: "полковник", color: "text-red-600" },
+    // { rank: "бригадний генерал", color: "" },
+    // { rank: "генерал-майор", color: "" },
+    // { rank: "генерал-лейтенант", color: "" },
+    // { rank: "генерал", color: "" }
   ];
 
   // Список відділів за підрозділами
@@ -670,16 +684,152 @@ const EditPerson = () => {
     },
   ];
 
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("uk-UA", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  // Функція для розрахунку віку на основі дати народження
+  const calculateAge = (birthDate: string): number => {
+    if (!birthDate) return 0;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+  const calculateSalary = (tariffCategory: number): number => {
+    const tariffToSalary: Record<number, number> = {
+      60: 10150,
+      59: 10010,
+      58: 9870,
+      57: 9730,
+      56: 9590,
+      55: 9440,
+      54: 9300,
+      53: 9160,
+      52: 9020,
+      51: 8880,
+      50: 8740,
+      49: 8600,
+      48: 8460,
+      47: 8320,
+      46: 8180,
+      45: 8030,
+      44: 7890,
+      43: 7750,
+      42: 7610,
+      41: 7470,
+      40: 7330,
+      39: 7190,
+      38: 7050,
+      37: 6910,
+      36: 6770,
+      35: 6630,
+      34: 6480,
+      33: 6340,
+      32: 6200,
+      31: 6060,
+      30: 5920,
+      29: 5780,
+      28: 5640,
+      27: 5500,
+      26: 5360,
+      25: 5220,
+      24: 5070,
+      23: 4930,
+      22: 4790,
+      21: 4650,
+      20: 4510,
+      19: 4370,
+      18: 4230,
+      17: 4090,
+      16: 3950,
+      15: 3810,
+      14: 3660,
+      13: 3520,
+      12: 3440,
+      11: 3350,
+      10: 3260,
+      9: 3170,
+      8: 3080,
+      7: 3000,
+      6: 2910,
+      5: 2820,
+      4: 2730,
+      3: 2640,
+      2: 2550,
+      1: 2470,
+    };
+    return tariffToSalary[tariffCategory] || 0;
+  };
+
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6 flex justify-center">
-      <div className="w-full max-w-4xl space-y-6">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">
-            {isNewPerson ? "Додати особу" : `Редагувати ${formData.fullName}`}
-          </h1>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold">
+              {isNewPerson
+                ? "Додавання нової особи"
+                : `Редагування особи: ${formData.fullName}`}
+            </h1>
+          </div>
           <div className="space-x-2">
             <Button variant="outline" onClick={handleNavigateBack}>
               Назад
+            </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (!formData.fullName.trim()) {
+                  toast({
+                    title: "Помилка",
+                    description: "Будь ласка, введіть П.І.Б.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+
+                try {
+                  const doc = generatePersonDocument(formData);
+                  const blob = await Packer.toBlob(doc);
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = `${formData.fullName}_картка.docx`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+
+                  toast({
+                    title: "Успішно",
+                    description: "Документ Word успішно створено",
+                  });
+                } catch (error) {
+                  console.error("Error generating Word document:", error);
+                  toast({
+                    title: "Помилка",
+                    description: "Не вдалося створити документ Word",
+                    variant: "destructive",
+                  });
+                }
+              }}
+            >
+              Експорт в Word
             </Button>
             {!isNewPerson && (
               <Button variant="destructive" onClick={handleDelete}>
@@ -814,25 +964,35 @@ const EditPerson = () => {
             </div>
           </Card>
 
-          {/* Document Upload */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Документи</h2>
-            <DocumentUpload
-              documents={formData.documents}
-              onDocumentAdd={handleDocumentAdd}
-              onDocumentRemove={handleDocumentRemove}
-            />
+          <Card className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Військові дані</h2>
+            <div className="space-y-4">
+              {formFields[1].fields.map((field) => renderField(field))}
+            </div>
           </Card>
 
-          {/* Form Fields */}
-          {formFields.map((section) => (
-            <Card key={section.section} className="p-6">
-              <h2 className="text-lg font-semibold mb-4">{section.section}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {section.fields.map((field) => renderField(field))}
-              </div>
-            </Card>
-          ))}
+          <Card className="p-4 md:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Додаткова інформація</h2>
+            <div className="space-y-4">
+              <Textarea
+                value={formData.additionalInfo}
+                onChange={(e) =>
+                  handleInputChange("additionalInfo", e.target.value)
+                }
+                placeholder="Введіть додаткову інформацію"
+                className="min-h-[150px]"
+              />
+            </div>
+          </Card>
+
+          <Card className="p-4 md:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Документи</h2>
+            <DocumentUpload
+              onDocumentAdd={handleDocumentAdd}
+              onDocumentRemove={handleDocumentRemove}
+              documents={formData.documents}
+            />
+          </Card>
         </div>
       </div>
     </div>
