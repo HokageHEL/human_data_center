@@ -20,6 +20,7 @@ import { DocumentUpload } from "@/components/DocumentUpload";
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
+import { platform } from "os";
 
 interface FieldOption {
   value: string;
@@ -35,6 +36,7 @@ interface FieldConfig {
   show?: boolean;
   readonly?: boolean;
   onChange?: (value: any) => void;
+  placeholder?: string;
 }
 
 interface FormSection {
@@ -141,7 +143,9 @@ const EditPerson = () => {
           <Input
             value={formData[field.field as keyof typeof formData] as string}
             onChange={(e) => handleInputChange(field.field, e.target.value)}
-            placeholder={`Введіть ${field.label.toLowerCase()}`}
+            placeholder={
+              field.placeholder || `Введіть ${field.label.toLowerCase()}`
+            }
             readOnly={field.readonly}
           />
         )}
@@ -149,7 +153,9 @@ const EditPerson = () => {
           <Textarea
             value={formData[field.field as keyof typeof formData] as string}
             onChange={(e) => handleInputChange(field.field, e.target.value)}
-            placeholder={`Введіть ${field.label.toLowerCase()}`}
+            placeholder={
+              field.placeholder || `Введіть ${field.label.toLowerCase()}`
+            }
             readOnly={field.readonly}
           />
         )}
@@ -188,7 +194,9 @@ const EditPerson = () => {
               field.onChange?.(value);
             }}
             options={field.options}
-            placeholder={`Оберіть ${field.label.toLowerCase()}`}
+            placeholder={
+              field.placeholder || `Оберіть ${field.label.toLowerCase()}`
+            }
           />
         )}
         {field.type === "switch" && (
@@ -427,16 +435,42 @@ const EditPerson = () => {
     {
       section: "Загальні дані",
       fields: [
-        { label: "П.І.Б.", field: "fullName", type: "text" },
+        {
+          label: "Прізвище Імʼя По-батькові",
+          field: "fullName",
+          type: "text",
+          placeholder: "Петренко Іван Васильович",
+        },
         {
           label: "Номер та серія паспорта",
           field: "passportNumber",
           type: "text",
+          placeholder: "12",
         },
-        { label: "ІПН", field: "taxId", type: "text" },
-        { label: "Місце реєстрації", field: "registrationPlace", type: "text" },
-        { label: "Адреса проживання", field: "address", type: "text" },
-        { label: "Сімейний стан", field: "familyStatus", type: "text" },
+        {
+          label: "ІПН",
+          field: "taxId",
+          type: "text",
+          placeholder: "123658912",
+        },
+        {
+          label: "Місце реєстрації",
+          field: "registrationPlace",
+          type: "text",
+          placeholder: "Вінниця",
+        },
+        {
+          label: "Адреса проживання",
+          field: "address",
+          type: "text",
+          placeholder: "вул. Хрещатик, 12",
+        },
+        {
+          label: "Сімейний стан",
+          field: "familyStatus",
+          type: "text",
+          placeholder: "одружений",
+        },
         { label: "Родичі", field: "relatives", type: "textarea" },
         { label: "Освіта", field: "education", type: "textarea" },
         {
@@ -449,7 +483,12 @@ const EditPerson = () => {
           ],
         },
         { label: "Дата народження", field: "birthDate", type: "date" },
-        { label: "Номер телефону", field: "phoneNumber", type: "text" },
+        {
+          label: "Номер телефону",
+          field: "phoneNumber",
+          type: "text",
+          placeholder: "0971234567",
+        },
       ],
     },
     {
@@ -495,6 +534,7 @@ const EditPerson = () => {
           label: "Номер висновку ВЛК",
           field: "medicalCommissionNumber",
           type: "text",
+          placeholder: "123456789",
           show: formData.fitnessStatus === "обмежено придатний",
         },
         {
@@ -527,11 +567,17 @@ const EditPerson = () => {
             : [],
           show: formData.unit && formData.unit !== "",
         },
-        { label: "ВОС", field: "militarySpecialty", type: "text" },
+        {
+          label: "ВОС",
+          field: "militarySpecialty",
+          type: "text",
+          placeholder: "041256",
+        },
         {
           label: "Тарифний розряд",
           field: "tariffCategory",
           type: "number",
+          placeholder: "4",
           onChange: (value) =>
             handleInputChange("salary", calculateSalary(value)),
         },
@@ -575,8 +621,14 @@ const EditPerson = () => {
           label: "Номер військового документа",
           field: "militaryDocumentNumber",
           type: "text",
+          placeholder: "1234567SN",
         },
-        { label: "Номер ШПО", field: "shpoNumber", type: "text" },
+        {
+          label: "Номер ШПО",
+          field: "shpoNumber",
+          type: "text",
+          placeholder: "8",
+        },
         {
           label: "УБД",
           field: "combatExperienceStatus",
@@ -587,6 +639,7 @@ const EditPerson = () => {
           field: "combatExperienceNumber",
           type: "text",
           show: formData.combatExperienceStatus,
+          placeholder: "123456789",
         },
         {
           label: "Періоди участі у бойових діях",
