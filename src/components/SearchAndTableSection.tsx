@@ -229,7 +229,9 @@ export const SearchAndTableSection = ({
                 {columns.map((column, index) => (
                   <TableHead
                     key={column.field}
-                    className={`cursor-move ${column.width} relative group
+                    className={`cursor-move ${
+                      column.width
+                    } relative group justtify-center whitespace-nowrap
                     ${
                       dropIndicator === index ? "border-l-2 border-primary" : ""
                     }
@@ -252,7 +254,7 @@ export const SearchAndTableSection = ({
                     onClick={() => handleSort(column.field as SortField)}
                   >
                     <div className="flex items-center gap-1">
-                      <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {/* <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" /> */}
                       {column.label}
                       {sortConfig.field === column.field &&
                         (sortConfig.order === "asc" ? (
@@ -301,7 +303,7 @@ export const SearchAndTableSection = ({
                 >
                   {columns.map((column) => (
                     <TableCell
-                      className="flex-row items-center justify-center"
+                      className="flex-row items-center justify-center text-center whitespace-nowrap"
                       key={column.field}
                     >
                       {renderCell(person, column.field)}
