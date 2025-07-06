@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" href="/wasp-logo.png?v=3" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>human-data-center</title>
+    <title>ОСА</title>
     <meta name="description" content="Human Data Center Project" />
     <meta name="author" content="" />
 
@@ -20,10 +20,14 @@
     <meta name="twitter:image" content="" />
     <script>
       // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark')
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
       } else {
-        document.documentElement.classList.remove('dark')
+        document.documentElement.classList.remove("dark");
       }
     </script>
   </head>

@@ -15,7 +15,7 @@ export function Header() {
             alt="WASP Logo"
             className="h-8 w-8 object-contain"
           />
-          WASP
+          ОСА
         </div>
         <Button
           variant="ghost"
