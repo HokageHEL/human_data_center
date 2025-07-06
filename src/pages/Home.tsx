@@ -89,8 +89,8 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     birthDate: "",
-    militaryRank: [],
-    positionRank: [],
+    militaryRank: [] as string[],
+    positionRank: [] as string[],
     unit: "all",
     gender: "all",
     fitnessStatus: "all",
@@ -179,6 +179,7 @@ const Home = () => {
         matchesSearch &&
         matchesBirthDate &&
         matchesMilitaryRank &&
+        matchesPositionRank &&
         matchesUnit &&
         matchesGender &&
         matchesFitnessStatus &&
@@ -263,7 +264,8 @@ const Home = () => {
   const handleResetFilters = () => {
     setFilters({
       birthDate: "",
-      militaryRank: "",
+      militaryRank: [],
+      positionRank: [],
       unit: "all",
       gender: "all",
       fitnessStatus: "all",
@@ -274,7 +276,17 @@ const Home = () => {
   };
 
   const isAnyFilterActive = () => {
-    return searchTerm !== "";
+    return (
+      searchTerm !== "" ||
+      filters.birthDate !== "" ||
+      filters.militaryRank.length > 0 ||
+      filters.positionRank.length > 0 ||
+      filters.unit !== "all" ||
+      filters.gender !== "all" ||
+      filters.fitnessStatus !== "all" ||
+      filters.isInPPD ||
+      filters.combatExperienceStatus
+    );
   };
 
   return (
