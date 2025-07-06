@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 export function Footer({ className }: { className?: string }) {
   return (
@@ -9,18 +9,11 @@ export function Footer({ className }: { className?: string }) {
             WASP — Wartime Accounting of Service Personnel
           </p>
           <p className="text-center text-sm leading-loose text-muted-foreground">
-            Built with care for those who serve. All rights reserved © {new Date().getFullYear()}
+            Built with care for those who serve. All rights reserved ©{" "}
+            {new Date().getFullYear()}
           </p>
-          <a 
-            href="https://github.com/HELHokage" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-center text-sm leading-loose text-muted-foreground hover:text-primary transition-colors"
-          >
-            GitHub: @HELHokage
-          </a>
         </div>
       </div>
     </footer>
-  )
+  );
 }
