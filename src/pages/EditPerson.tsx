@@ -466,14 +466,14 @@ const EditPerson = () => {
           placeholder: "вул. Хрещатик, 12",
         },
         {
-          label: "Сімейний стан",
-          field: "familyStatus",
-          type: "text",
-          placeholder: "одружений",
-        },
-        {
           label: "Родичі",
           field: "relatives",
+          type: "textarea",
+          placeholder: `мама, папа`,
+        },
+        {
+          label: "Освіта",
+          field: "education",
           type: "textarea",
           placeholder: `НТУУ "КПІ"`,
         },
