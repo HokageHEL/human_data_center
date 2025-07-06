@@ -10,7 +10,12 @@ export function Header() {
       <div className="container flex h-14 items-center justify-between">
         <span></span>
         <div className="flex items-center gap-2 font-bold text-xl">
-          ОСА
+          <img
+            src="/wasp-logo.png"
+            alt="WASP Logo"
+            className="h-8 w-8 object-contain"
+          />
+          WASP
         </div>
         <Button
           variant="ghost"
