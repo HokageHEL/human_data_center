@@ -84,13 +84,13 @@ export const SearchAndTableSection = ({
   const [isDragging, setIsDragging] = useState(false);
 
   const defaultColumns = [
-    { field: "completionPercentage", label: "Заповнено", width: "w-[120px]" },
-    { field: "shpoNumber", label: "№ШПО", width: "w-[80px]" },
+    { field: "shpoNumber", label: "№", width: "w-[80px]" },
     { field: "fullName", label: "ПІБ", width: "w-[200px]" },
-    { field: "birthDate", label: "Дата народження", width: "w-[150px]" },
-    { field: "age", label: "Вік", width: "w-[80px]" },
     { field: "militaryRank", label: "Військове звання", width: "w-[150px]" },
     { field: "position", label: "Посада", width: "w-[150px]" },
+    { field: "birthDate", label: "Дата народження", width: "w-[150px]" },
+    { field: "age", label: "Вік", width: "w-[80px]" },
+    { field: "completionPercentage", label: "Заповнено", width: "w-[120px]" },
     { field: "gender", label: "Стать", width: "w-[100px]" },
   ];
 
