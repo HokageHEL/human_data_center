@@ -478,12 +478,6 @@ const EditPerson = () => {
           placeholder: `НТУУ "КПІ"`,
         },
         {
-          label: "Освіта",
-          field: "education",
-          type: "textarea",
-          placeholder: `мама, папа`,
-        },
-        {
           label: "Стать",
           field: "gender",
           type: "select",
