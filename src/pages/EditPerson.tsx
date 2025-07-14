@@ -309,11 +309,7 @@ const EditPerson = () => {
   };
 
   const handleDelete = async () => {
-    if (
-      window.confirm(
-        "Ви впевнені, що хочете видалити цю особу? Дані будуть збережені в архіві протягом тижня."
-      )
-    ) {
+    if (window.confirm("Ви впевнені, що хочете видалити цю особу?")) {
       try {
         await deletePerson(formData.fullName);
         toast({
@@ -480,12 +476,6 @@ const EditPerson = () => {
           field: "address",
           type: "text",
           placeholder: "вул. Хрещатик, 12",
-        },
-        {
-          label: "Сімейний стан",
-          field: "familyStatus",
-          type: "text",
-          placeholder: "одружений",
         },
         {
           label: "Родичі",

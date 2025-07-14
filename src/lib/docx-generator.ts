@@ -1,4 +1,5 @@
 import { Document, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType } from 'docx';
+import * as XLSX from 'xlsx';
 
 interface PersonData {
   fullName: string;
@@ -55,6 +56,54 @@ const createTableRow = (label: string, value: string): TableRow => {
       }),
     ],
   });
+};
+
+export const generateTableDocument = (people: Partial<PersonData>[], columns: { field: string; label: string }[]): Document => {
+  const doc = new Document({
+    sections: [{
+      properties: {},
+      children: [
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [
+            new TableRow({
+              children: columns.map(col => 
+                new TableCell({
+                  children: [new Paragraph({ children: [new TextRun({ text: col.label, bold: true })] })],
+                  width: { size: 100 / columns.length, type: WidthType.PERCENTAGE },
+                })
+              ),
+            }),
+            ...people.map(person => 
+              new TableRow({
+                children: columns.map(col => 
+                  new TableCell({
+                    children: [new Paragraph({ children: [new TextRun({ text: String(person[col.field as keyof PersonData] || '') })] })],
+                    width: { size: 100 / columns.length, type: WidthType.PERCENTAGE },
+                  })
+                ),
+              })
+            ),
+          ],
+        }),
+      ],
+    }],
+  });
+  return doc;
+};
+
+export const exportToExcel = (people: Partial<PersonData>[], columns: { field: string; label: string }[]): Uint8Array => {
+  const worksheet = XLSX.utils.json_to_sheet(
+    people.map(person => 
+      columns.reduce((obj, col) => ({
+        ...obj,
+        [col.label]: person[col.field as keyof PersonData]
+      }), {})
+    )
+  );
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'People');
+  return XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
 };
 
 export const generatePersonDocument = (person: PersonData): Document => {

@@ -4,9 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, User, ArrowUpDown, GripHorizontal } from "lucide-react";
+import { Plus, User, ArrowUpDown, GripHorizontal, FileText, FileSpreadsheet } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Person, addPerson } from "@/lib/data";
+import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
+import { Packer } from "docx";
+import { saveAs } from "file-saver";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -145,6 +148,24 @@ export const SearchAndTableSection = ({
     navigate("/edit/new");
   };
 
+  const handleExportToWord = async () => {
+    const exportColumns = columns.filter(col => 
+      col.field !== 'completionPercentage' && col.field !== 'isInPPD'
+    );
+    const doc = generateTableDocument(filteredPeople, exportColumns);
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, 'people-table.docx');
+  };
+
+  const handleExportToExcel = () => {
+    const exportColumns = columns.filter(col => 
+      col.field !== 'completionPercentage' && col.field !== 'isInPPD'
+    );
+    const data = exportToExcel(filteredPeople, exportColumns);
+    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, 'people-table.xlsx');
+  };
+
   const renderCell = (person: Person, field: string) => {
     switch (field) {
       case "completionPercentage":
@@ -198,14 +219,34 @@ export const SearchAndTableSection = ({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full h-12 text-lg border-2 border-border focus:border-primary"
           />
-          <Button
-            onClick={handleAddPerson}
-            className="h-12 px-6 text-lg hover:bg-green-300"
-            size="lg"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Додати
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleExportToWord}
+              className="h-12 px-4 text-lg"
+              variant="outline"
+              size="lg"
+            >
+              <FileText className="mr-2 h-5 w-5" />
+              Word
+            </Button>
+            <Button
+              onClick={handleExportToExcel}
+              className="h-12 px-4 text-lg"
+              variant="outline"
+              size="lg"
+            >
+              <FileSpreadsheet className="mr-2 h-5 w-5" />
+              Excel
+            </Button>
+            <Button
+              onClick={handleAddPerson}
+              className="h-12 px-6 text-lg hover:bg-green-300"
+              size="lg"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              Додати
+            </Button>
+          </div>
         </div>
 
         <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">

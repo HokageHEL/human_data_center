@@ -130,33 +130,79 @@ const Home = () => {
         .includes(searchTerm.toLowerCase());
       const matchesBirthDate =
         !filters.birthDate || person.birthDate.includes(filters.birthDate);
-      const matchesMilitaryRank = filters.militaryRank.length === 0 || (person.militaryRank ? filters.militaryRank.some(rank => {
-        const personRank = person.militaryRank.toLowerCase();
-        switch (rank) {
-          case "Офіцери":
-            return ["молодший лейтенант", "лейтенант", "старший лейтенант", "капітан", "майор", "підполковник", "полковник"].some(r => personRank === r);
-          case "Сержанти":
-            return ["молодший сержант", "сержант", "старший сержант", "головний сержант", "штаб-сержант", "майстер-сержант", "старший майстер-сержант", "головний майстер-сержант"].some(r => personRank === r);
-          case "Солдати":
-            return ["солдат", "старший солдат"].some(r => personRank === r);
-          default:
-            return false;
-        }
-      }) : filters.militaryRank.length === 0);
+      const matchesMilitaryRank =
+        filters.militaryRank.length === 0 ||
+        (person.militaryRank
+          ? filters.militaryRank.some((rank) => {
+              const personRank = person.militaryRank.toLowerCase();
+              switch (rank) {
+                case "Офіцери":
+                  return [
+                    "молодший лейтенант",
+                    "лейтенант",
+                    "старший лейтенант",
+                    "капітан",
+                    "майор",
+                    "підполковник",
+                    "полковник",
+                  ].some((r) => personRank === r);
+                case "Сержанти":
+                  return [
+                    "молодший сержант",
+                    "сержант",
+                    "старший сержант",
+                    "головний сержант",
+                    "штаб-сержант",
+                    "майстер-сержант",
+                    "старший майстер-сержант",
+                    "головний майстер-сержант",
+                  ].some((r) => personRank === r);
+                case "Солдати":
+                  return ["солдат", "старший солдат"].some(
+                    (r) => personRank === r
+                  );
+                default:
+                  return false;
+              }
+            })
+          : filters.militaryRank.length === 0);
 
-      const matchesPositionRank = filters.positionRank.length === 0 || (person.positionRank ? filters.positionRank.some(rank => {
-        const positionRank = person.positionRank.toLowerCase();
-        switch (rank) {
-          case "Офіцери":
-            return ["молодший лейтенант", "лейтенант", "старший лейтенант", "капітан", "майор", "підполковник", "полковник"].some(r => positionRank === r);
-          case "Сержанти":
-            return ["молодший сержант", "сержант", "старший сержант", "головний сержант", "штаб-сержант", "майстер-сержант", "старший майстер-сержант", "головний майстер-сержант"].some(r => positionRank === r);
-          case "Солдати":
-            return ["солдат", "старший солдат"].some(r => positionRank === r);
-          default:
-            return false;
-        }
-      }) : filters.positionRank.length === 0);
+      const matchesPositionRank =
+        filters.positionRank.length === 0 ||
+        (person.positionRank
+          ? filters.positionRank.some((rank) => {
+              const positionRank = person.positionRank.toLowerCase();
+              switch (rank) {
+                case "Офіцери":
+                  return [
+                    "молодший лейтенант",
+                    "лейтенант",
+                    "старший лейтенант",
+                    "капітан",
+                    "майор",
+                    "підполковник",
+                    "полковник",
+                  ].some((r) => positionRank === r);
+                case "Сержанти":
+                  return [
+                    "молодший сержант",
+                    "сержант",
+                    "старший сержант",
+                    "головний сержант",
+                    "штаб-сержант",
+                    "майстер-сержант",
+                    "старший майстер-сержант",
+                    "головний майстер-сержант",
+                  ].some((r) => positionRank === r);
+                case "Солдати":
+                  return ["солдат", "старший солдат"].some(
+                    (r) => positionRank === r
+                  );
+                default:
+                  return false;
+              }
+            })
+          : filters.positionRank.length === 0);
       const matchesUnit =
         !filters.unit ||
         filters.unit === "all" ||
@@ -195,9 +241,9 @@ const Home = () => {
 
       // Special handling for shpoNumber field
       if (field === "shpoNumber") {
-        const aValue = a[field] || "";
-        const bValue = b[field] || "";
-        return aValue.localeCompare(bValue) * order;
+        const aValue = Number(a[field]) || 999;
+        const bValue = Number(b[field]) || 999;
+        return (aValue - bValue) * order;
       }
 
       // Special handling for militaryRank field
