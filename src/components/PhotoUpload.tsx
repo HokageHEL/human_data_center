@@ -91,7 +91,11 @@ export function PhotoUpload({
           />
         ) : (
           <img
-            src={theme === "dark" ? "/photo-placeholder-dark.jpeg" : "/photo-placeholder-light.png"}
+            src={
+              theme === "dark"
+                ? "./photo-placeholder-dark.jpeg"
+                : "./photo-placeholder-light.png"
+            }
             alt="Додати фото"
             className="w-full h-full object-cover"
           />

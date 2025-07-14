@@ -11,7 +11,7 @@ export function Header() {
         <span></span>
         <div className="flex items-center gap-2 font-bold text-xl">
           <img
-            src="/wasp-logo.png"
+            src="./wasp-logo.png"
             alt="WASP Logo"
             className="h-8 w-8 object-contain"
           />
