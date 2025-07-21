@@ -7,7 +7,13 @@ import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 import BirthdayTracker from "@/components/BirthdayTracker";
 import ContractTracker from "@/components/ContractTracker";
 import StatusTracker from "@/components/StatusTracker";
-import { getMilitaryRankNames, RANK_CATEGORIES, isRankInCategory, REQUIRED_PERSON_FIELDS, OPTIONAL_PERSON_FIELDS } from "@/lib/constants";
+import {
+  getMilitaryRankNames,
+  RANK_CATEGORIES,
+  isRankInCategory,
+  REQUIRED_PERSON_FIELDS,
+  OPTIONAL_PERSON_FIELDS,
+} from "@/lib/constants";
 
 const calculateCompletionPercentage = (person: Person): number => {
   let filledRequiredFields = REQUIRED_PERSON_FIELDS.filter(
@@ -97,11 +103,11 @@ const Home = () => {
           ? filters.militaryRank.some((rank) => {
               switch (rank) {
                 case "Офіцери":
-                  return isRankInCategory(person.militaryRank, 'OFFICERS');
+                  return isRankInCategory(person.militaryRank, "OFFICERS");
                 case "Сержанти":
-                  return isRankInCategory(person.militaryRank, 'SERGEANTS');
+                  return isRankInCategory(person.militaryRank, "SERGEANTS");
                 case "Солдати":
-                  return isRankInCategory(person.militaryRank, 'SOLDIERS');
+                  return isRankInCategory(person.militaryRank, "SOLDIERS");
                 default:
                   return false;
               }
@@ -114,11 +120,11 @@ const Home = () => {
           ? filters.positionRank.some((rank) => {
               switch (rank) {
                 case "Офіцери":
-                  return isRankInCategory(person.positionRank, 'OFFICERS');
+                  return isRankInCategory(person.positionRank, "OFFICERS");
                 case "Сержанти":
-                  return isRankInCategory(person.positionRank, 'SERGEANTS');
+                  return isRankInCategory(person.positionRank, "SERGEANTS");
                 case "Солдати":
-                  return isRankInCategory(person.positionRank, 'SOLDIERS');
+                  return isRankInCategory(person.positionRank, "SOLDIERS");
                 default:
                   return false;
               }
@@ -228,24 +234,27 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6 flex justify-center">
-      <div className="w-full max-w-8xl">
-        <div className="flex justify-center">
-          <div className="w-full max-w-7xl grid grid-cols-[auto,1fr,1fr] gap-6">
-            {/* Filters Section */}
-            <div className="space-y-4">
-              <FilterSection
-                filters={filters}
-                setFilters={setFilters}
-                people={people}
-                handleResetFilters={handleResetFilters}
-              />
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background p-3 sm:p-4 lg:p-6">
+      <div className="w-full max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[auto,2fr] xl:grid-cols-[auto,1fr,1fr] gap-4 lg:gap-6">
+          {/* Filters Section */}
+          <div className="space-y-4 order-1 lg:order-1">
+            <FilterSection
+              filters={filters}
+              setFilters={setFilters}
+              people={people}
+              handleResetFilters={handleResetFilters}
+            />
+            {/* Status trackers - hidden on mobile, shown on lg+ */}
+            <div className="hidden lg:block space-y-4">
               <StatusTracker people={filteredPeople} />
               <BirthdayTracker people={filteredPeople} />
               <ContractTracker people={filteredPeople} />
             </div>
+          </div>
 
-            {/* Search and Table Section */}
+          {/* Search and Table Section */}
+          <div className="order-2 lg:order-2 xl:order-3">
             <SearchAndTableSection
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
@@ -256,6 +265,13 @@ const Home = () => {
               handleDelete={handleDelete}
               setPeople={setPeople}
             />
+          </div>
+
+          {/* Status trackers for mobile - at bottom */}
+          <div className="lg:hidden space-y-4 order-3">
+            <StatusTracker people={filteredPeople} />
+            <BirthdayTracker people={filteredPeople} />
+            <ContractTracker people={filteredPeople} />
           </div>
         </div>
       </div>

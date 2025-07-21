@@ -17,7 +17,7 @@ import { Person, addPerson } from "@/lib/data";
 import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
 import { Packer } from "docx";
 import { saveAs } from "file-saver";
-import { getExportColumns, TABLE_COLUMNS_STORAGE_KEY, type TableColumn } from "@/lib/constants";
+import { getExportColumns, TABLE_COLUMNS_STORAGE_KEY, DEFAULT_TABLE_COLUMNS, type TableColumn } from "@/lib/constants";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -196,41 +196,43 @@ export const SearchAndTableSection = ({
   const peopleInPPD = filteredPeople.filter((person) => person.isInPPD).length;
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="lg:col-span-2">
-        <div className="mb-6 flex gap-4">
+    <div className="w-full">
+      <div className="w-full">
+        <div className="mb-6 space-y-4">
           <Input
             type="text"
             placeholder="Пошук..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-12 text-lg border-2 border-border focus:border-primary"
+            className="w-full h-10 sm:h-12 text-base sm:text-lg border-2 border-border focus:border-primary"
           />
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:gap-4">
             <Button
               onClick={handleExportToWord}
-              className="h-12 px-4 text-lg"
+              className="h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-lg flex-1 sm:flex-none"
               variant="outline"
-              size="lg"
+              size="sm"
             >
-              <FileText className="mr-2 h-5 w-5" />
-              Word
+              <FileText className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
+              <span className="hidden sm:inline">Word</span>
+              <span className="sm:hidden">W</span>
             </Button>
             <Button
               onClick={handleExportToExcel}
-              className="h-12 px-4 text-lg"
+              className="h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-lg flex-1 sm:flex-none"
               variant="outline"
-              size="lg"
+              size="sm"
             >
-              <FileSpreadsheet className="mr-2 h-5 w-5" />
-              Excel
+              <FileSpreadsheet className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
+              <span className="hidden sm:inline">Excel</span>
+              <span className="sm:hidden">E</span>
             </Button>
             <Button
               onClick={handleAddPerson}
-              className="h-12 px-6 text-lg hover:bg-green-300"
-              size="lg"
+              className="h-10 sm:h-12 px-4 sm:px-6 text-sm sm:text-lg hover:bg-green-300 flex-1 sm:flex-none"
+              size="sm"
             >
-              <Plus className="mr-2 h-5 w-5" />
+              <Plus className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
               Додати
             </Button>
           </div>
@@ -250,112 +252,115 @@ export const SearchAndTableSection = ({
             Скинути порядок
           </Button>
         </div>
-        <Card className="p-6 bg-card border-border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columns.map((column, index) => (
-                  <TableHead
-                    key={column.field}
-                    className={`cursor-move ${
-                      column.width
-                    } relative group justtify-center whitespace-nowrap
-                    ${
-                      dropIndicator === index ? "border-l-2 border-primary" : ""
-                    }
-                    ${
-                      isDragging && draggedColumn.current === index
-                        ? "opacity-50 bg-accent"
-                        : ""
-                    }
-                    ${
-                      isDragging && draggedColumn.current !== index
-                        ? "hover:border-l-2 hover:border-primary/50"
-                        : ""
-                    }
-                  `}
-                    draggable
-                    onDragStart={() => handleDragStart(index)}
-                    onDragEnter={() => handleDragEnter(index)}
-                    onDragEnd={handleDragEnd}
-                    onDragOver={(e) => e.preventDefault()}
-                    onClick={() => handleSort(column.field as SortField)}
-                  >
-                    <div className="flex items-center gap-1">
-                      {/* <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" /> */}
-                      {column.label}
-                      {sortConfig.field === column.field &&
-                        (sortConfig.order === "asc" ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="m18 15-6-6-6 6" />
-                          </svg>
-                        ) : sortConfig.order === "desc" ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="m6 9 6 6 6-6" />
-                          </svg>
-                        ) : (
-                          <ArrowUpDown className="h-4 w-4" />
-                        ))}
-                    </div>
-                  </TableHead>
-                ))}
-                <TableHead>ППД</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPeople.map((person) => (
-                <TableRow
-                  key={person.fullName}
-                  className="cursor-pointer hover:bg-accent"
-                  onClick={() => handlePersonClick(person)}
-                >
-                  {columns.map((column) => (
-                    <TableCell
-                      className="flex-row items-center justify-center text-center whitespace-nowrap"
+        <Card className="p-3 sm:p-6 bg-card border-border">
+          <div className="overflow-x-auto">
+            <Table className="min-w-full">
+              <TableHeader>
+                <TableRow>
+                  {columns.map((column, index) => (
+                    <TableHead
                       key={column.field}
+                      className={`cursor-move ${
+                        column.width
+                      } relative group justify-center whitespace-nowrap text-xs sm:text-sm
+                      ${
+                        dropIndicator === index ? "border-l-2 border-primary" : ""
+                      }
+                      ${
+                        isDragging && draggedColumn.current === index
+                          ? "opacity-50 bg-accent"
+                          : ""
+                      }
+                      ${
+                        isDragging && draggedColumn.current !== index
+                          ? "hover:border-l-2 hover:border-primary/50"
+                          : ""
+                      }
+                    `}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragEnter={() => handleDragEnter(index)}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={(e) => e.preventDefault()}
+                      onClick={() => handleSort(column.field as SortField)}
                     >
-                      {renderCell(person, column.field)}
-                    </TableCell>
-                  ))}
-                  <TableCell>
-                    <Switch
-                      checked={person.isInPPD}
-                      onCheckedChange={async (checked) => {
-                        const updatedPerson = { ...person, isInPPD: checked };
-                        await addPerson(updatedPerson);
-                        setPeople((prevPeople) =>
-                          prevPeople.map((p) =>
-                            p.fullName === person.fullName ? updatedPerson : p
-                          )
-                        );
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </TableCell>
+                      <div className="flex items-center gap-1">
+                        {/* <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" /> */}
+                        {column.label}
+                        {sortConfig.field === column.field &&
+                          (sortConfig.order === "asc" ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="m18 15-6-6-6 6" />
+                            </svg>
+                          ) : sortConfig.order === "desc" ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="m6 9 6 6 6-6" />
+                            </svg>
+                          ) : (
+                            <ArrowUpDown className="h-4 w-4" />
+                          ))}
+                      </div>
+                    </TableHead>
+
+                ))}
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">ППД</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredPeople.map((person) => (
+                  <TableRow
+                    key={person.fullName}
+                    className="cursor-pointer hover:bg-accent"
+                    onClick={() => handlePersonClick(person)}
+                  >
+                    {columns.map((column) => (
+                      <TableCell
+                        className="text-center whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4 py-2"
+                        key={column.field}
+                      >
+                        {renderCell(person, column.field)}
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-center px-2 sm:px-4 py-2">
+                      <Switch
+                        checked={person.isInPPD}
+                        onCheckedChange={async (checked) => {
+                          const updatedPerson = { ...person, isInPPD: checked };
+                          await addPerson(updatedPerson);
+                          setPeople((prevPeople) =>
+                            prevPeople.map((p) =>
+                              p.fullName === person.fullName ? updatedPerson : p
+                            )
+                          );
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </Card>
       </div>
     </div>
