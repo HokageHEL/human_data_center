@@ -3,13 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, User, ArrowUpDown, GripHorizontal, FileText, FileSpreadsheet } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, FileText, FileSpreadsheet, ArrowUpDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Person, addPerson } from "@/lib/data";
 import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
 import { Packer } from "docx";
 import { saveAs } from "file-saver";
+import { getExportColumns, TABLE_COLUMNS_STORAGE_KEY, type TableColumn } from "@/lib/constants";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -32,14 +40,6 @@ const calculateAge = (birthDate: string): number => {
   }
   return age;
 };
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 type SortField =
   | "fullName"
@@ -86,24 +86,15 @@ export const SearchAndTableSection = ({
   const [dropIndicator, setDropIndicator] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const defaultColumns = [
-    { field: "shpoNumber", label: "№", width: "w-[80px]" },
-    { field: "fullName", label: "ПІБ", width: "w-[200px]" },
-    { field: "militaryRank", label: "Військове звання", width: "w-[150px]" },
-    { field: "position", label: "Посада", width: "w-[150px]" },
-    { field: "birthDate", label: "Дата народження", width: "w-[150px]" },
-    { field: "age", label: "Вік", width: "w-[80px]" },
-    { field: "completionPercentage", label: "Заповнено", width: "w-[120px]" },
-    { field: "gender", label: "Стать", width: "w-[100px]" },
-  ];
 
-  const [columns, setColumns] = useState(() => {
-    const savedColumns = localStorage.getItem("tableColumns");
-    return savedColumns ? JSON.parse(savedColumns) : defaultColumns;
+
+  const [columns, setColumns] = useState<TableColumn[]>(() => {
+    const savedColumns = localStorage.getItem(TABLE_COLUMNS_STORAGE_KEY);
+    return savedColumns ? JSON.parse(savedColumns) : DEFAULT_TABLE_COLUMNS;
   });
 
   useEffect(() => {
-    localStorage.setItem("tableColumns", JSON.stringify(columns));
+    localStorage.setItem(TABLE_COLUMNS_STORAGE_KEY, JSON.stringify(columns));
   }, [columns]);
 
   const handleDragStart = (index: number) => {
@@ -132,8 +123,8 @@ export const SearchAndTableSection = ({
   };
 
   const resetColumnOrder = () => {
-    setColumns(defaultColumns);
-    localStorage.setItem("tableColumns", JSON.stringify(defaultColumns));
+    setColumns(DEFAULT_TABLE_COLUMNS);
+    localStorage.setItem(TABLE_COLUMNS_STORAGE_KEY, JSON.stringify(DEFAULT_TABLE_COLUMNS));
   };
 
   const handlePersonClick = (person: Person) => {
@@ -149,18 +140,14 @@ export const SearchAndTableSection = ({
   };
 
   const handleExportToWord = async () => {
-    const exportColumns = columns.filter(col => 
-      col.field !== 'completionPercentage' && col.field !== 'isInPPD'
-    );
+    const exportColumns = getExportColumns(columns);
     const doc = generateTableDocument(filteredPeople, exportColumns);
     const blob = await Packer.toBlob(doc);
     saveAs(blob, 'people-table.docx');
   };
 
   const handleExportToExcel = () => {
-    const exportColumns = columns.filter(col => 
-      col.field !== 'completionPercentage' && col.field !== 'isInPPD'
-    );
+    const exportColumns = getExportColumns(columns);
     const data = exportToExcel(filteredPeople, exportColumns);
     const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(blob, 'people-table.xlsx');

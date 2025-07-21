@@ -7,49 +7,10 @@ import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 import BirthdayTracker from "@/components/BirthdayTracker";
 import ContractTracker from "@/components/ContractTracker";
 import StatusTracker from "@/components/StatusTracker";
+import { getMilitaryRankNames, RANK_CATEGORIES, isRankInCategory, REQUIRED_PERSON_FIELDS, OPTIONAL_PERSON_FIELDS } from "@/lib/constants";
 
 const calculateCompletionPercentage = (person: Person): number => {
-  const requiredFields = [
-    "fullName",
-    "passportNumber",
-    "taxId",
-    "registrationPlace",
-    "address",
-    "familyStatus",
-    "relatives",
-    "education",
-    "gender",
-    "birthDate",
-    "phoneNumber",
-    "photo",
-    "position",
-    "militaryRank",
-    "positionRank",
-    "fitnessStatus",
-    "unit",
-    "department",
-    "militarySpecialty",
-    "tariffCategory",
-    "salary",
-    "serviceType",
-    "serviceStartDate",
-    "servicePeriods",
-    "unitStartDate",
-    "previousServicePlaces",
-    "militaryDocumentNumber",
-    "shpoNumber",
-  ];
-
-  const optionalFields = [
-    "medicalCommissionNumber",
-    "medicalCommissionDate",
-    "contractEndDate",
-    "combatExperienceNumber",
-    "combatPeriods",
-    "additionalInfo",
-  ];
-
-  let filledRequiredFields = requiredFields.filter(
+  let filledRequiredFields = REQUIRED_PERSON_FIELDS.filter(
     (field) =>
       person[field as keyof Person] &&
       person[field as keyof Person].toString().trim() !== ""
@@ -60,7 +21,7 @@ const calculateCompletionPercentage = (person: Person): number => {
     filledRequiredFields++;
   }
 
-  const totalFields = requiredFields.length + 1; // +1 for documents
+  const totalFields = REQUIRED_PERSON_FIELDS.length + 1; // +1 for documents
   return Math.round((filledRequiredFields / totalFields) * 100);
 };
 
@@ -134,33 +95,13 @@ const Home = () => {
         filters.militaryRank.length === 0 ||
         (person.militaryRank
           ? filters.militaryRank.some((rank) => {
-              const personRank = person.militaryRank.toLowerCase();
               switch (rank) {
                 case "Офіцери":
-                  return [
-                    "молодший лейтенант",
-                    "лейтенант",
-                    "старший лейтенант",
-                    "капітан",
-                    "майор",
-                    "підполковник",
-                    "полковник",
-                  ].some((r) => personRank === r);
+                  return isRankInCategory(person.militaryRank, 'OFFICERS');
                 case "Сержанти":
-                  return [
-                    "молодший сержант",
-                    "сержант",
-                    "старший сержант",
-                    "головний сержант",
-                    "штаб-сержант",
-                    "майстер-сержант",
-                    "старший майстер-сержант",
-                    "головний майстер-сержант",
-                  ].some((r) => personRank === r);
+                  return isRankInCategory(person.militaryRank, 'SERGEANTS');
                 case "Солдати":
-                  return ["солдат", "старший солдат"].some(
-                    (r) => personRank === r
-                  );
+                  return isRankInCategory(person.militaryRank, 'SOLDIERS');
                 default:
                   return false;
               }
@@ -171,33 +112,13 @@ const Home = () => {
         filters.positionRank.length === 0 ||
         (person.positionRank
           ? filters.positionRank.some((rank) => {
-              const positionRank = person.positionRank.toLowerCase();
               switch (rank) {
                 case "Офіцери":
-                  return [
-                    "молодший лейтенант",
-                    "лейтенант",
-                    "старший лейтенант",
-                    "капітан",
-                    "майор",
-                    "підполковник",
-                    "полковник",
-                  ].some((r) => positionRank === r);
+                  return isRankInCategory(person.positionRank, 'OFFICERS');
                 case "Сержанти":
-                  return [
-                    "молодший сержант",
-                    "сержант",
-                    "старший сержант",
-                    "головний сержант",
-                    "штаб-сержант",
-                    "майстер-сержант",
-                    "старший майстер-сержант",
-                    "головний майстер-сержант",
-                  ].some((r) => positionRank === r);
+                  return isRankInCategory(person.positionRank, 'SERGEANTS');
                 case "Солдати":
-                  return ["солдат", "старший солдат"].some(
-                    (r) => positionRank === r
-                  );
+                  return isRankInCategory(person.positionRank, 'SOLDIERS');
                 default:
                   return false;
               }
@@ -247,27 +168,9 @@ const Home = () => {
 
       // Special handling for militaryRank field
       if (field === "militaryRank") {
-        const militaryRanks = [
-          "солдат",
-          "старший солдат",
-          "молодший сержант",
-          "сержант",
-          "старший сержант",
-          "головний сержант",
-          "штаб-сержант",
-          "майстер-сержант",
-          "старший майстер-сержант",
-          "головний майстер-сержант",
-          "молодший лейтенант",
-          "лейтенант",
-          "старший лейтенант",
-          "капітан",
-          "майор",
-          "підполковник",
-          "полковник",
-        ];
-        const aIndex = militaryRanks.indexOf(a[field]);
-        const bIndex = militaryRanks.indexOf(b[field]);
+        const militaryRankNames = getMilitaryRankNames();
+        const aIndex = militaryRankNames.indexOf(a[field]);
+        const bIndex = militaryRankNames.indexOf(b[field]);
         return (aIndex - bIndex) * order;
       }
 
@@ -309,7 +212,8 @@ const Home = () => {
   const handleResetFilters = () => {
     setFilters({
       birthDate: "",
-      militaryRank: "",
+      militaryRank: [],
+      positionRank: [],
       unit: "all",
       gender: "all",
       fitnessStatus: "all",

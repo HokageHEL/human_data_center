@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ABSENCE_STATUS_OPTIONS } from "@/lib/constants";
 
 interface PhotoUploadProps {
   currentPhoto: string;
@@ -43,16 +44,7 @@ export function PhotoUpload({
   }, [currentPhoto]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const absenceStatusOptions = [
-    { value: "не_вказано", label: "Не вказано" },
-    { value: "відпустка", label: "Відпустка" },
-    { value: "короткострокове_лікування", label: "Короткострокове лікування" },
-    { value: "довгострокове_лікування", label: "Довгострокове лікування" },
-    { value: "відрядження", label: "Відрядження" },
-    { value: "декрет", label: "Декрет" },
-    { value: "РВБД", label: "Район Ведення Бойових Дій" },
-    { value: "навчання", label: "Навчання" },
-  ];
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -152,7 +144,7 @@ export function PhotoUpload({
                 <SelectValue placeholder="Оберіть статус відсутності" />
               </SelectTrigger>
               <SelectContent>
-                {absenceStatusOptions.map((option) => (
+                {ABSENCE_STATUS_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
