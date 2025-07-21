@@ -28,11 +28,8 @@ export const useResizableColumns = (initialColumns: ResizableColumn[]) => {
 
     const deltaX = e.clientX - startX.current;
     const newWidth = Math.max(
-      columns[resizingColumn].minWidth || 80,
-      Math.min(
-        columns[resizingColumn].maxWidth || 500,
-        startWidth.current + deltaX
-      )
+      columns[resizingColumn].minWidth || 20,
+      startWidth.current + deltaX
     );
 
     setColumns(prev => 

@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -92,10 +98,10 @@ export const SearchAndTableSection = ({
   const draggedOverColumn = useRef<number | null>(null);
   const [dropIndicator, setDropIndicator] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  
+
   // Local state to track current people data for immediate UI updates
   const [localPeople, setLocalPeople] = useState<Person[]>(filteredPeople);
-  
+
   // Update local state when filteredPeople prop changes
   useEffect(() => {
     setLocalPeople(filteredPeople);
@@ -274,7 +280,8 @@ export const SearchAndTableSection = ({
     (person) => person.status === "РВБД" && !person.isInPPD
   ).length;
   const peopleNotSpecifiedLeave = localPeople.filter(
-    (person) => (!person.status || person.status === "не_вказано") && !person.isInPPD
+    (person) =>
+      (!person.status || person.status === "не_вказано") && !person.isInPPD
   ).length;
 
   return (
@@ -390,8 +397,7 @@ export const SearchAndTableSection = ({
                     `}
                       style={{
                         width: `${column.width}px`,
-                        minWidth: `${column.minWidth || 80}px`,
-                        maxWidth: `${column.maxWidth || 500}px`,
+                        minWidth: `${column.minWidth || 20}px`,
                       }}
                       draggable
                       onDragStart={() => handleDragStart(index)}
@@ -466,8 +472,7 @@ export const SearchAndTableSection = ({
                         key={column.field}
                         style={{
                           width: `${column.width}px`,
-                          minWidth: `${column.minWidth || 80}px`,
-                          maxWidth: `${column.maxWidth || 500}px`,
+                          minWidth: `${column.minWidth || 20}px`,
                         }}
                       >
                         {renderCell(person, column.field, column.width)}
@@ -478,14 +483,14 @@ export const SearchAndTableSection = ({
                         checked={person.isInPPD}
                         onCheckedChange={async (checked) => {
                           const updatedPerson = { ...person, isInPPD: checked };
-                          
+
                           // Update local state immediately for UI responsiveness
                           setLocalPeople((prevPeople) =>
                             prevPeople.map((p) =>
                               p.fullName === person.fullName ? updatedPerson : p
                             )
                           );
-                          
+
                           // Update database and parent state
                           await addPerson(updatedPerson);
                           setPeople((prevPeople) =>
