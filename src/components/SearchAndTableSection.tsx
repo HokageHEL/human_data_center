@@ -17,7 +17,14 @@ import { Person, addPerson } from "@/lib/data";
 import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
 import { Packer } from "docx";
 import { saveAs } from "file-saver";
-import { getExportColumns, TABLE_COLUMNS_STORAGE_KEY, DEFAULT_TABLE_COLUMNS, type TableColumn } from "@/lib/constants";
+import {
+  getExportColumns,
+  TABLE_COLUMNS_STORAGE_KEY,
+  DEFAULT_TABLE_COLUMNS,
+  type TableColumn,
+} from "@/lib/constants";
+import { useResizableColumns } from "@/hooks/use-resizable-columns";
+import { TruncatedText } from "@/components/ui/truncated-text";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -86,12 +93,13 @@ export const SearchAndTableSection = ({
   const [dropIndicator, setDropIndicator] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-
-
-  const [columns, setColumns] = useState<TableColumn[]>(() => {
-    const savedColumns = localStorage.getItem(TABLE_COLUMNS_STORAGE_KEY);
-    return savedColumns ? JSON.parse(savedColumns) : DEFAULT_TABLE_COLUMNS;
-  });
+  const { columns, setColumns, handleMouseDown, isResizing, resizingColumn } =
+    useResizableColumns(
+      (() => {
+        const savedColumns = localStorage.getItem(TABLE_COLUMNS_STORAGE_KEY);
+        return savedColumns ? JSON.parse(savedColumns) : DEFAULT_TABLE_COLUMNS;
+      })()
+    );
 
   useEffect(() => {
     localStorage.setItem(TABLE_COLUMNS_STORAGE_KEY, JSON.stringify(columns));
@@ -124,7 +132,10 @@ export const SearchAndTableSection = ({
 
   const resetColumnOrder = () => {
     setColumns(DEFAULT_TABLE_COLUMNS);
-    localStorage.setItem(TABLE_COLUMNS_STORAGE_KEY, JSON.stringify(DEFAULT_TABLE_COLUMNS));
+    localStorage.setItem(
+      TABLE_COLUMNS_STORAGE_KEY,
+      JSON.stringify(DEFAULT_TABLE_COLUMNS)
+    );
   };
 
   const handlePersonClick = (person: Person) => {
@@ -143,17 +154,19 @@ export const SearchAndTableSection = ({
     const exportColumns = getExportColumns(columns);
     const doc = generateTableDocument(filteredPeople, exportColumns);
     const blob = await Packer.toBlob(doc);
-    saveAs(blob, 'people-table.docx');
+    saveAs(blob, "people-table.docx");
   };
 
   const handleExportToExcel = () => {
     const exportColumns = getExportColumns(columns);
     const data = exportToExcel(filteredPeople, exportColumns);
-    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, 'people-table.xlsx');
+    const blob = new Blob([data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, "people-table.xlsx");
   };
 
-  const renderCell = (person: Person, field: string) => {
+  const renderCell = (person: Person, field: string, columnWidth: number) => {
     switch (field) {
       case "completionPercentage":
         return (
@@ -174,19 +187,54 @@ export const SearchAndTableSection = ({
           </div>
         );
       case "shpoNumber":
-        return person.shpoNumber;
+        return (
+          <TruncatedText
+            text={person.shpoNumber || ""}
+            maxWidth={columnWidth - 20}
+          />
+        );
       case "fullName":
-        return <div className="flex items-center gap-2">{person.fullName}</div>;
+        return (
+          <TruncatedText
+            text={person.fullName || ""}
+            maxWidth={columnWidth - 20}
+          />
+        );
       case "birthDate":
-        return <span>{formatDate(person.birthDate)}</span>;
+        return (
+          <TruncatedText
+            text={formatDate(person.birthDate)}
+            maxWidth={columnWidth - 20}
+          />
+        );
       case "age":
-        return <span>{calculateAge(person.birthDate)}</span>;
+        return (
+          <TruncatedText
+            text={calculateAge(person.birthDate).toString()}
+            maxWidth={columnWidth - 20}
+          />
+        );
       case "militaryRank":
-        return person.militaryRank;
+        return (
+          <TruncatedText
+            text={person.militaryRank || ""}
+            maxWidth={columnWidth - 20}
+          />
+        );
       case "position":
-        return person.position;
+        return (
+          <TruncatedText
+            text={person.position || ""}
+            maxWidth={columnWidth - 20}
+          />
+        );
       case "gender":
-        return person.gender;
+        return (
+          <TruncatedText
+            text={person.gender || ""}
+            maxWidth={columnWidth - 20}
+          />
+        );
       default:
         return null;
     }
@@ -194,6 +242,31 @@ export const SearchAndTableSection = ({
 
   const totalPeople = filteredPeople.length;
   const peopleInPPD = filteredPeople.filter((person) => person.isInPPD).length;
+  const peopleNotInPPD = totalPeople - peopleInPPD;
+  const peopleOnVacation = filteredPeople.filter(
+    (person) => person.status === "відпустка"
+  ).length;
+  const peopleOnBusinessTrip = filteredPeople.filter(
+    (person) => person.status === "відрядження"
+  ).length;
+  const peopleOnMaternityLeave = filteredPeople.filter(
+    (person) => person.status === "декрет"
+  ).length;
+  const peopleOnLongSickLeave = filteredPeople.filter(
+    (person) => person.status === "довгострокове_лікування"
+  ).length;
+  const peopleOnShortSickLeave = filteredPeople.filter(
+    (person) => person.status === "короткострокове_лікування"
+  ).length;
+  const peopleOnTraining = filteredPeople.filter(
+    (person) => person.status === "навчання"
+  ).length;
+  const peopleOnRvbd = filteredPeople.filter(
+    (person) => person.status === "РВБД"
+  ).length;
+  const peopleNotSpecifiedLeave = filteredPeople.filter(
+    (person) => person.status === "не_вказано"
+  ).length;
 
   return (
     <div className="w-full">
@@ -239,9 +312,38 @@ export const SearchAndTableSection = ({
         </div>
 
         <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
-          <div className="flex gap-4">
-            <span>Всього: {totalPeople}</span>
-            <span>У ППД: {peopleInPPD}</span>
+          <div className="flex gap-8">
+            <div className="flex gap-4">
+              <span>Всього: {totalPeople}</span>
+              <span>У ППД: {peopleInPPD}</span>
+            </div>
+            <div className="flex gap-4">
+              <span>
+                <span className="font-bold">Не</span> в ППД: {peopleNotInPPD}
+              </span>
+              {peopleOnVacation > 0 && (
+                <span>Відпустка: {peopleOnVacation}</span>
+              )}
+              {peopleOnBusinessTrip > 0 && (
+                <span>Відрядження: {peopleOnBusinessTrip}</span>
+              )}
+              {peopleOnMaternityLeave > 0 && (
+                <span>Декрет: {peopleOnMaternityLeave}</span>
+              )}
+              {peopleOnLongSickLeave > 0 && (
+                <span>Довгострокове лікування: {peopleOnLongSickLeave}</span>
+              )}
+              {peopleOnShortSickLeave > 0 && (
+                <span>Короткострокове лікування: {peopleOnShortSickLeave}</span>
+              )}
+              {peopleOnTraining > 0 && (
+                <span>Навчання: {peopleOnTraining}</span>
+              )}
+              {peopleOnRvbd > 0 && <span>РВБД: {peopleOnRvbd}</span>}
+              {peopleNotSpecifiedLeave > 0 && (
+                <span>Не вказано: {peopleNotSpecifiedLeave}</span>
+              )}
+            </div>
           </div>
           <Button
             onClick={resetColumnOrder}
@@ -254,17 +356,17 @@ export const SearchAndTableSection = ({
         </div>
         <Card className="p-3 sm:p-6 bg-card border-border">
           <div className="overflow-x-auto">
-            <Table className="min-w-full">
+            <Table className="min-w-full table-fixed">
               <TableHeader>
                 <TableRow>
                   {columns.map((column, index) => (
                     <TableHead
                       key={column.field}
-                      className={`cursor-move ${
-                        column.width
-                      } relative group justify-center whitespace-nowrap text-xs sm:text-sm
+                      className={`relative group justify-center whitespace-nowrap text-xs sm:text-sm border-r border-border
                       ${
-                        dropIndicator === index ? "border-l-2 border-primary" : ""
+                        dropIndicator === index
+                          ? "border-l-2 border-primary"
+                          : ""
                       }
                       ${
                         isDragging && draggedColumn.current === index
@@ -277,16 +379,25 @@ export const SearchAndTableSection = ({
                           : ""
                       }
                     `}
+                      style={{
+                        width: `${column.width}px`,
+                        minWidth: `${column.minWidth || 80}px`,
+                        maxWidth: `${column.maxWidth || 500}px`,
+                      }}
                       draggable
                       onDragStart={() => handleDragStart(index)}
                       onDragEnter={() => handleDragEnter(index)}
                       onDragEnd={handleDragEnd}
                       onDragOver={(e) => e.preventDefault()}
-                      onClick={() => handleSort(column.field as SortField)}
                     >
-                      <div className="flex items-center gap-1">
-                        {/* <GripHorizontal className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" /> */}
-                        {column.label}
+                      <div
+                        className="flex items-center gap-1 cursor-pointer px-2"
+                        onClick={() => handleSort(column.field as SortField)}
+                      >
+                        <TruncatedText
+                          text={column.label}
+                          maxWidth={column.width - 40}
+                        />
                         {sortConfig.field === column.field &&
                           (sortConfig.order === "asc" ? (
                             <svg
@@ -320,10 +431,17 @@ export const SearchAndTableSection = ({
                             <ArrowUpDown className="h-4 w-4" />
                           ))}
                       </div>
+                      {/* Resize handle */}
+                      <div
+                        className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/50 group-hover:bg-primary/30"
+                        onMouseDown={(e) => handleMouseDown(e, index)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
                     </TableHead>
-
-                ))}
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">ППД</TableHead>
+                  ))}
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap w-[80px]">
+                    ППД
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -335,10 +453,15 @@ export const SearchAndTableSection = ({
                   >
                     {columns.map((column) => (
                       <TableCell
-                        className="text-center whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4 py-2"
+                        className="text-center text-xs sm:text-sm px-2 py-2 border-r border-border"
                         key={column.field}
+                        style={{
+                          width: `${column.width}px`,
+                          minWidth: `${column.minWidth || 80}px`,
+                          maxWidth: `${column.maxWidth || 500}px`,
+                        }}
                       >
-                        {renderCell(person, column.field)}
+                        {renderCell(person, column.field, column.width)}
                       </TableCell>
                     ))}
                     <TableCell className="text-center px-2 sm:px-4 py-2">

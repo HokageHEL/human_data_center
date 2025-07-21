@@ -7,12 +7,12 @@ import { SearchAndTableSection } from "@/components/SearchAndTableSection";
 import BirthdayTracker from "@/components/BirthdayTracker";
 import ContractTracker from "@/components/ContractTracker";
 import StatusTracker from "@/components/StatusTracker";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp, Filter } from "lucide-react";
 import {
   getMilitaryRankNames,
-  RANK_CATEGORIES,
   isRankInCategory,
   REQUIRED_PERSON_FIELDS,
-  OPTIONAL_PERSON_FIELDS,
 } from "@/lib/constants";
 
 const calculateCompletionPercentage = (person: Person): number => {
@@ -54,6 +54,7 @@ const calculateAge = (birthDate: string): number => {
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     birthDate: "",
     militaryRank: [],
@@ -233,46 +234,125 @@ const Home = () => {
     return searchTerm !== "";
   };
 
+  // Helper functions to check if trackers have relevant data
+  const getUpcomingBirthdays = (daysRange = 10) => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+
+    const getDaysUntilBirthday = (birthDate: string): number => {
+      const [year, month, day] = birthDate.split("-").map(Number);
+      const nextBirthday = new Date(currentYear, month - 1, day);
+
+      if (nextBirthday < today) {
+        nextBirthday.setFullYear(currentYear + 1);
+      }
+
+      const timeDiff = nextBirthday.getTime() - today.getTime();
+      return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    };
+
+    return filteredPeople
+      .filter((p) => !!p.birthDate)
+      .filter((p) => getDaysUntilBirthday(p.birthDate) <= daysRange);
+  };
+
+  const getUpcomingContracts = (daysRange = 10) => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+
+    const getDaysUntilContract = (contractDate: string): number => {
+      const [year, month, day] = contractDate.split("-").map(Number);
+      const nextContract = new Date(currentYear, month - 1, day);
+
+      if (nextContract < today) {
+        nextContract.setFullYear(currentYear + 1);
+      }
+
+      const timeDiff = nextContract.getTime() - today.getTime();
+      return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    };
+
+    return filteredPeople
+      .filter((p) => !!p.contractEndDate)
+      .filter((p) => getDaysUntilContract(p.contractEndDate) <= daysRange);
+  };
+
+  const hasUpcomingBirthdays = getUpcomingBirthdays().length > 0;
+  const hasUpcomingContracts = getUpcomingContracts().length > 0;
+
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-3 sm:p-4 lg:p-6">
-      <div className="w-full max-w-[1600px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[auto,2fr] xl:grid-cols-[auto,1fr,1fr] gap-4 lg:gap-6">
-          {/* Filters Section */}
-          <div className="space-y-4 order-1 lg:order-1">
-            <FilterSection
-              filters={filters}
-              setFilters={setFilters}
-              people={people}
-              handleResetFilters={handleResetFilters}
-            />
-            {/* Status trackers - hidden on mobile, shown on lg+ */}
-            <div className="hidden lg:block space-y-4">
-              <StatusTracker people={filteredPeople} />
-              <BirthdayTracker people={filteredPeople} />
-              <ContractTracker people={filteredPeople} />
+      <div className="w-full max-w-[1600px] mx-auto space-y-4">
+        {/* Top Controls Bar */}
+        <div className="flex items-center justify-start gap-4">
+          <Button
+            onClick={() => setShowFilters(!showFilters)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Фільтри
+            {showFilters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+
+        {/* Collapsible Filters Section */}
+        {showFilters && (
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-4 lg:gap-6 p-4 bg-card border border-border rounded-lg">
+            {/* Main Filters */}
+            <div>
+              <FilterSection
+                filters={filters}
+                setFilters={setFilters}
+                people={people}
+                handleResetFilters={handleResetFilters}
+              />
             </div>
           </div>
+        )}
 
-          {/* Search and Table Section */}
-          <div className="order-2 lg:order-2 xl:order-3">
-            <SearchAndTableSection
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              sortConfig={sortConfig}
-              setSortConfig={setSortConfig}
-              filteredPeople={filteredPeople}
-              handleSort={handleSort}
-              handleDelete={handleDelete}
-              setPeople={setPeople}
-            />
+        {/* Personal Status Summary - Always above table */}
+        {/* <div className="text-sm text-muted-foreground bg-card border border-border rounded-lg p-3">
+          Всього: {filteredPeople.length} | У ППД:{" "}
+          {filteredPeople.filter((p) => p.isInPPD).length} | Відпустка:{" "}
+          {filteredPeople.filter((p) => p.status === "відпустка").length}
+        </div> */}
+
+        {/* Conditional Birthday and Contract Trackers - Always at top of table when data exists */}
+        {(hasUpcomingBirthdays || hasUpcomingContracts) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {hasUpcomingBirthdays && (
+              <BirthdayTracker people={filteredPeople} />
+            )}
+            {hasUpcomingContracts && (
+              <ContractTracker people={filteredPeople} />
+            )}
           </div>
+        )}
 
-          {/* Status trackers for mobile - at bottom */}
-          <div className="lg:hidden space-y-4 order-3">
+        {/* Status Tracker - Compact view when filters are hidden */}
+        {!showFilters && (
+          <div className="lg:hidden">
             <StatusTracker people={filteredPeople} />
-            <BirthdayTracker people={filteredPeople} />
-            <ContractTracker people={filteredPeople} />
           </div>
+        )}
+
+        {/* Main Table Section - Full Width */}
+        <div className="w-full">
+          <SearchAndTableSection
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            sortConfig={sortConfig}
+            setSortConfig={setSortConfig}
+            filteredPeople={filteredPeople}
+            handleSort={handleSort}
+            handleDelete={handleDelete}
+            setPeople={setPeople}
+          />
         </div>
       </div>
     </div>

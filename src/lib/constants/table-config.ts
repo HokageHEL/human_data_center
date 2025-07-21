@@ -3,18 +3,20 @@
 export interface TableColumn {
   field: string;
   label: string;
-  width: string;
+  width: number; // width in pixels
+  minWidth?: number;
+  maxWidth?: number;
 }
 
 export const DEFAULT_TABLE_COLUMNS: TableColumn[] = [
-  { field: "shpoNumber", label: "№", width: "w-[80px]" },
-  { field: "fullName", label: "ПІБ", width: "w-[200px]" },
-  { field: "militaryRank", label: "Військове звання", width: "w-[150px]" },
-  { field: "position", label: "Посада", width: "w-[150px]" },
-  { field: "birthDate", label: "Дата народження", width: "w-[150px]" },
-  { field: "age", label: "Вік", width: "w-[80px]" },
-  { field: "completionPercentage", label: "Заповнено", width: "w-[120px]" },
-  { field: "gender", label: "Стать", width: "w-[100px]" },
+  { field: "shpoNumber", label: "№", width: 80, minWidth: 60, maxWidth: 120 },
+  { field: "fullName", label: "ПІБ", width: 200, minWidth: 150, maxWidth: 350 },
+  { field: "militaryRank", label: "Військове звання", width: 150, minWidth: 120, maxWidth: 250 },
+  { field: "position", label: "Посада", width: 150, minWidth: 120, maxWidth: 300 },
+  { field: "birthDate", label: "Дата народження", width: 150, minWidth: 120, maxWidth: 200 },
+  { field: "age", label: "Вік", width: 80, minWidth: 60, maxWidth: 100 },
+  { field: "completionPercentage", label: "Заповнено", width: 120, minWidth: 100, maxWidth: 150 },
+  { field: "gender", label: "Стать", width: 100, minWidth: 80, maxWidth: 120 },
 ];
 
 // Fields that should be excluded from exports
