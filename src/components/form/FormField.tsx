@@ -16,17 +16,19 @@ interface FieldOption {
   className?: string;
 }
 
+type FormFieldValue = string | number | boolean | null | undefined;
+
 interface FormFieldProps {
   label: string;
   field: string;
   type: "text" | "textarea" | "date" | "number" | "select" | "switch";
-  value: any;
-  onChange: (field: string, value: any) => void;
+  value: FormFieldValue;
+  onChange: (field: string, value: FormFieldValue) => void;
   options?: FieldOption[];
   show?: boolean;
   readonly?: boolean;
   placeholder?: string;
-  onFieldChange?: (value: any) => void;
+  onFieldChange?: (value: FormFieldValue) => void;
 }
 
 export const FormField = ({
@@ -43,7 +45,7 @@ export const FormField = ({
 }: FormFieldProps) => {
   if (!show) return null;
 
-  const handleChange = (newValue: any) => {
+  const handleChange = (newValue: FormFieldValue) => {
     onChange(field, newValue);
     onFieldChange?.(newValue);
   };

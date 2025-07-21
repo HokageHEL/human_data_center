@@ -1,9 +1,38 @@
 import { FormField } from "./FormField";
 import { FITNESS_STATUS_OPTIONS, SERVICE_TYPE_OPTIONS } from "@/lib/constants";
 
+type FormFieldValue = string | number | boolean | null | undefined;
+
+interface MilitaryFormData {
+  position?: string;
+  militaryRank?: string;
+  lastRankDate?: string;
+  positionRank?: string;
+  fitnessStatus?: string;
+  medicalCommissionNumber?: string;
+  medicalCommissionDate?: string;
+  unit?: string;
+  department?: string;
+  militarySpecialty?: string;
+  tariffCategory?: number;
+  salary?: number;
+  serviceType?: string;
+  serviceStartDate?: string;
+  unitStartDate?: string;
+  contractEndDate?: string;
+  servicePeriods?: string;
+  previousServicePlaces?: string;
+  militaryDocumentNumber?: string;
+  shpoNumber?: string;
+  combatExperienceStatus?: boolean;
+  combatExperienceNumber?: string;
+  combatPeriods?: string;
+  [key: string]: FormFieldValue;
+}
+
 interface MilitaryDataSectionProps {
-  formData: any;
-  onInputChange: (field: string, value: any) => void;
+  formData: MilitaryFormData;
+  onInputChange: (field: string, value: FormFieldValue) => void;
   militaryRanks: Array<{ rank: string; color: string }>;
   departmentsByUnit: Record<string, string[]>;
   calculateSalary: (tariffCategory: number) => number;

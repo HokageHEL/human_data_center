@@ -1,9 +1,25 @@
 import { FormField } from "./FormField";
 import { GENDER_OPTIONS } from "@/lib/constants";
 
+type FormFieldValue = string | number | boolean | null | undefined;
+
+interface PersonFormData {
+  fullName?: string;
+  passportNumber?: string;
+  taxId?: string;
+  registrationPlace?: string;
+  address?: string;
+  relatives?: string;
+  education?: string;
+  gender?: string;
+  birthDate?: string;
+  phoneNumber?: string;
+  [key: string]: FormFieldValue;
+}
+
 interface GeneralInfoSectionProps {
-  formData: any;
-  onInputChange: (field: string, value: any) => void;
+  formData: PersonFormData;
+  onInputChange: (field: string, value: FormFieldValue) => void;
 }
 
 
