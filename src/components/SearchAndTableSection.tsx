@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
+import React, { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,14 @@ export const SearchAndTableSection = ({
   const draggedOverColumn = useRef<number | null>(null);
   const [dropIndicator, setDropIndicator] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  
+  // Local state to track current people data for immediate UI updates
+  const [localPeople, setLocalPeople] = useState<Person[]>(filteredPeople);
+  
+  // Update local state when filteredPeople prop changes
+  useEffect(() => {
+    setLocalPeople(filteredPeople);
+  }, [filteredPeople]);
 
   const { columns, setColumns, handleMouseDown, isResizing, resizingColumn } =
     useResizableColumns(
@@ -240,32 +248,33 @@ export const SearchAndTableSection = ({
     }
   };
 
-  const totalPeople = filteredPeople.length;
-  const peopleInPPD = filteredPeople.filter((person) => person.isInPPD).length;
+  // Use local state for status calculations to ensure immediate updates
+  const totalPeople = localPeople.length;
+  const peopleInPPD = localPeople.filter((person) => person.isInPPD).length;
   const peopleNotInPPD = totalPeople - peopleInPPD;
-  const peopleOnVacation = filteredPeople.filter(
-    (person) => person.status === "відпустка"
+  const peopleOnVacation = localPeople.filter(
+    (person) => person.status === "відпустка" && !person.isInPPD
   ).length;
-  const peopleOnBusinessTrip = filteredPeople.filter(
-    (person) => person.status === "відрядження"
+  const peopleOnBusinessTrip = localPeople.filter(
+    (person) => person.status === "відрядження" && !person.isInPPD
   ).length;
-  const peopleOnMaternityLeave = filteredPeople.filter(
-    (person) => person.status === "декрет"
+  const peopleOnMaternityLeave = localPeople.filter(
+    (person) => person.status === "декрет" && !person.isInPPD
   ).length;
-  const peopleOnLongSickLeave = filteredPeople.filter(
-    (person) => person.status === "довгострокове_лікування"
+  const peopleOnLongSickLeave = localPeople.filter(
+    (person) => person.status === "довгострокове_лікування" && !person.isInPPD
   ).length;
-  const peopleOnShortSickLeave = filteredPeople.filter(
-    (person) => person.status === "короткострокове_лікування"
+  const peopleOnShortSickLeave = localPeople.filter(
+    (person) => person.status === "короткострокове_лікування" && !person.isInPPD
   ).length;
-  const peopleOnTraining = filteredPeople.filter(
-    (person) => person.status === "навчання"
+  const peopleOnTraining = localPeople.filter(
+    (person) => person.status === "навчання" && !person.isInPPD
   ).length;
-  const peopleOnRvbd = filteredPeople.filter(
-    (person) => person.status === "РВБД"
+  const peopleOnRvbd = localPeople.filter(
+    (person) => person.status === "РВБД" && !person.isInPPD
   ).length;
-  const peopleNotSpecifiedLeave = filteredPeople.filter(
-    (person) => person.status === "не_вказано"
+  const peopleNotSpecifiedLeave = localPeople.filter(
+    (person) => (!person.status || person.status === "не_вказано") && !person.isInPPD
   ).length;
 
   return (
@@ -445,7 +454,7 @@ export const SearchAndTableSection = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPeople.map((person) => (
+                {localPeople.map((person) => (
                   <TableRow
                     key={person.fullName}
                     className="cursor-pointer hover:bg-accent"
@@ -469,6 +478,15 @@ export const SearchAndTableSection = ({
                         checked={person.isInPPD}
                         onCheckedChange={async (checked) => {
                           const updatedPerson = { ...person, isInPPD: checked };
+                          
+                          // Update local state immediately for UI responsiveness
+                          setLocalPeople((prevPeople) =>
+                            prevPeople.map((p) =>
+                              p.fullName === person.fullName ? updatedPerson : p
+                            )
+                          );
+                          
+                          // Update database and parent state
                           await addPerson(updatedPerson);
                           setPeople((prevPeople) =>
                             prevPeople.map((p) =>
