@@ -2,38 +2,15 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ABSENCE_STATUS_OPTIONS } from "@/lib/constants";
-
 interface PhotoUploadProps {
   currentPhoto: string;
   onPhotoChange: (photo: string) => void;
-  isInPPD: boolean;
-  onIsInPPDChange: (isInPPD: boolean) => void;
-  absenceStatus: string;
-  onAbsenceStatusChange: (status: string) => void;
-  status: string;
-  onStatusChange: (status: string) => void;
 }
 
 export function PhotoUpload({
   currentPhoto,
   onPhotoChange,
-  isInPPD,
-  onIsInPPDChange,
-  absenceStatus,
-  onAbsenceStatusChange,
-  status,
-  onStatusChange,
 }: PhotoUploadProps) {
   const [previewUrl, setPreviewUrl] = useState(currentPhoto);
   const { theme } = useTheme();
@@ -119,40 +96,6 @@ export function PhotoUpload({
             </Button>
           )}
         </div>
-      </div>
-      <div className="space-y-4 mt-2">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="isInPPD"
-            checked={isInPPD}
-            onCheckedChange={onIsInPPDChange}
-          />
-          <Label htmlFor="isInPPD">В ППД</Label>
-        </div>
-
-        {!isInPPD && (
-          <div className="space-y-2">
-            <Label htmlFor="absenceStatus">Причина відсутності</Label>
-            <Select
-              value={absenceStatus}
-              onValueChange={(value) => {
-                onAbsenceStatusChange(value);
-                onStatusChange(value);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Оберіть статус відсутності" />
-              </SelectTrigger>
-              <SelectContent>
-                {ABSENCE_STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
       </div>
     </div>
   );

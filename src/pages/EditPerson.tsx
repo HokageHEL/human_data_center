@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { DocumentUpload } from "@/components/DocumentUpload";
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "@/components/PhotoUpload";
+import { PPDSection } from "@/components/form/PPDSection";
 import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
 import { platform } from "os";
 import { GeneralInfoSection } from "@/components/form/GeneralInfoSection";
@@ -462,6 +463,8 @@ const EditPerson = () => {
                 onPhotoChange={(photoData) =>
                   handleInputChange("photo", photoData)
                 }
+              />
+              <PPDSection
                 isInPPD={formData.isInPPD}
                 onIsInPPDChange={(isInPPD) =>
                   handleInputChange("isInPPD", isInPPD)
@@ -470,7 +473,6 @@ const EditPerson = () => {
                 onAbsenceStatusChange={(status) =>
                   handleInputChange("absenceStatus", status)
                 }
-                status={formData.status || formData.absenceStatus}
                 onStatusChange={(status) => handleInputChange("status", status)}
               />
               <GeneralInfoSection
