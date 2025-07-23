@@ -22,12 +22,7 @@ const calculateCompletionPercentage = (person: Person): number => {
       person[field as keyof Person].toString().trim() !== ""
   ).length;
 
-  // Documents count as a field if there are any
-  if (person.documents && person.documents.length > 0) {
-    filledRequiredFields++;
-  }
-
-  const totalFields = REQUIRED_PERSON_FIELDS.length + 1; // +1 for documents
+  const totalFields = REQUIRED_PERSON_FIELDS.length;
   return Math.round((filledRequiredFields / totalFields) * 100);
 };
 
@@ -314,13 +309,6 @@ const Home = () => {
             </div>
           </div>
         )}
-
-        {/* Personal Status Summary - Always above table */}
-        {/* <div className="text-sm text-muted-foreground bg-card border border-border rounded-lg p-3">
-          Всього: {filteredPeople.length} | У ППД:{" "}
-          {filteredPeople.filter((p) => p.isInPPD).length} | Відпустка:{" "}
-          {filteredPeople.filter((p) => p.status === "відпустка").length}
-        </div> */}
 
         {/* Conditional Birthday and Contract Trackers - Always at top of table when data exists */}
         {(hasUpcomingBirthdays || hasUpcomingContracts) && (

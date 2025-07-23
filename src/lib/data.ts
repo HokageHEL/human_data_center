@@ -7,7 +7,15 @@ export interface Document {
 }
 
 export interface Person {
-  status?: "не_вказано" | "відпустка" | "короткострокове_лікування" | "довгострокове_лікування" | "відрядження" | "декрет" | "РВБД" | "навчання";
+  status?:
+    | "не_вказано"
+    | "відпустка"
+    | "короткострокове_лікування"
+    | "довгострокове_лікування"
+    | "відрядження"
+    | "декрет"
+    | "РВБД"
+    | "навчання";
 
   // Загальні дані
   fullName: string;
@@ -22,7 +30,7 @@ export interface Person {
   birthDate: string;
   phoneNumber: string;
   photo: string;
-  documents: Document[];
+  documents?: Document[];
   additionalInfo?: string;
 
   // Військові дані
@@ -50,44 +58,49 @@ export interface Person {
   combatExperienceNumber?: string;
   combatPeriods: string;
   isInPPD: boolean;
-  
+
   deleted?: boolean;
 }
 
-const DB_NAME = 'militaryDB';
-const STORE_NAME = 'people';
+const DB_NAME = "militaryDB";
+const STORE_NAME = "people";
 const DB_VERSION = 11; // Increment version to trigger store recreation and fix potential data corruption
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    console.log('Opening database:', DB_NAME, 'version:', DB_VERSION);
+    console.log("Opening database:", DB_NAME, "version:", DB_VERSION);
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      console.error('Database error:', request.error);
+      console.error("Database error:", request.error);
       reject(request.error);
     };
 
     request.onsuccess = () => {
-      console.log('Database opened successfully');
+      console.log("Database opened successfully");
       resolve(request.result);
     };
 
     request.onupgradeneeded = (event) => {
-      console.log('Database upgrade needed. Old version:', event.oldVersion, 'New version:', DB_VERSION);
+      console.log(
+        "Database upgrade needed. Old version:",
+        event.oldVersion,
+        "New version:",
+        DB_VERSION
+      );
       const db = request.result;
 
       if (event.oldVersion < DB_VERSION) {
-        console.log('Deleting old object store if exists');
+        console.log("Deleting old object store if exists");
         if (db.objectStoreNames.contains(STORE_NAME)) {
           db.deleteObjectStore(STORE_NAME);
         }
-        console.log('Creating new object store:', STORE_NAME);
-        const store = db.createObjectStore(STORE_NAME, { keyPath: 'fullName' });
-        store.createIndex('fullName', 'fullName', { unique: true });
-        store.createIndex('deleted', 'deleted', { unique: false });
-        store.createIndex('status', 'status', { unique: false });
-        console.log('Object store created successfully');
+        console.log("Creating new object store:", STORE_NAME);
+        const store = db.createObjectStore(STORE_NAME, { keyPath: "fullName" });
+        store.createIndex("fullName", "fullName", { unique: true });
+        store.createIndex("deleted", "deleted", { unique: false });
+        store.createIndex("status", "status", { unique: false });
+        console.log("Object store created successfully");
       }
     };
   });
@@ -98,7 +111,7 @@ async function readPeopleData(): Promise<{ people: Person[] }> {
   try {
     const db = await openDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const transaction = db.transaction(STORE_NAME, "readonly");
       const store = transaction.objectStore(STORE_NAME);
       const request = store.getAll();
 
@@ -106,99 +119,110 @@ async function readPeopleData(): Promise<{ people: Person[] }> {
       request.onerror = () => reject(request.error);
     });
   } catch (error) {
-    console.error('Error reading people data:', error);
+    console.error("Error reading people data:", error);
     return { people: [] };
   }
 }
 
 // Write person data
 async function writePerson(person: Person): Promise<void> {
-  console.log('Writing person to database:', person.fullName);
+  console.log("Writing person to database:", person.fullName);
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const transaction = db.transaction(STORE_NAME, "readwrite");
     const store = transaction.objectStore(STORE_NAME);
-    
+
     // Ensure we're storing a clean copy of the person object
     const personToStore = {
       ...person,
       deleted: person.deleted || false,
-      photo: person.photo || ''
+      photo: person.photo || "",
     };
-    
-    console.log('Person data to store:', personToStore);
+
+    console.log("Person data to store:", personToStore);
     const request = store.put(personToStore);
 
     request.onsuccess = () => {
-      console.log('Successfully wrote person to database:', person.fullName);
+      console.log("Successfully wrote person to database:", person.fullName);
       resolve();
     };
     request.onerror = () => {
-      console.error('Error in writePerson:', request.error);
+      console.error("Error in writePerson:", request.error);
       reject(request.error);
     };
 
     transaction.oncomplete = () => {
-      console.log('Transaction completed for:', person.fullName);
+      console.log("Transaction completed for:", person.fullName);
       db.close();
     };
   });
 }
 
 // Add or update a person
-export async function addPerson(person: Person, oldName?: string): Promise<void> {
+export async function addPerson(
+  person: Person,
+  oldName?: string
+): Promise<void> {
   let db: IDBDatabase | null = null;
   try {
-    console.log('Adding/updating person. New name:', person.fullName);
-    console.log('Old name (if changing):', oldName);
-    
+    console.log("Adding/updating person. New name:", person.fullName);
+    console.log("Old name (if changing):", oldName);
+
     // Ensure names are properly decoded for database operations
     const decodedNewName = decodeURIComponent(person.fullName);
     const decodedOldName = oldName ? decodeURIComponent(oldName) : undefined;
-    
-    console.log('Decoded new name:', decodedNewName);
-    console.log('Decoded old name:', decodedOldName);
-    
+
+    console.log("Decoded new name:", decodedNewName);
+    console.log("Decoded old name:", decodedOldName);
+
     const personToStore = {
       ...person,
       fullName: decodedNewName, // Use decoded name for storage
       deleted: person.deleted || false,
-      photo: person.photo || ''
+      photo: person.photo || "",
     };
-    
+
     db = await openDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const transaction = db.transaction(STORE_NAME, "readwrite");
       const store = transaction.objectStore(STORE_NAME);
 
       if (decodedOldName && decodedOldName !== decodedNewName) {
-        console.log('Handling name change from', decodedOldName, 'to', decodedNewName);
+        console.log(
+          "Handling name change from",
+          decodedOldName,
+          "to",
+          decodedNewName
+        );
         const deleteRequest = store.delete(decodedOldName);
         deleteRequest.onsuccess = () => {
-          console.log('Successfully deleted old record:', decodedOldName);
+          console.log("Successfully deleted old record:", decodedOldName);
           const addRequest = store.put(personToStore);
           addRequest.onsuccess = () => {
-            console.log('Successfully added new record:', decodedNewName);
+            console.log("Successfully added new record:", decodedNewName);
             resolve();
           };
           addRequest.onerror = () => {
-            console.error('Error adding/updating person:', addRequest.error);
+            console.error("Error adding/updating person:", addRequest.error);
             reject(addRequest.error);
           };
         };
         deleteRequest.onerror = () => {
-          console.error('Error deleting old record:', deleteRequest.error);
+          console.error("Error deleting old record:", deleteRequest.error);
           reject(deleteRequest.error);
         };
       } else {
-        console.log('Adding/updating record without name change:', decodedNewName);
+        console.log(
+          "Adding/updating record without name change:",
+          decodedNewName
+        );
         const addRequest = store.put(personToStore);
         addRequest.onsuccess = () => {
-          console.log('Successfully added/updated record:', decodedNewName);
+          console.log("Successfully added/updated record:", decodedNewName);
           resolve();
         };
         addRequest.onerror = () => {
-          console.error('Error adding/updating person:', addRequest.error);
+          console.error("Error adding/updating person:", addRequest.error);
           reject(addRequest.error);
         };
       }
@@ -208,13 +232,13 @@ export async function addPerson(person: Person, oldName?: string): Promise<void>
       };
 
       transaction.onerror = () => {
-        console.error('Transaction error:', transaction.error);
+        console.error("Transaction error:", transaction.error);
         if (db) db.close();
         reject(transaction.error);
       };
     });
   } catch (error) {
-    console.error('Error in addPerson:', error);
+    console.error("Error in addPerson:", error);
     if (db) db.close();
     throw error;
   }
@@ -224,22 +248,22 @@ export async function addPerson(person: Person, oldName?: string): Promise<void>
 export async function getPerson(fullName: string): Promise<Person | null> {
   let db: IDBDatabase | null = null;
   try {
-    console.log('Getting person with fullName:', fullName);
-    console.log('URL-decoded fullName:', decodeURIComponent(fullName));
+    console.log("Getting person with fullName:", fullName);
+    console.log("URL-decoded fullName:", decodeURIComponent(fullName));
     const decodedName = decodeURIComponent(fullName);
     db = await openDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const transaction = db.transaction(STORE_NAME, "readonly");
       const store = transaction.objectStore(STORE_NAME);
       const request = store.get(decodedName);
 
       request.onsuccess = () => {
         const person = request.result;
-        console.log('getPerson result for', decodedName, ':', person);
+        console.log("getPerson result for", decodedName, ":", person);
         resolve(person && !person.deleted ? person : null);
       };
       request.onerror = () => {
-        console.error('Error in getPerson:', request.error);
+        console.error("Error in getPerson:", request.error);
         reject(request.error);
       };
 
@@ -248,7 +272,7 @@ export async function getPerson(fullName: string): Promise<Person | null> {
       };
     });
   } catch (error) {
-    console.error('Error getting person:', error);
+    console.error("Error getting person:", error);
     if (db) db.close();
     throw error;
   }
@@ -260,21 +284,24 @@ export async function getActivePeople(): Promise<Person[]> {
   try {
     db = await openDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const transaction = db.transaction(STORE_NAME, "readonly");
       const store = transaction.objectStore(STORE_NAME);
       const request = store.getAll();
 
       request.onsuccess = () => {
         const allPeople = request.result;
-        console.log('Total records found:', allPeople.length);
-        const activePeople = allPeople.filter(person => !person.deleted);
-        console.log('Active (non-deleted) records:', activePeople.length);
-        console.log('Active people names:', activePeople.map(p => p.fullName));
+        console.log("Total records found:", allPeople.length);
+        const activePeople = allPeople.filter((person) => !person.deleted);
+        console.log("Active (non-deleted) records:", activePeople.length);
+        console.log(
+          "Active people names:",
+          activePeople.map((p) => p.fullName)
+        );
         resolve(activePeople);
       };
 
       request.onerror = () => {
-        console.error('Error in getActivePeople:', request.error);
+        console.error("Error in getActivePeople:", request.error);
         reject(request.error);
       };
 
@@ -283,7 +310,7 @@ export async function getActivePeople(): Promise<Person[]> {
       };
     });
   } catch (error) {
-    console.error('Error getting active people:', error);
+    console.error("Error getting active people:", error);
     if (db) db.close();
     throw error;
   }
@@ -297,7 +324,7 @@ export async function deletePerson(fullName: string): Promise<void> {
       await writePerson({ ...person, deleted: true });
     }
   } catch (error) {
-    console.error('Error deleting person:', error);
+    console.error("Error deleting person:", error);
     throw error;
   }
 }

@@ -14,19 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { DocumentUpload } from "@/components/DocumentUpload";
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { PPDSection } from "@/components/form/PPDSection";
 import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
-import { platform } from "os";
 import { GeneralInfoSection } from "@/components/form/GeneralInfoSection";
 import { MilitaryDataSection } from "@/components/form/MilitaryDataSection";
 import { calculateSalary, DEPARTMENTS_BY_UNIT, MILITARY_RANKS } from "@/lib/constants";
 
-// Removed interfaces and SelectField component - now using atomic components
 
 const EditPerson = () => {
   const { name } = useParams();
@@ -88,7 +84,6 @@ const EditPerson = () => {
       | "навчання",
   });
 
-  // Removed renderField function - now using atomic components
 
   // Load existing data on component mount
   useEffect(() => {
@@ -254,13 +249,6 @@ const EditPerson = () => {
       });
     }
   };
-
-  // Список військових звань з кольорами
-
-
-
-
-  // Removed formFields object - now using atomic components
 
   const formatDate = (dateString: string): string => {
     if (!dateString) return "";
