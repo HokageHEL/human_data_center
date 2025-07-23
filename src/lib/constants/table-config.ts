@@ -41,6 +41,7 @@ export const DEFAULT_TABLE_COLUMNS: TableColumn[] = [
     maxWidth: 150,
   },
   { field: "gender", label: "Стать", width: 100, minWidth: 10, maxWidth: 120 },
+  { field: "isInPPD", label: "ППД", width: 100, minWidth: 10, maxWidth: 120 },
 ];
 
 // Fields that should be excluded from exports

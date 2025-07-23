@@ -250,6 +250,31 @@ export const SearchAndTableSection = ({
             maxWidth={columnWidth - 20}
           />
         );
+      case "isInPPD": // Add this new case
+        return (
+          <Switch
+            checked={person.isInPPD}
+            onCheckedChange={async (checked) => {
+              const updatedPerson = { ...person, isInPPD: checked };
+
+              // Update local state immediately for UI responsiveness
+              setLocalPeople((prevPeople) =>
+                prevPeople.map((p) =>
+                  p.fullName === person.fullName ? updatedPerson : p
+                )
+              );
+
+              // Update database and parent state
+              await addPerson(updatedPerson);
+              setPeople((prevPeople) =>
+                prevPeople.map((p) =>
+                  p.fullName === person.fullName ? updatedPerson : p
+                )
+              );
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        );
       default:
         return null;
     }
@@ -346,7 +371,7 @@ export const SearchAndTableSection = ({
                       onDragOver={(e) => e.preventDefault()}
                     >
                       <div
-                        className="flex items-center gap-1 cursor-pointer px-2"
+                        className="flex text-center justify-center items-center gap-1 cursor-pointer px-2"
                         onClick={() => handleSort(column.field as SortField)}
                       >
                         <TruncatedText
@@ -394,9 +419,6 @@ export const SearchAndTableSection = ({
                       />
                     </TableHead>
                   ))}
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap w-[80px]">
-                    ППД
-                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -418,30 +440,6 @@ export const SearchAndTableSection = ({
                         {renderCell(person, column.field, column.width)}
                       </TableCell>
                     ))}
-                    <TableCell className="text-center px-2 sm:px-4 py-2">
-                      <Switch
-                        checked={person.isInPPD}
-                        onCheckedChange={async (checked) => {
-                          const updatedPerson = { ...person, isInPPD: checked };
-
-                          // Update local state immediately for UI responsiveness
-                          setLocalPeople((prevPeople) =>
-                            prevPeople.map((p) =>
-                              p.fullName === person.fullName ? updatedPerson : p
-                            )
-                          );
-
-                          // Update database and parent state
-                          await addPerson(updatedPerson);
-                          setPeople((prevPeople) =>
-                            prevPeople.map((p) =>
-                              p.fullName === person.fullName ? updatedPerson : p
-                            )
-                          );
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
