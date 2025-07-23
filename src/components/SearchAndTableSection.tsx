@@ -31,6 +31,7 @@ import {
 } from "@/lib/constants";
 import { useResizableColumns } from "@/hooks/use-resizable-columns";
 import { TruncatedText } from "@/components/ui/truncated-text";
+import { PersonnelStatistics } from "@/components/PersonnelStatistics";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -254,36 +255,6 @@ export const SearchAndTableSection = ({
     }
   };
 
-  // Use local state for status calculations to ensure immediate updates
-  const totalPeople = localPeople.length;
-  const peopleInPPD = localPeople.filter((person) => person.isInPPD).length;
-  const peopleNotInPPD = totalPeople - peopleInPPD;
-  const peopleOnVacation = localPeople.filter(
-    (person) => person.status === "відпустка" && !person.isInPPD
-  ).length;
-  const peopleOnBusinessTrip = localPeople.filter(
-    (person) => person.status === "відрядження" && !person.isInPPD
-  ).length;
-  const peopleOnMaternityLeave = localPeople.filter(
-    (person) => person.status === "декрет" && !person.isInPPD
-  ).length;
-  const peopleOnLongSickLeave = localPeople.filter(
-    (person) => person.status === "довгострокове_лікування" && !person.isInPPD
-  ).length;
-  const peopleOnShortSickLeave = localPeople.filter(
-    (person) => person.status === "короткострокове_лікування" && !person.isInPPD
-  ).length;
-  const peopleOnTraining = localPeople.filter(
-    (person) => person.status === "навчання" && !person.isInPPD
-  ).length;
-  const peopleOnRvbd = localPeople.filter(
-    (person) => person.status === "РВБД" && !person.isInPPD
-  ).length;
-  const peopleNotSpecifiedLeave = localPeople.filter(
-    (person) =>
-      (!person.status || person.status === "не_вказано") && !person.isInPPD
-  ).length;
-
   return (
     <div className="w-full">
       <div className="w-full">
@@ -328,39 +299,8 @@ export const SearchAndTableSection = ({
         </div>
 
         <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
-          <div className="flex gap-8">
-            <div className="flex gap-4">
-              <span>Всього: {totalPeople}</span>
-              <span>У ППД: {peopleInPPD}</span>
-            </div>
-            <div className="flex gap-4">
-              <span>
-                <span className="font-bold">Не</span> в ППД: {peopleNotInPPD}
-              </span>
-              {peopleOnVacation > 0 && (
-                <span>Відпустка: {peopleOnVacation}</span>
-              )}
-              {peopleOnBusinessTrip > 0 && (
-                <span>Відрядження: {peopleOnBusinessTrip}</span>
-              )}
-              {peopleOnMaternityLeave > 0 && (
-                <span>Декрет: {peopleOnMaternityLeave}</span>
-              )}
-              {peopleOnLongSickLeave > 0 && (
-                <span>Довгострокове лікування: {peopleOnLongSickLeave}</span>
-              )}
-              {peopleOnShortSickLeave > 0 && (
-                <span>Короткострокове лікування: {peopleOnShortSickLeave}</span>
-              )}
-              {peopleOnTraining > 0 && (
-                <span>Навчання: {peopleOnTraining}</span>
-              )}
-              {peopleOnRvbd > 0 && <span>РВБД: {peopleOnRvbd}</span>}
-              {peopleNotSpecifiedLeave > 0 && (
-                <span>Не вказано: {peopleNotSpecifiedLeave}</span>
-              )}
-            </div>
-          </div>
+          <PersonnelStatistics people={localPeople} />
+
           <Button
             onClick={resetColumnOrder}
             variant="outline"

@@ -32,7 +32,7 @@ export const DEFAULT_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
   },
-  { field: "age", label: "Вік", width: 60, minWidth: 10, maxWidth: 100 },
+  { field: "age", label: "Вік", width: 61, minWidth: 10, maxWidth: 100 },
   {
     field: "completionPercentage",
     label: "Заповнено",
