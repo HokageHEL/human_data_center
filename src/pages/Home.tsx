@@ -64,8 +64,8 @@ const Home = () => {
     field: SortField;
     order: SortOrder;
   }>({
-    field: "fullName",
-    order: null,
+    field: "shpoNumber",
+    order: "asc",
   });
   const [people, setPeople] = useState<Array<Person>>([]);
 
