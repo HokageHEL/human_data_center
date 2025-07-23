@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from "react";
 
 export interface ResizableColumn {
   field: string;
@@ -15,29 +15,33 @@ export const useResizableColumns = (initialColumns: ResizableColumn[]) => {
   const startX = useRef<number>(0);
   const startWidth = useRef<number>(0);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, columnIndex: number) => {
-    e.preventDefault();
-    setIsResizing(true);
-    setResizingColumn(columnIndex);
-    startX.current = e.clientX;
-    startWidth.current = columns[columnIndex].width;
-  }, [columns]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent, columnIndex: number) => {
+      e.preventDefault();
+      setIsResizing(true);
+      setResizingColumn(columnIndex);
+      startX.current = e.clientX;
+      startWidth.current = columns[columnIndex].width;
+    },
+    [columns]
+  );
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isResizing || resizingColumn === null) return;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing || resizingColumn === null) return;
 
-    const deltaX = e.clientX - startX.current;
-    const newWidth = Math.max(
-      columns[resizingColumn].minWidth || 20,
-      startWidth.current + deltaX
-    );
+      const deltaX = e.clientX - startX.current;
 
-    setColumns(prev => 
-      prev.map((col, index) => 
-        index === resizingColumn ? { ...col, width: newWidth } : col
-      )
-    );
-  }, [isResizing, resizingColumn, columns]);
+      const newWidth = startWidth.current + deltaX;
+
+      setColumns((prev) =>
+        prev.map((col, index) =>
+          index === resizingColumn ? { ...col, width: newWidth } : col
+        )
+      );
+    },
+    [isResizing, resizingColumn, columns]
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsResizing(false);
@@ -46,16 +50,16 @@ export const useResizableColumns = (initialColumns: ResizableColumn[]) => {
 
   useEffect(() => {
     if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
 
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       };
     }
   }, [isResizing, handleMouseMove, handleMouseUp]);
@@ -65,6 +69,6 @@ export const useResizableColumns = (initialColumns: ResizableColumn[]) => {
     setColumns,
     handleMouseDown,
     isResizing,
-    resizingColumn
+    resizingColumn,
   };
 };
