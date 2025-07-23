@@ -6,7 +6,7 @@ export const REQUIRED_PERSON_FIELDS = [
   "taxId",
   "registrationPlace",
   "address",
-  // "familyStatus",
+  "familyStatus",
   "relatives",
   "education",
   "gender",

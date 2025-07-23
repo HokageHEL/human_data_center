@@ -22,8 +22,6 @@ interface GeneralInfoSectionProps {
   onInputChange: (field: string, value: FormFieldValue) => void;
 }
 
-
-
 export const GeneralInfoSection = ({
   formData,
   onInputChange,
@@ -69,6 +67,14 @@ export const GeneralInfoSection = ({
         value={formData.address}
         onChange={onInputChange}
         placeholder="вул. Хрещатик, 12"
+      />
+      <FormField
+        label="Сімейний стан"
+        field="familyStatus"
+        type="text"
+        value={formData.familyStatus}
+        onChange={onInputChange}
+        placeholder="одружений"
       />
       <FormField
         label="Родичі"
