@@ -58,13 +58,17 @@ export interface Person {
   combatExperienceNumber?: string;
   combatPeriods: string;
   isInPPD: boolean;
+  BMT: boolean;
+  BMTDate?: string;
+  professionCourse: boolean;
+  professionCourseValue?: string;
 
   deleted?: boolean;
 }
 
 const DB_NAME = "militaryDB";
 const STORE_NAME = "people";
-const DB_VERSION = 11; // Increment version to trigger store recreation and fix potential data corruption
+const DB_VERSION = 16; // Added BMT and professionCourse fields with data preservation
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -81,7 +85,7 @@ function openDB(): Promise<IDBDatabase> {
       resolve(request.result);
     };
 
-    request.onupgradeneeded = (event) => {
+    request.onupgradeneeded = async (event) => {
       console.log(
         "Database upgrade needed. Old version:",
         event.oldVersion,
@@ -89,18 +93,65 @@ function openDB(): Promise<IDBDatabase> {
         DB_VERSION
       );
       const db = request.result;
+      const transaction = event.target.transaction;
 
-      if (event.oldVersion < DB_VERSION) {
-        console.log("Deleting old object store if exists");
-        if (db.objectStoreNames.contains(STORE_NAME)) {
-          db.deleteObjectStore(STORE_NAME);
+      try {
+        if (event.oldVersion < DB_VERSION) {
+          let existingData: Person[] = [];
+
+          // Backup existing data if store exists
+          if (db.objectStoreNames.contains(STORE_NAME)) {
+            console.log("Backing up existing data before upgrade");
+            const oldStore = transaction.objectStore(STORE_NAME);
+            const getAllRequest = oldStore.getAll();
+
+            await new Promise((resolve, reject) => {
+              getAllRequest.onsuccess = () => {
+                existingData = getAllRequest.result || [];
+                console.log(`Backed up ${existingData.length} records`);
+                resolve(existingData);
+              };
+              getAllRequest.onerror = () => reject(getAllRequest.error);
+            });
+
+            // Delete old store
+            console.log("Deleting old object store");
+            db.deleteObjectStore(STORE_NAME);
+          }
+
+          // Create new store with updated schema
+          console.log("Creating new object store:", STORE_NAME);
+          const store = db.createObjectStore(STORE_NAME, {
+            keyPath: "fullName",
+          });
+          store.createIndex("fullName", "fullName", { unique: true });
+          store.createIndex("deleted", "deleted", { unique: false });
+          store.createIndex("status", "status", { unique: false });
+
+          // Restore data with new fields
+          if (existingData.length > 0) {
+            console.log(
+              `Restoring ${existingData.length} records with new fields`
+            );
+            for (const person of existingData) {
+              // Add new fields with default values if they don't exist
+              const updatedPerson = {
+                ...person,
+                BMT: person.BMT ?? false,
+                BMTDate: person.BMTDate ?? "",
+                professionCourse: person.professionCourse ?? false,
+                professionCourseValue: person.professionCourseValue ?? "",
+              };
+              store.put(updatedPerson);
+            }
+            console.log("Data restoration completed");
+          }
+
+          console.log("Database upgrade completed successfully");
         }
-        console.log("Creating new object store:", STORE_NAME);
-        const store = db.createObjectStore(STORE_NAME, { keyPath: "fullName" });
-        store.createIndex("fullName", "fullName", { unique: true });
-        store.createIndex("deleted", "deleted", { unique: false });
-        store.createIndex("status", "status", { unique: false });
-        console.log("Object store created successfully");
+      } catch (error) {
+        console.error("Error during database upgrade:", error);
+        throw error;
       }
     };
   });
