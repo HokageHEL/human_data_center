@@ -1,20 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import { ArrowLeft } from "lucide-react";
 import { useAccentColor } from "@/hooks/use-accent-color";
 import ColumnVisibilitySettings from "@/components/ColumnVisibilitySettings";
+import ColorPicker from "@/components/ColorPicker";
 
 const Options = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { accentColor, updateAccentColor, resetAccentColor } = useAccentColor();
 
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateAccentColor(e.target.value);
-  };
+
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-8">
@@ -56,33 +54,11 @@ const Options = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="primary-color">Основний колір</Label>
-            <div className="flex items-center gap-4">
-              <Input
-                id="primary-color"
-                type="text"
-                value={accentColor}
-                onChange={handleColorChange}
-                placeholder="35 100% 65%"
-                className="font-mono"
-              />
-              <div
-                className="w-10 h-10 rounded-md border"
-                style={{ backgroundColor: `hsl(${accentColor})` }}
-              />
-              <Button
-                variant="outline"
-                onClick={resetAccentColor}
-                size="sm"
-              >
-                Скинути
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Формат: відтінок насиченість яскравість (HSL)
-            </p>
-          </div>
+          <ColorPicker
+            value={accentColor}
+            onChange={updateAccentColor}
+            onReset={resetAccentColor}
+          />
 
           <ColumnVisibilitySettings />
         </div>
