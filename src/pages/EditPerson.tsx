@@ -156,6 +156,29 @@ const EditPerson = () => {
     )
   );
 
+  // Listen for navigation attempts from Header
+  useEffect(() => {
+    const handleUnsavedChangesCheck = (event: CustomEvent) => {
+      if (hasUnsavedChanges) {
+        if (
+          window.confirm(
+            "Ви маєте незбережені зміни. Ви впевнені, що хочете залишити сторінку?"
+          )
+        ) {
+          navigate(event.detail.targetPath);
+        }
+      } else {
+        navigate(event.detail.targetPath);
+      }
+    };
+
+    window.addEventListener('checkUnsavedChanges', handleUnsavedChangesCheck as EventListener);
+    
+    return () => {
+      window.removeEventListener('checkUnsavedChanges', handleUnsavedChangesCheck as EventListener);
+    };
+  }, [hasUnsavedChanges, navigate]);
+
   const handleNavigateBack = () => {
     if (hasUnsavedChanges) {
       if (
