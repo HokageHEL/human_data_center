@@ -24,10 +24,27 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
 
   useEffect(() => {
     const loadedColumns = getVisibleColumns();
-    setVisibleColumns(loadedColumns);
-  }, []);
+    const requiredFields = ['shpoNumber', 'fullName'];
+    
+    if (loadedColumns.length > 0) {
+      // Ensure required fields are always included
+      const finalColumns = [...new Set([...requiredFields, ...loadedColumns])];
+      setVisibleColumns(finalColumns);
+      onColumnsChange?.(finalColumns);
+    } else {
+      // Ensure required fields are always included in default
+      const finalColumns = [...new Set([...requiredFields, ...DEFAULT_VISIBLE_COLUMNS])];
+      setVisibleColumns(finalColumns);
+      onColumnsChange?.(finalColumns);
+    }
+  }, [onColumnsChange]);
 
   const handleColumnToggle = (columnField: string, checked: boolean) => {
+    // Prevent toggling of required fields
+    if (columnField === 'shpoNumber' || columnField === 'fullName') {
+      return;
+    }
+    
     const newVisibleColumns = checked 
       ? [...visibleColumns, columnField]
       : visibleColumns.filter(col => col !== columnField);
@@ -53,16 +70,23 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
       ? ALL_TABLE_COLUMNS.filter(col => col.category === category).map(col => col.field)
       : ALL_TABLE_COLUMNS.map(col => col.field);
     
-    const newVisibleColumns = visibleColumns.filter(col => !columnsToDeselect.includes(col));
+    // Always keep required fields selected
+    const requiredFields = ['shpoNumber', 'fullName'];
+    const newVisibleColumns = visibleColumns.filter(col => 
+      !columnsToDeselect.includes(col) || requiredFields.includes(col)
+    );
     setVisibleColumns(newVisibleColumns);
     saveVisibleColumns(newVisibleColumns);
     onColumnsChange?.(newVisibleColumns);
   };
 
   const handleResetToDefault = () => {
-    setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
-    saveVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
-    onColumnsChange?.(DEFAULT_VISIBLE_COLUMNS);
+    // Ensure required fields are always included
+    const requiredFields = ['shpoNumber', 'fullName'];
+    const finalColumns = [...new Set([...requiredFields, ...DEFAULT_VISIBLE_COLUMNS])];
+    setVisibleColumns(finalColumns);
+    saveVisibleColumns(finalColumns);
+    onColumnsChange?.(finalColumns);
     
     toast({
       title: "Налаштування скинуто",
@@ -77,14 +101,13 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
   const getCategoryTitle = (category: string) => {
     switch (category) {
       case 'system': return 'Системні поля';
-      case 'general': return 'Загальна інформація';
       case 'personal': return 'Особисті дані';
       case 'military': return 'Військові дані';
       default: return category;
     }
   };
 
-  const categories = ['system', 'general', 'personal', 'military'];
+  const categories = ['system', 'personal', 'military'];
 
   return (
     <Card>
@@ -165,12 +188,20 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
                       onCheckedChange={(checked) => 
                         handleColumnToggle(column.field, checked as boolean)
                       }
+                      disabled={column.field === 'shpoNumber' || column.field === 'fullName'}
                     />
                     <Label 
                       htmlFor={column.field} 
-                      className="text-sm cursor-pointer"
+                      className={`text-sm cursor-pointer ${
+                        column.field === 'shpoNumber' || column.field === 'fullName' 
+                          ? 'text-muted-foreground' 
+                          : ''
+                      }`}
                     >
                       {column.label}
+                      {(column.field === 'shpoNumber' || column.field === 'fullName') && (
+                        <span className="ml-1 text-xs text-muted-foreground">(always visible)</span>
+                      )}
                     </Label>
                   </div>
                 ))}

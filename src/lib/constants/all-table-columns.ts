@@ -6,18 +6,19 @@ export interface TableColumn {
   width: number;
   minWidth?: number;
   maxWidth?: number;
-  category: 'general' | 'military' | 'personal' | 'system';
+  category: 'military' | 'personal' | 'system';
 }
 
 // All possible table columns based on Person interface
 export const ALL_TABLE_COLUMNS: TableColumn[] = [
   // System/Generated fields
   { field: "shpoNumber", label: "№", width: 60, minWidth: 10, maxWidth: 120, category: 'system' },
-  { field: "age", label: "Вік", width: 61, minWidth: 10, maxWidth: 100, category: 'system' },
   { field: "completionPercentage", label: "Заповнено", width: 120, minWidth: 10, maxWidth: 150, category: 'system' },
+  { field: "isInPPD", label: "ППД", width: 100, minWidth: 10, maxWidth: 120, category: 'system' },
   
-  // General/Personal Information
-  { field: "fullName", label: "ПІБ", width: 300, minWidth: 10, maxWidth: 350, category: 'general' },
+  // Personal Information
+  { field: "fullName", label: "ПІБ", width: 300, minWidth: 10, maxWidth: 350, category: 'personal' },
+  { field: "age", label: "Вік", width: 61, minWidth: 10, maxWidth: 100, category: 'personal' },
   { field: "passportNumber", label: "Номер паспорта", width: 150, minWidth: 10, maxWidth: 200, category: 'personal' },
   { field: "taxId", label: "ІПН", width: 120, minWidth: 10, maxWidth: 150, category: 'personal' },
   { field: "registrationPlace", label: "Місце реєстрації", width: 200, minWidth: 10, maxWidth: 300, category: 'personal' },
@@ -53,11 +54,10 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
   { field: "combatExperienceStatus", label: "Бойовий досвід", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
   { field: "combatExperienceNumber", label: "№ бойового досвіду", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
   { field: "combatPeriods", label: "Періоди бойових дій", width: 200, minWidth: 10, maxWidth: 300, category: 'military' },
-  { field: "BMT", label: "БМТ", width: 100, minWidth: 10, maxWidth: 120, category: 'military' },
-  { field: "BMTDate", label: "Дата БМТ", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
-  { field: "professionCourse", label: "Курси кваліфікації", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
-  { field: "professionCourseValue", label: "Назва курсів", width: 200, minWidth: 10, maxWidth: 300, category: 'military' },
-  { field: "isInPPD", label: "ППД", width: 100, minWidth: 10, maxWidth: 120, category: 'military' },
+  { field: "BMT", label: "БЗВП", width: 100, minWidth: 10, maxWidth: 120, category: 'military' },
+  { field: "BMTDate", label: "Дата проходження БЗВП", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
+  { field: "professionCourse", label: "ФАХ", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
+  { field: "professionCourseValue", label: "ВОС за ФАХом", width: 200, minWidth: 10, maxWidth: 300, category: 'military' },
   { field: "status", label: "Статус", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
 ];
 
