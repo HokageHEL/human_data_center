@@ -32,6 +32,7 @@ import {
 import { useResizableColumns } from "@/hooks/use-resizable-columns";
 import { TruncatedText } from "@/components/ui/truncated-text";
 import { PersonnelStatistics } from "@/components/PersonnelStatistics";
+import { ExportColumnDialog } from "@/components/ExportColumnDialog";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -102,6 +103,9 @@ export const SearchAndTableSection = ({
 
   // Local state to track current people data for immediate UI updates
   const [localPeople, setLocalPeople] = useState<Person[]>(filteredPeople);
+  
+  // Export dialog state
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   // Update local state when filteredPeople prop changes
   useEffect(() => {
@@ -165,20 +169,22 @@ export const SearchAndTableSection = ({
     navigate("/edit/new");
   };
 
-  const handleExportToWord = async () => {
-    const exportColumns = getExportColumns(columns);
-    const doc = generateTableDocument(filteredPeople, exportColumns);
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, "people-table.docx");
+  const handleOpenExportDialog = () => {
+    setIsExportDialogOpen(true);
   };
 
-  const handleExportToExcel = () => {
-    const exportColumns = getExportColumns(columns);
-    const data = exportToExcel(filteredPeople, exportColumns);
-    const blob = new Blob([data], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    saveAs(blob, "people-table.xlsx");
+  const handleExport = async (selectedColumns: TableColumn[], exportType: 'word' | 'excel') => {
+    if (exportType === 'word') {
+      const doc = generateTableDocument(filteredPeople, selectedColumns);
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, "people-table.docx");
+    } else {
+      const data = exportToExcel(filteredPeople, selectedColumns);
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "people-table.xlsx");
+    }
   };
 
   const renderCell = (person: Person, field: string, columnWidth: number) => {
@@ -293,7 +299,7 @@ export const SearchAndTableSection = ({
           />
           <div className="flex flex-wrap gap-2 sm:gap-4">
             <Button
-              onClick={handleExportToWord}
+              onClick={handleOpenExportDialog}
               className="h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-lg flex-1 sm:flex-none"
               variant="outline"
               size="sm"
@@ -303,7 +309,7 @@ export const SearchAndTableSection = ({
               <span className="sm:hidden">W</span>
             </Button>
             <Button
-              onClick={handleExportToExcel}
+              onClick={handleOpenExportDialog}
               className="h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-lg flex-1 sm:flex-none"
               variant="outline"
               size="sm"
@@ -447,6 +453,13 @@ export const SearchAndTableSection = ({
           </div>
         </Card>
       </div>
+      
+      <ExportColumnDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        onExport={handleExport}
+        columns={columns}
+      />
     </div>
   );
 };

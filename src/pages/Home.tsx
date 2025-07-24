@@ -16,7 +16,7 @@ import {
 } from "@/lib/constants";
 
 const calculateCompletionPercentage = (person: Person): number => {
-  let filledRequiredFields = REQUIRED_PERSON_FIELDS.filter(
+  const filledRequiredFields = REQUIRED_PERSON_FIELDS.filter(
     (field) =>
       person[field as keyof Person] &&
       person[field as keyof Person].toString().trim() !== ""
