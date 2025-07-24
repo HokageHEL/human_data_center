@@ -1,5 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TruncatedTextProps {
   text: string;
@@ -17,7 +23,6 @@ export const TruncatedText: React.FC<TruncatedTextProps> = ({
   truncationThreshold = 5,
 }) => {
   const [isTruncated, setIsTruncated] = useState(false);
-  const [showTooltipState, setShowTooltipState] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,25 +39,30 @@ export const TruncatedText: React.FC<TruncatedTextProps> = ({
     return () => window.removeEventListener("resize", checkTruncation);
   }, [text, truncationThreshold]);
 
-  return (
-    <div className="relative">
-      <div
-        ref={textRef}
-        className={cn("truncate", className)}
-        style={{ maxWidth: maxWidth ? `${maxWidth}px` : undefined }}
-        onMouseEnter={() =>
-          isTruncated && showTooltip && setShowTooltipState(true)
-        }
-        onMouseLeave={() => setShowTooltipState(false)}
-        title={isTruncated && showTooltip ? text : undefined}
-      >
-        {text}
-      </div>
-      {showTooltipState && isTruncated && showTooltip && (
-        <div className="absolute z-50 px-2 py-1 text-sm text-white bg-gray-900 rounded shadow-lg -top-8 left-0 whitespace-nowrap max-w-xs break-words">
-          {text}
-        </div>
-      )}
+  const content = (
+    <div
+      ref={textRef}
+      className={cn("truncate", className)}
+      style={{ maxWidth: maxWidth ? `${maxWidth}px` : undefined }}
+    >
+      {text}
     </div>
+  );
+
+  if (!showTooltip || !isTruncated) {
+    return content;
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {content}
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{text}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

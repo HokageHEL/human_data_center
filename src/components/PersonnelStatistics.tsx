@@ -1,5 +1,6 @@
 import React from 'react';
 import { Person } from '@/lib/data';
+import { Badge } from '@/components/ui/badge';
 
 interface PersonnelStatisticsProps {
   people: Person[];
@@ -37,38 +38,56 @@ export const PersonnelStatistics: React.FC<PersonnelStatisticsProps> = ({ people
   ).length;
 
   return (
-    <div className="flex gap-8">
-      <div className="flex gap-4">
-        <span>Всього: {totalPeople}</span>
-        <span>У ППД: {peopleInPPD}</span>
-      </div>
-      <div className="flex gap-4">
-        <span>
-          <span className="font-bold">Не</span> в ППД: {peopleNotInPPD}
-        </span>
-        {peopleOnVacation > 0 && (
-          <span>Відпустка: {peopleOnVacation}</span>
-        )}
-        {peopleOnBusinessTrip > 0 && (
-          <span>Відрядження: {peopleOnBusinessTrip}</span>
-        )}
-        {peopleOnMaternityLeave > 0 && (
-          <span>Декрет: {peopleOnMaternityLeave}</span>
-        )}
-        {peopleOnLongSickLeave > 0 && (
-          <span>Довгострокове лікування: {peopleOnLongSickLeave}</span>
-        )}
-        {peopleOnShortSickLeave > 0 && (
-          <span>Короткострокове лікування: {peopleOnShortSickLeave}</span>
-        )}
-        {peopleOnTraining > 0 && (
-          <span>Навчання: {peopleOnTraining}</span>
-        )}
-        {peopleOnRvbd > 0 && <span>РВБД: {peopleOnRvbd}</span>}
-        {peopleNotSpecifiedLeave > 0 && (
-          <span>Не вказано: {peopleNotSpecifiedLeave}</span>
-        )}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      <Badge variant="default" className="text-sm">
+        Всього: {totalPeople}
+      </Badge>
+      <Badge variant="secondary" className="text-sm">
+        У ППД: {peopleInPPD}
+      </Badge>
+      <Badge variant="outline" className="text-sm">
+        Не в ППД: {peopleNotInPPD}
+      </Badge>
+      {peopleOnVacation > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Відпустка: {peopleOnVacation}
+        </Badge>
+      )}
+      {peopleOnBusinessTrip > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Відрядження: {peopleOnBusinessTrip}
+        </Badge>
+      )}
+      {peopleOnMaternityLeave > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Декрет: {peopleOnMaternityLeave}
+        </Badge>
+      )}
+      {peopleOnLongSickLeave > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Довгострокове лікування: {peopleOnLongSickLeave}
+        </Badge>
+      )}
+      {peopleOnShortSickLeave > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Короткострокове лікування: {peopleOnShortSickLeave}
+        </Badge>
+      )}
+      {peopleOnTraining > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Навчання: {peopleOnTraining}
+        </Badge>
+      )}
+      {peopleOnRvbd > 0 && (
+        <Badge variant="outline" className="text-sm">
+          РВБД: {peopleOnRvbd}
+        </Badge>
+      )}
+      {peopleNotSpecifiedLeave > 0 && (
+        <Badge variant="outline" className="text-sm">
+          Не вказано: {peopleNotSpecifiedLeave}
+        </Badge>
+      )}
     </div>
   );
 };
