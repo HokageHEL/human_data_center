@@ -8,13 +8,21 @@ import BirthdayTracker from "@/components/BirthdayTracker";
 import ContractTracker from "@/components/ContractTracker";
 import StatusTracker from "@/components/StatusTracker";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Download, Plus } from "lucide-react";
 import {
   getMilitaryRankNames,
   isRankInCategory,
   REQUIRED_PERSON_FIELDS,
 } from "@/lib/constants";
+import {
+  ALL_TABLE_COLUMNS,
+  type TableColumn,
+} from "@/lib/constants/all-table-columns";
 import { useUrlFilters } from "@/hooks/use-url-filters";
+import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
+import { Packer } from "docx";
+import { saveAs } from "file-saver";
+import { ExportColumnDialog } from "@/components/ExportColumnDialog";
 
 const calculateCompletionPercentage = (person: Person): number => {
   const filledRequiredFields = REQUIRED_PERSON_FIELDS.filter(
@@ -49,9 +57,11 @@ const calculateAge = (birthDate: string): number => {
 };
 
 const Home = () => {
+  const navigate = useNavigate();
   const { searchTerm, setSearchTerm, filters, setFilters, sortConfig, setSortConfig, resetFilters } = useUrlFilters();
   const [showFilters, setShowFilters] = useState(false);
   const [people, setPeople] = useState<Array<Person>>([]);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   useEffect(() => {
     const loadPeople = async () => {
@@ -203,6 +213,29 @@ const Home = () => {
     resetFilters();
   };
 
+  const handleAddPerson = () => {
+    console.log("Navigating to add new person page");
+    navigate("/edit/new");
+  };
+
+  const handleOpenExportDialog = () => {
+    setIsExportDialogOpen(true);
+  };
+
+  const handleExport = async (selectedColumns: TableColumn[], exportType: 'word' | 'excel') => {
+    if (exportType === 'word') {
+      const doc = generateTableDocument(filteredPeople, selectedColumns);
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, "people-table.docx");
+    } else {
+      const data = exportToExcel(filteredPeople, selectedColumns);
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "people-table.xlsx");
+    }
+  };
+
   const isAnyFilterActive = () => {
     return (
       searchTerm !== "" ||
@@ -267,43 +300,60 @@ const Home = () => {
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-3 sm:p-4 lg:p-6">
       <div className="w-full max-w-[1600px] mx-auto space-y-4">
         {/* Top Controls Bar */}
-        <div className="flex items-center justify-start gap-4">
-          <Button
-            onClick={() => setShowFilters(!showFilters)}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Фільтри
-            {showFilters ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-          {isAnyFilterActive() && (
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
             <Button
+              onClick={() => setShowFilters(!showFilters)}
               variant="outline"
-              size="sm"
-              onClick={handleResetFilters}
-              className="text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-2"
             >
-              Скинути
+              <Filter className="h-4 w-4" />
+              Фільтри
+              {showFilters ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
             </Button>
-          )}
+            {isAnyFilterActive() && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetFilters}
+                className="text-muted-foreground hover:text-foreground/90"
+              >
+                Скинути
+              </Button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2 sm:gap-4">
+            <Button
+              onClick={handleOpenExportDialog}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Експорт</span>
+              <span className="sm:hidden">Е</span>
+            </Button>
+            <Button
+              onClick={handleAddPerson}
+              className="flex items-center gap-2 hover:bg-green-400"
+            >
+              <Plus className="h-4 w-4" />
+              Додати
+            </Button>
+          </div>
         </div>
 
         {/* Collapsible Filters Section */}
         {showFilters && (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-4 lg:gap-6 p-4 bg-card border border-border rounded-lg">
-            {/* Main Filters */}
-            <div>
-              <FilterSection
-                filters={filters}
-                setFilters={setFilters}
-                people={people}
-              />
-            </div>
+          <div className="p-4 bg-card border border-border rounded-lg">
+            <FilterSection
+              filters={filters}
+              setFilters={setFilters}
+              people={people}
+            />
           </div>
         )}
 
@@ -340,6 +390,13 @@ const Home = () => {
           />
         </div>
       </div>
+      
+      <ExportColumnDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        onExport={handleExport}
+        columns={ALL_TABLE_COLUMNS}
+      />
     </div>
   );
 };

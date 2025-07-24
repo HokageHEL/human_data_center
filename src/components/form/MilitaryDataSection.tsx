@@ -31,6 +31,15 @@ interface MilitaryFormData {
   BMTDate?: string;
   professionCourse?: boolean;
   professionCourseValue?: string;
+
+  // Military orders
+  appointmentOrderNumber?: string;
+  appointmentOrderDate?: string;
+  enrollmentOrderNumber?: string;
+  enrollmentOrderDate?: string;
+  dismissalOrderNumber?: string;
+  dismissalOrderDate?: string;
+
   [key: string]: FormFieldValue;
 }
 
@@ -307,6 +316,61 @@ export const MilitaryDataSection = ({
             placeholder="123456"
           />
         )}
+      </div>
+
+      {/* Military Orders Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          label="№ наказу про призначення"
+          field="appointmentOrderNumber"
+          type="text"
+          value={formData.appointmentOrderNumber}
+          onChange={onInputChange}
+          placeholder="123/2024"
+        />
+        <FormField
+          label="Дата наказу про призначення"
+          field="appointmentOrderDate"
+          type="date"
+          value={formData.appointmentOrderDate}
+          onChange={onInputChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          label="№ наказу (про зарахування у списки частини)"
+          field="enrollmentOrderNumber"
+          type="text"
+          value={formData.enrollmentOrderNumber}
+          onChange={onInputChange}
+          placeholder="456/2024"
+        />
+        <FormField
+          label="Дата наказу (про зарахування у списки частини)"
+          field="enrollmentOrderDate"
+          type="date"
+          value={formData.enrollmentOrderDate}
+          onChange={onInputChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          label="№ наказу (про виключення з списків частини)"
+          field="dismissalOrderNumber"
+          type="text"
+          value={formData.dismissalOrderNumber}
+          onChange={onInputChange}
+          placeholder="789/2024"
+        />
+        <FormField
+          label="Дата наказу (про виключення з списків частини)"
+          field="dismissalOrderDate"
+          type="date"
+          value={formData.dismissalOrderDate}
+          onChange={onInputChange}
+        />
       </div>
     </>
   );

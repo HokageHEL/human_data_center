@@ -35,7 +35,7 @@ export function Header() {
           variant="ghost"
           size="icon"
           onClick={handleSettingsClick}
-          className="relative h-9 w-9 transition-colors hover:bg-accent/20 dark:hover:bg-accent/10"
+          className="relative h-9 w-9 transition-colors hover:bg-accent/30 dark:hover:bg-accent/20"
         >
           <Settings className="h-5 w-5" />
           <span className="sr-only">Open settings</span>

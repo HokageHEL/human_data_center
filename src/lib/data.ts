@@ -62,13 +62,21 @@ export interface Person {
   BMTDate?: string;
   professionCourse: boolean;
   professionCourseValue?: string;
+  
+  // Military orders
+  appointmentOrderNumber?: string;
+  appointmentOrderDate?: string;
+  enrollmentOrderNumber?: string;
+  enrollmentOrderDate?: string;
+  dismissalOrderNumber?: string;
+  dismissalOrderDate?: string;
 
   deleted?: boolean;
 }
 
 const DB_NAME = "militaryDB";
 const STORE_NAME = "people";
-const DB_VERSION = 16; // Added BMT and professionCourse fields with data preservation
+const DB_VERSION = 17; // Added military order fields with data preservation
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -141,6 +149,14 @@ function openDB(): Promise<IDBDatabase> {
                 BMTDate: person.BMTDate ?? "",
                 professionCourse: person.professionCourse ?? false,
                 professionCourseValue: person.professionCourseValue ?? "",
+                
+                // Military orders
+                appointmentOrderNumber: person.appointmentOrderNumber ?? "",
+                appointmentOrderDate: person.appointmentOrderDate ?? "",
+                enrollmentOrderNumber: person.enrollmentOrderNumber ?? "",
+                enrollmentOrderDate: person.enrollmentOrderDate ?? "",
+                dismissalOrderNumber: person.dismissalOrderNumber ?? "",
+                dismissalOrderDate: person.dismissalOrderDate ?? "",
               };
               store.put(updatedPerson);
             }

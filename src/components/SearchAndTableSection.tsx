@@ -17,26 +17,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Download, ArrowUpDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Person, addPerson } from "@/lib/data";
-import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
-import { Packer } from "docx";
-import { saveAs } from "file-saver";
 import {
-  getExportColumns,
   TABLE_COLUMNS_STORAGE_KEY,
-  type TableColumn,
 } from "@/lib/constants";
 import {
   getTableColumnsConfig,
   getVisibleColumns,
   ALL_TABLE_COLUMNS,
+  DEFAULT_VISIBLE_COLUMNS,
+  saveVisibleColumns,
 } from "@/lib/constants/all-table-columns";
+import { useToast } from "@/hooks/use-toast";
 import { useResizableColumns } from "@/hooks/use-resizable-columns";
 
 import { PersonnelStatistics } from "@/components/PersonnelStatistics";
-import { ExportColumnDialog } from "@/components/ExportColumnDialog";
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return "";
@@ -100,6 +97,7 @@ export const SearchAndTableSection = ({
   setPeople,
 }: SearchAndTableSectionProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const draggedColumn = useRef<number | null>(null);
   const draggedOverColumn = useRef<number | null>(null);
   const [dropIndicator, setDropIndicator] = useState<number | null>(null);
@@ -107,9 +105,6 @@ export const SearchAndTableSection = ({
 
   // Local state to track current people data for immediate UI updates
   const [localPeople, setLocalPeople] = useState<Person[]>(filteredPeople);
-  
-  // Export dialog state
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   // Update local state when filteredPeople prop changes
   useEffect(() => {
@@ -155,12 +150,24 @@ export const SearchAndTableSection = ({
   };
 
   const resetColumnOrder = () => {
+    // Reset column visibility to defaults
+    const requiredFields = ['shpoNumber', 'fullName'];
+    const finalColumns = [...new Set([...requiredFields, ...DEFAULT_VISIBLE_COLUMNS])];
+    saveVisibleColumns(finalColumns);
+    
+    // Reset column order
     const defaultColumns = getTableColumnsConfig();
     setColumns(defaultColumns);
     localStorage.setItem(
       TABLE_COLUMNS_STORAGE_KEY,
       JSON.stringify(defaultColumns)
     );
+    
+    // Show toast notification
+    toast({
+      title: "Налаштування скинуто",
+      description: "Порядок та видимість стовпців повернуто до стандартних налаштувань",
+    });
   };
 
   // Listen for changes in visible columns and update table accordingly
@@ -187,29 +194,6 @@ export const SearchAndTableSection = ({
     const encodedName = encodeURIComponent(person.fullName);
     console.log("Encoded name for URL:", encodedName);
     navigate(`/edit/${encodedName}`);
-  };
-
-  const handleAddPerson = () => {
-    console.log("Navigating to add new person page");
-    navigate("/edit/new");
-  };
-
-  const handleOpenExportDialog = () => {
-    setIsExportDialogOpen(true);
-  };
-
-  const handleExport = async (selectedColumns: TableColumn[], exportType: 'word' | 'excel') => {
-    if (exportType === 'word') {
-      const doc = generateTableDocument(filteredPeople, selectedColumns);
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, "people-table.docx");
-    } else {
-      const data = exportToExcel(filteredPeople, selectedColumns);
-      const blob = new Blob([data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, "people-table.xlsx");
-    }
   };
 
   const renderCell = (person: Person, field: string, columnWidth: number) => {
@@ -388,26 +372,7 @@ export const SearchAndTableSection = ({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full h-10 sm:h-12 text-base sm:text-lg border-2 border-border focus:border-primary"
           />
-          <div className="flex flex-wrap gap-2 sm:gap-4">
-            <Button
-              onClick={handleOpenExportDialog}
-              className="h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-lg flex-1 sm:flex-none"
-              variant="outline"
-              size="sm"
-            >
-              <Download className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
-              <span className="hidden sm:inline">Експорт</span>
-              <span className="sm:hidden">Е</span>
-            </Button>
-            <Button
-              onClick={handleAddPerson}
-              className="h-10 sm:h-12 px-4 sm:px-6 text-sm sm:text-lg hover:bg-green-300 flex-1 sm:flex-none"
-              size="sm"
-            >
-              <Plus className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
-              Додати
-            </Button>
-          </div>
+
         </div>
 
         <div className="mb-4 flex justify-between items-center text-sm text-muted-foreground">
@@ -443,7 +408,7 @@ export const SearchAndTableSection = ({
                       }
                       ${
                         isDragging && draggedColumn.current !== index
-                          ? "hover:border-l-2 hover:border-primary/50"
+                          ? "hover:border-l-2 hover:border-primary/70"
                           : ""
                       }
                     `}
@@ -499,7 +464,7 @@ export const SearchAndTableSection = ({
                       </div>
                       {/* Resize handle */}
                       <div
-                        className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/50 group-hover:bg-primary/30"
+                        className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/70 group-hover:bg-primary/50"
                         onMouseDown={(e) => handleMouseDown(e, index)}
                         onClick={(e) => e.stopPropagation()}
                       />
@@ -511,7 +476,7 @@ export const SearchAndTableSection = ({
                 {localPeople.map((person) => (
                   <TableRow
                     key={person.fullName}
-                    className="cursor-pointer hover:bg-accent/10 dark:hover:bg-accent/5"
+                    className="cursor-pointer hover:bg-accent/80"
                     onClick={() => handlePersonClick(person)}
                   >
                     {columns.map((column) => (
@@ -533,13 +498,6 @@ export const SearchAndTableSection = ({
           </div>
         </Card>
       </div>
-      
-      <ExportColumnDialog
-        isOpen={isExportDialogOpen}
-        onClose={() => setIsExportDialogOpen(false)}
-        onExport={handleExport}
-        columns={columns}
-      />
     </div>
   );
 };

@@ -76,6 +76,15 @@ const EditPerson = () => {
     BMTDate: "",
     professionCourse: false,
     professionCourseValue: "",
+    
+    // Military orders
+    appointmentOrderNumber: "",
+    appointmentOrderDate: "",
+    enrollmentOrderNumber: "",
+    enrollmentOrderDate: "",
+    dismissalOrderNumber: "",
+    dismissalOrderDate: "",
+    
     isInPPD: false,
     absenceStatus: "не_вказано" as
       | "не_вказано"
