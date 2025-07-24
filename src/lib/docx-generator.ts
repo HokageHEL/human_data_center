@@ -58,6 +58,41 @@ const createTableRow = (label: string, value: string): TableRow => {
   });
 };
 
+// Helper function to calculate age from birth date
+const calculateAge = (birthDate: string): number => {
+  if (!birthDate) return 0;
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
+// Helper function to get field value, handling calculated fields
+const getFieldValue = (person: Partial<PersonData>, field: string): string => {
+  switch (field) {
+    case 'age':
+      return person.birthDate ? calculateAge(person.birthDate).toString() : '';
+    case 'birthDate':
+      return person.birthDate ? new Date(person.birthDate).toLocaleDateString('uk-UA', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }) : '';
+    case 'gender':
+      return person.gender || '';
+    case 'isInPPD':
+      return person.isInPPD ? 'Так' : 'Ні';
+    case 'combatExperienceStatus':
+      return person.combatExperienceStatus ? 'Так' : 'Ні';
+    default:
+      return String(person[field as keyof PersonData] || '');
+  }
+};
+
 export const generateTableDocument = (people: Partial<PersonData>[], columns: { field: string; label: string }[]): Document => {
   const doc = new Document({
     sections: [{
@@ -78,7 +113,7 @@ export const generateTableDocument = (people: Partial<PersonData>[], columns: { 
               new TableRow({
                 children: columns.map(col => 
                   new TableCell({
-                    children: [new Paragraph({ children: [new TextRun({ text: String(person[col.field as keyof PersonData] || '') })] })],
+                    children: [new Paragraph({ children: [new TextRun({ text: getFieldValue(person, col.field) })] })],
                     width: { size: 100 / columns.length, type: WidthType.PERCENTAGE },
                   })
                 ),
@@ -97,7 +132,7 @@ export const exportToExcel = (people: Partial<PersonData>[], columns: { field: s
     people.map(person => 
       columns.reduce((obj, col) => ({
         ...obj,
-        [col.label]: person[col.field as keyof PersonData]
+        [col.label]: getFieldValue(person, col.field)
       }), {})
     )
   );
