@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import { ArrowLeft } from "lucide-react";
 import { useAccentColor } from "@/hooks/use-accent-color";
+import ColumnVisibilitySettings from "@/components/ColumnVisibilitySettings";
 
 const Options = () => {
   const navigate = useNavigate();
@@ -82,6 +83,8 @@ const Options = () => {
               Формат: відтінок насиченість яскравість (HSL)
             </p>
           </div>
+
+          <ColumnVisibilitySettings />
         </div>
       </div>
     </div>

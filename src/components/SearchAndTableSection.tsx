@@ -26,9 +26,13 @@ import { saveAs } from "file-saver";
 import {
   getExportColumns,
   TABLE_COLUMNS_STORAGE_KEY,
-  DEFAULT_TABLE_COLUMNS,
   type TableColumn,
 } from "@/lib/constants";
+import {
+  getTableColumnsConfig,
+  getVisibleColumns,
+  ALL_TABLE_COLUMNS,
+} from "@/lib/constants/all-table-columns";
 import { useResizableColumns } from "@/hooks/use-resizable-columns";
 import { TruncatedText } from "@/components/ui/truncated-text";
 import { PersonnelStatistics } from "@/components/PersonnelStatistics";
@@ -113,12 +117,13 @@ export const SearchAndTableSection = ({
   }, [filteredPeople]);
 
   const { columns, setColumns, handleMouseDown, isResizing, resizingColumn } =
-    useResizableColumns(
-      (() => {
-        const savedColumns = localStorage.getItem(TABLE_COLUMNS_STORAGE_KEY);
-        return savedColumns ? JSON.parse(savedColumns) : DEFAULT_TABLE_COLUMNS;
-      })()
-    );
+    useResizableColumns([]);
+
+  // Initialize columns from localStorage on component mount
+  useEffect(() => {
+    const newColumns = getTableColumnsConfig();
+    setColumns(newColumns);
+  }, [setColumns]);
 
   useEffect(() => {
     localStorage.setItem(TABLE_COLUMNS_STORAGE_KEY, JSON.stringify(columns));
@@ -150,12 +155,32 @@ export const SearchAndTableSection = ({
   };
 
   const resetColumnOrder = () => {
-    setColumns(DEFAULT_TABLE_COLUMNS);
+    const defaultColumns = getTableColumnsConfig();
+    setColumns(defaultColumns);
     localStorage.setItem(
       TABLE_COLUMNS_STORAGE_KEY,
-      JSON.stringify(DEFAULT_TABLE_COLUMNS)
+      JSON.stringify(defaultColumns)
     );
   };
+
+  // Listen for changes in visible columns and update table accordingly
+  useEffect(() => {
+    const handleColumnVisibilityChange = () => {
+      const newColumns = getTableColumnsConfig();
+      setColumns(newColumns);
+      localStorage.setItem(TABLE_COLUMNS_STORAGE_KEY, JSON.stringify(newColumns));
+    };
+
+    // Listen for custom event (same page changes)
+    window.addEventListener('columnVisibilityChanged', handleColumnVisibilityChange);
+    // Listen for storage event (different tab changes)
+    window.addEventListener('storage', handleColumnVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('columnVisibilityChanged', handleColumnVisibilityChange);
+      window.removeEventListener('storage', handleColumnVisibilityChange);
+    };
+  }, [setColumns]);
 
   const handlePersonClick = (person: Person) => {
     console.log("Navigating to edit page for person:", person.fullName);
@@ -188,6 +213,21 @@ export const SearchAndTableSection = ({
   };
 
   const renderCell = (person: Person, field: string, columnWidth: number) => {
+    const renderText = (text: string | number | undefined) => (
+      <TruncatedText
+        text={text?.toString() || ""}
+        maxWidth={columnWidth - 20}
+      />
+    );
+
+    const renderBoolean = (value: boolean | undefined) => (
+      <span className={`px-2 py-1 rounded text-xs ${
+        value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+      }`}>
+        {value ? 'Так' : 'Ні'}
+      </span>
+    );
+
     switch (field) {
       case "completionPercentage":
         return (
@@ -208,55 +248,94 @@ export const SearchAndTableSection = ({
           </div>
         );
       case "shpoNumber":
-        return (
-          <TruncatedText
-            text={person.shpoNumber || ""}
-            maxWidth={columnWidth - 20}
-          />
-        );
+        return renderText(person.shpoNumber);
       case "fullName":
-        return (
-          <TruncatedText
-            text={person.fullName || ""}
-            maxWidth={columnWidth - 20}
-          />
-        );
+        return renderText(person.fullName);
       case "birthDate":
-        return (
-          <TruncatedText
-            text={formatDate(person.birthDate)}
-            maxWidth={columnWidth - 20}
-          />
-        );
+        return renderText(formatDate(person.birthDate));
       case "age":
-        return (
-          <TruncatedText
-            text={calculateAge(person.birthDate).toString()}
-            maxWidth={columnWidth - 20}
-          />
-        );
+        return renderText(calculateAge(person.birthDate));
       case "militaryRank":
-        return (
-          <TruncatedText
-            text={person.militaryRank || ""}
-            maxWidth={columnWidth - 20}
-          />
-        );
+        return renderText(person.militaryRank);
       case "position":
-        return (
-          <TruncatedText
-            text={person.position || ""}
-            maxWidth={columnWidth - 20}
-          />
-        );
+        return renderText(person.position);
       case "gender":
+        return renderText(person.gender);
+      case "passportNumber":
+        return renderText(person.passportNumber);
+      case "taxId":
+        return renderText(person.taxId);
+      case "registrationPlace":
+        return renderText(person.registrationPlace);
+      case "address":
+        return renderText(person.address);
+      case "familyStatus":
+        return renderText(person.familyStatus);
+      case "relatives":
+        return renderText(person.relatives);
+      case "education":
+        return renderText(person.education);
+      case "phoneNumber":
+        return renderText(person.phoneNumber);
+      case "additionalInfo":
+        return renderText(person.additionalInfo);
+      case "lastRankDate":
+        return renderText(formatDate(person.lastRankDate || ''));
+      case "positionRank":
+        return renderText(person.positionRank);
+      case "fitnessStatus":
+        return renderText(person.fitnessStatus);
+      case "medicalCommissionNumber":
+        return renderText(person.medicalCommissionNumber);
+      case "medicalCommissionDate":
+        return renderText(formatDate(person.medicalCommissionDate || ''));
+      case "unit":
+        return renderText(person.unit);
+      case "department":
+        return renderText(person.department);
+      case "militarySpecialty":
+        return renderText(person.militarySpecialty);
+      case "tariffCategory":
+        return renderText(person.tariffCategory);
+      case "salary":
+        return renderText(person.salary);
+      case "serviceType":
+        return renderText(person.serviceType);
+      case "serviceStartDate":
+        return renderText(formatDate(person.serviceStartDate));
+      case "servicePeriods":
+        return renderText(person.servicePeriods);
+      case "unitStartDate":
+        return renderText(formatDate(person.unitStartDate));
+      case "previousServicePlaces":
+        return renderText(person.previousServicePlaces);
+      case "contractEndDate":
+        return renderText(formatDate(person.contractEndDate || ''));
+      case "militaryDocumentNumber":
+        return renderText(person.militaryDocumentNumber);
+      case "combatExperienceStatus":
+        return renderBoolean(person.combatExperienceStatus);
+      case "combatExperienceNumber":
+        return renderText(person.combatExperienceNumber);
+      case "combatPeriods":
+        return renderText(person.combatPeriods);
+      case "status":
         return (
-          <TruncatedText
-            text={person.gender || ""}
-            maxWidth={columnWidth - 20}
-          />
+          <span className={`px-2 py-1 rounded text-xs ${
+            person.status === 'не_вказано' ? 'bg-gray-100 text-gray-800' :
+            person.status === 'відпустка' ? 'bg-blue-100 text-blue-800' :
+            person.status === 'короткострокове_лікування' ? 'bg-yellow-100 text-yellow-800' :
+            person.status === 'довгострокове_лікування' ? 'bg-orange-100 text-orange-800' :
+            person.status === 'відрядження' ? 'bg-purple-100 text-purple-800' :
+            person.status === 'декрет' ? 'bg-pink-100 text-pink-800' :
+            person.status === 'РВБД' ? 'bg-red-100 text-red-800' :
+            person.status === 'навчання' ? 'bg-green-100 text-green-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {person.status?.replace('_', ' ') || 'не вказано'}
+          </span>
         );
-      case "isInPPD": // Add this new case
+      case "isInPPD":
         return (
           <Switch
             checked={person.isInPPD}
@@ -282,7 +361,7 @@ export const SearchAndTableSection = ({
           />
         );
       default:
-        return null;
+        return renderText('');
     }
   };
 
