@@ -34,7 +34,7 @@ import {
   ALL_TABLE_COLUMNS,
 } from "@/lib/constants/all-table-columns";
 import { useResizableColumns } from "@/hooks/use-resizable-columns";
-import { TruncatedText } from "@/components/ui/truncated-text";
+
 import { PersonnelStatistics } from "@/components/PersonnelStatistics";
 import { ExportColumnDialog } from "@/components/ExportColumnDialog";
 
@@ -214,10 +214,9 @@ export const SearchAndTableSection = ({
 
   const renderCell = (person: Person, field: string, columnWidth: number) => {
     const renderText = (text: string | number | undefined) => (
-      <TruncatedText
-        text={text?.toString() || ""}
-        maxWidth={columnWidth - 20}
-      />
+      <span className="truncate">
+        {text?.toString() || ""}
+      </span>
     );
 
     const renderBoolean = (value: boolean | undefined) => (
@@ -459,13 +458,12 @@ export const SearchAndTableSection = ({
                       onDragOver={(e) => e.preventDefault()}
                     >
                       <div
-                        className="flex text-center justify-center items-center gap-1 cursor-pointer px-2"
+                        className="flex text-center justify-center items-center gap-1 cursor-pointer px-2 overflow-hidden"
                         onClick={() => handleSort(column.field as SortField)}
                       >
-                        <TruncatedText
-                          text={column.label}
-                          maxWidth={column.width - 40}
-                        />
+                        <span className="truncate">
+                          {column.label}
+                        </span>
                         {sortConfig.field === column.field &&
                           (sortConfig.order === "asc" ? (
                             <svg
@@ -518,7 +516,7 @@ export const SearchAndTableSection = ({
                   >
                     {columns.map((column) => (
                       <TableCell
-                        className="text-center text-xs sm:text-sm px-2 py-2 border-r border-border"
+                        className="text-center text-xs sm:text-sm px-2 py-2 border-r border-border overflow-hidden"
                         key={column.field}
                         style={{
                           width: `${column.width}px`,
