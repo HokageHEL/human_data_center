@@ -72,8 +72,10 @@ const calculateAge = (birthDate: string): number => {
 };
 
 // Helper function to get field value, handling calculated fields
-const getFieldValue = (person: Partial<PersonData>, field: string): string => {
+const getFieldValue = (person: Partial<PersonData>, field: string, index?: number): string => {
   switch (field) {
+    case 'shpoNumber':
+      return index !== undefined ? (index + 1).toString() : '';
     case 'age':
       return person.birthDate ? calculateAge(person.birthDate).toString() : '';
     case 'birthDate':
@@ -109,11 +111,11 @@ export const generateTableDocument = (people: Partial<PersonData>[], columns: { 
                 })
               ),
             }),
-            ...people.map(person => 
+            ...people.map((person, index) => 
               new TableRow({
                 children: columns.map(col => 
                   new TableCell({
-                    children: [new Paragraph({ children: [new TextRun({ text: getFieldValue(person, col.field) })] })],
+                    children: [new Paragraph({ children: [new TextRun({ text: getFieldValue(person, col.field, index) })] })],
                     width: { size: 100 / columns.length, type: WidthType.PERCENTAGE },
                   })
                 ),
@@ -129,10 +131,10 @@ export const generateTableDocument = (people: Partial<PersonData>[], columns: { 
 
 export const exportToExcel = (people: Partial<PersonData>[], columns: { field: string; label: string }[]): Uint8Array => {
   const worksheet = XLSX.utils.json_to_sheet(
-    people.map(person => 
+    people.map((person, index) => 
       columns.reduce((obj, col) => ({
         ...obj,
-        [col.label]: getFieldValue(person, col.field)
+        [col.label]: getFieldValue(person, col.field, index)
       }), {})
     )
   );
