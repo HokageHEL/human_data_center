@@ -293,6 +293,16 @@ const Home = () => {
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
+          {(searchTerm !== "" || filters.birthDate !== "" || filters.militaryRank.length > 0 || filters.positionRank.length > 0 || filters.unit !== "all" || filters.gender !== "all" || filters.fitnessStatus !== "all" || filters.isInPPD || filters.combatExperienceStatus) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Скинути
+            </Button>
+          )}
         </div>
 
         {/* Collapsible Filters Section */}
@@ -304,7 +314,6 @@ const Home = () => {
                 filters={filters}
                 setFilters={setFilters}
                 people={people}
-                handleResetFilters={handleResetFilters}
               />
             </div>
           </div>

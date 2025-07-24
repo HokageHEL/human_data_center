@@ -36,44 +36,18 @@ interface FilterSectionProps {
     }>
   >;
   people: Person[];
-  handleResetFilters: () => void;
 }
 
 export const FilterSection = ({
   filters,
   setFilters,
   people,
-  handleResetFilters,
 }: FilterSectionProps) => {
-  const isAnyFilterActive = () => {
-    return (
-      filters.birthDate !== "" ||
-      filters.militaryRank.length > 0 ||
-      filters.positionRank.length > 0 ||
-      filters.unit !== "all" ||
-      filters.gender !== "all" ||
-      filters.fitnessStatus !== "all" ||
-      filters.isInPPD ||
-      filters.combatExperienceStatus
-    );
-  };
 
   return (
     <Card className="p-4">
-      <div className="flex justify-between items-center mb-4 h-9">
+      <div className="mb-4">
         <h3 className="font-semibold">Фільтри</h3>
-        <div className="w-[72px]">
-          {isAnyFilterActive() && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleResetFilters}
-              className="text-muted-foreground hover:text-foreground w-full"
-            >
-              Скинути
-            </Button>
-          )}
-        </div>
       </div>
       <div className="space-y-2">
         <div className="space-y-2">
