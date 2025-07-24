@@ -88,9 +88,10 @@ const Home = () => {
       completionPercentage: calculateCompletionPercentage(person),
     }))
     .filter((person) => {
-      const matchesSearch = person.fullName
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      const matchesSearch = searchTerm === "" || 
+        person.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (person.position && person.position.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (person.militaryRank && person.militaryRank.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesBirthDate =
         !filters.birthDate || person.birthDate.includes(filters.birthDate);
       const matchesMilitaryRank =
