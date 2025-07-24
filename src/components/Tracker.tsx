@@ -1,5 +1,7 @@
 import { Person } from "@/lib/data";
 import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface TrackerInfo {
   fullName: string;
@@ -50,22 +52,31 @@ const Tracker: React.FC<Props> = ({
     .filter((b) => b.daysLeft <= daysRange)
     .sort((a, b) => a.daysLeft - b.daysLeft);
 
+  if (upcomingDates.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="mt-4 border p-4 rounded-xl shadow ">
-      <h2 className="text-lg font-bold mb-2 whitespace-nowrap">{title}</h2>
-      <ul className="space-y-1">
-        {upcomingDates.map((item, idx) => (
-          <li key={idx} className="text-sm">
-            <span className="font-bold">{item.fullName}</span>
-            <span> — {item.date} </span>
-            <span>
-              ( {dateLabel} <span className="font-bold">{item.daysLeft}</span>{" "}
-              дн.)
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Card className="mt-4">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {upcomingDates.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between text-sm">
+              <span className="font-medium">{item.fullName}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">{item.date}</span>
+                <Badge variant={item.daysLeft <= 3 ? "destructive" : "secondary"} className="text-xs">
+                  {dateLabel} {item.daysLeft} дн.
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
