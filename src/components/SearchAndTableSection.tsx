@@ -340,7 +340,12 @@ export const SearchAndTableSection = ({
           <Switch
             checked={person.isInPPD}
             onCheckedChange={async (checked) => {
-              const updatedPerson = { ...person, isInPPD: checked };
+              const updatedPerson = { 
+                ...person, 
+                isInPPD: checked,
+                // Set status to 'не_вказано' when PPD is activated
+                status: checked ? 'не_вказано' : person.status
+              };
 
               // Update local state immediately for UI responsiveness
               setLocalPeople((prevPeople) =>
