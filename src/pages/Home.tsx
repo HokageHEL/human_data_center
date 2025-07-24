@@ -52,13 +52,13 @@ const Home = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     birthDate: "",
-    militaryRank: [],
-    positionRank: [],
-    unit: "all",
-    gender: "all",
-    fitnessStatus: "all",
+    militaryRank: [] as string[],
+    positionRank: [] as string[],
+    unit: "",
+    gender: "",
+    fitnessStatus: "",
     isInPPD: false,
-    combatExperienceStatus: false,
+    combatExperienceStatus: "all",
   });
   const [sortConfig, setSortConfig] = useState<{
     field: SortField;
@@ -141,8 +141,9 @@ const Home = () => {
       const matchesIsInPPD =
         !filters.isInPPD || (filters.isInPPD && person.isInPPD);
       const matchesCombatExperience =
-        !filters.combatExperienceStatus ||
-        (filters.combatExperienceStatus && person.combatExperienceStatus);
+      filters.combatExperienceStatus === "all" ||
+      (filters.combatExperienceStatus === "with" && person.combatExperienceStatus) ||
+      (filters.combatExperienceStatus === "without" && !person.combatExperienceStatus);
 
       return (
         matchesSearch &&
@@ -216,17 +217,27 @@ const Home = () => {
       birthDate: "",
       militaryRank: [],
       positionRank: [],
-      unit: "all",
-      gender: "all",
-      fitnessStatus: "all",
+      unit: "",
+      gender: "",
+      fitnessStatus: "",
       isInPPD: false,
-      combatExperienceStatus: false,
+      combatExperienceStatus: "all",
     });
     setSearchTerm("");
   };
 
   const isAnyFilterActive = () => {
-    return searchTerm !== "";
+    return (
+      searchTerm !== "" ||
+      filters.birthDate !== "" ||
+      filters.militaryRank.length > 0 ||
+      filters.positionRank.length > 0 ||
+      filters.unit !== "" ||
+      filters.gender !== "" ||
+      filters.fitnessStatus !== "" ||
+      filters.isInPPD ||
+      filters.combatExperienceStatus !== "all"
+    );
   };
 
   // Helper functions to check if trackers have relevant data
@@ -293,7 +304,7 @@ const Home = () => {
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
-          {(searchTerm !== "" || filters.birthDate !== "" || filters.militaryRank.length > 0 || filters.positionRank.length > 0 || filters.unit !== "all" || filters.gender !== "all" || filters.fitnessStatus !== "all" || filters.isInPPD || filters.combatExperienceStatus) && (
+          {isAnyFilterActive() && (
             <Button
               variant="outline"
               size="sm"

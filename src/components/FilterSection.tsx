@@ -21,7 +21,7 @@ interface FilterSectionProps {
     gender: string;
     fitnessStatus: string;
     isInPPD: boolean;
-    combatExperienceStatus: boolean;
+    combatExperienceStatus: string;
   };
   setFilters: Dispatch<
     SetStateAction<{
@@ -32,7 +32,7 @@ interface FilterSectionProps {
       gender: string;
       fitnessStatus: string;
       isInPPD: boolean;
-      combatExperienceStatus: boolean;
+      combatExperienceStatus: string;
     }>
   >;
   people: Person[];
@@ -43,7 +43,6 @@ export const FilterSection = ({
   setFilters,
   people,
 }: FilterSectionProps) => {
-
   return (
     <Card className="p-4">
       <div className="mb-4">
@@ -103,6 +102,17 @@ export const FilterSection = ({
               </SelectContent>
             </Select>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="ppd"
+              checked={filters.isInPPD}
+              onCheckedChange={(checked) =>
+                setFilters((prev) => ({ ...prev, isInPPD: checked }))
+              }
+            />
+            <Label htmlFor="ppd">В ППД</Label>
+          </div>
         </div>
 
         {/* Column 2: Status Filters */}
@@ -133,29 +143,32 @@ export const FilterSection = ({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="ppd"
-                checked={filters.isInPPD}
-                onCheckedChange={(checked) =>
-                  setFilters((prev) => ({ ...prev, isInPPD: checked }))
-                }
-              />
-              <Label htmlFor="ppd">В ППД</Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="ubd"
-                checked={filters.combatExperienceStatus}
-                onCheckedChange={(checked) =>
+            <div className="space-y-2">
+              <Label>УБД</Label>
+              <Select
+                value={filters.combatExperienceStatus}
+                onValueChange={(value) =>
                   setFilters((prev) => ({
                     ...prev,
-                    combatExperienceStatus: checked,
+                    combatExperienceStatus: value,
                   }))
                 }
-              />
-              <Label htmlFor="ubd">УБД</Label>
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Оберіть статус УБД" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem key="all" value="all">
+                    Всі
+                  </SelectItem>
+                  <SelectItem key="with" value="with">
+                    З УБД
+                  </SelectItem>
+                  <SelectItem key="without" value="without">
+                    Без УБД
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -174,7 +187,9 @@ export const FilterSection = ({
                       ...prev,
                       militaryRank: checked
                         ? [...prev.militaryRank, "Офіцери"]
-                        : prev.militaryRank.filter((rank) => rank !== "Офіцери"),
+                        : prev.militaryRank.filter(
+                            (rank) => rank !== "Офіцери"
+                          ),
                     }))
                   }
                 />
@@ -189,7 +204,9 @@ export const FilterSection = ({
                       ...prev,
                       militaryRank: checked
                         ? [...prev.militaryRank, "Сержанти"]
-                        : prev.militaryRank.filter((rank) => rank !== "Сержанти"),
+                        : prev.militaryRank.filter(
+                            (rank) => rank !== "Сержанти"
+                          ),
                     }))
                   }
                 />
@@ -204,7 +221,9 @@ export const FilterSection = ({
                       ...prev,
                       militaryRank: checked
                         ? [...prev.militaryRank, "Солдати"]
-                        : prev.militaryRank.filter((rank) => rank !== "Солдати"),
+                        : prev.militaryRank.filter(
+                            (rank) => rank !== "Солдати"
+                          ),
                     }))
                   }
                 />
