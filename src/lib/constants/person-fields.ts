@@ -47,6 +47,10 @@ export const OPTIONAL_PERSON_FIELDS = [
   "status",
   "combatExperienceStatus",
   "combatPeriods",
+  "BMT",
+  "BMTDate",
+  "professionCourse",
+  "professionCourseValue",
 ] as const;
 
 // Type definitions

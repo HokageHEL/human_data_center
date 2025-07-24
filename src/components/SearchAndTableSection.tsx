@@ -365,6 +365,14 @@ export const SearchAndTableSection = ({
             onClick={(e) => e.stopPropagation()}
           />
         );
+      case "BMT":
+        return renderBoolean(person.BMT);
+      case "BMTDate":
+        return renderText(formatDate(person.BMTDate || ''));
+      case "professionCourse":
+        return renderBoolean(person.professionCourse);
+      case "professionCourseValue":
+        return renderText(person.professionCourseValue);
       default:
         return renderText('');
     }

@@ -72,6 +72,10 @@ const EditPerson = () => {
     combatExperienceStatus: false,
     combatExperienceNumber: "",
     combatPeriods: "",
+    BMT: false,
+    BMTDate: "",
+    professionCourse: false,
+    professionCourseValue: "",
     isInPPD: false,
     absenceStatus: "не_вказано" as
       | "не_вказано"

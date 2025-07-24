@@ -34,6 +34,10 @@ interface PersonData {
   combatExperienceStatus: boolean;
   combatExperienceNumber: string;
   combatPeriods: string;
+  BMT: boolean;
+  BMTDate: string;
+  professionCourse: boolean;
+  professionCourseValue: string;
   isInPPD: boolean;
 }
 
@@ -90,6 +94,10 @@ const getFieldValue = (person: Partial<PersonData>, field: string, index?: numbe
       return person.isInPPD ? 'Так' : 'Ні';
     case 'combatExperienceStatus':
       return person.combatExperienceStatus ? 'Так' : 'Ні';
+    case 'BMT':
+      return person.BMT ? 'Так' : 'Ні';
+    case 'professionCourse':
+      return person.professionCourse ? 'Так' : 'Ні';
     default:
       return String(person[field as keyof PersonData] || '');
   }
@@ -248,6 +256,10 @@ export const generatePersonDocument = (person: PersonData): Document => {
                           createTableRow('УБД', person.combatExperienceStatus ? 'Так' : 'Ні'),
                           person.combatExperienceStatus ? createTableRow('№ УБД', person.combatExperienceNumber) : null,
                           createTableRow('Періоди участі у бойових діях', person.combatPeriods),
+                          createTableRow('БМТ', person.BMT ? 'Так' : 'Ні'),
+                          person.BMT ? createTableRow('Дата БМТ', person.BMTDate) : null,
+                          createTableRow('Курси кваліфікації', person.professionCourse ? 'Так' : 'Ні'),
+                          person.professionCourse ? createTableRow('Назва курсів', person.professionCourseValue) : null,
                           createTableRow('ППД', person.isInPPD ? 'Так' : 'Ні'),
                         ].filter(Boolean) as TableRow[],
                       }),

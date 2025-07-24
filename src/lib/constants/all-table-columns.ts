@@ -53,6 +53,10 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
   { field: "combatExperienceStatus", label: "Бойовий досвід", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
   { field: "combatExperienceNumber", label: "№ бойового досвіду", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
   { field: "combatPeriods", label: "Періоди бойових дій", width: 200, minWidth: 10, maxWidth: 300, category: 'military' },
+  { field: "BMT", label: "БМТ", width: 100, minWidth: 10, maxWidth: 120, category: 'military' },
+  { field: "BMTDate", label: "Дата БМТ", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
+  { field: "professionCourse", label: "Курси кваліфікації", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
+  { field: "professionCourseValue", label: "Назва курсів", width: 200, minWidth: 10, maxWidth: 300, category: 'military' },
   { field: "isInPPD", label: "ППД", width: 100, minWidth: 10, maxWidth: 120, category: 'military' },
   { field: "status", label: "Статус", width: 150, minWidth: 10, maxWidth: 200, category: 'military' },
 ];
