@@ -14,6 +14,7 @@ import {
   isRankInCategory,
   REQUIRED_PERSON_FIELDS,
 } from "@/lib/constants";
+import { useUrlFilters } from "@/hooks/use-url-filters";
 
 const calculateCompletionPercentage = (person: Person): number => {
   const filledRequiredFields = REQUIRED_PERSON_FIELDS.filter(
@@ -48,25 +49,8 @@ const calculateAge = (birthDate: string): number => {
 };
 
 const Home = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const { searchTerm, setSearchTerm, filters, setFilters, sortConfig, setSortConfig, resetFilters } = useUrlFilters();
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    birthDate: "",
-    militaryRank: [] as string[],
-    positionRank: [] as string[],
-    unit: "",
-    gender: "",
-    fitnessStatus: "",
-    isInPPD: false,
-    combatExperienceStatus: "all",
-  });
-  const [sortConfig, setSortConfig] = useState<{
-    field: SortField;
-    order: SortOrder;
-  }>({
-    field: "shpoNumber",
-    order: "asc",
-  });
   const [people, setPeople] = useState<Array<Person>>([]);
 
   useEffect(() => {
@@ -215,17 +199,7 @@ const Home = () => {
   };
 
   const handleResetFilters = () => {
-    setFilters({
-      birthDate: "",
-      militaryRank: [],
-      positionRank: [],
-      unit: "",
-      gender: "",
-      fitnessStatus: "",
-      isInPPD: false,
-      combatExperienceStatus: "all",
-    });
-    setSearchTerm("");
+    resetFilters();
   };
 
   const isAnyFilterActive = () => {
