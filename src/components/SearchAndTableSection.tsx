@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, FileText, FileSpreadsheet, ArrowUpDown } from "lucide-react";
+import { Plus, Download, ArrowUpDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Person, addPerson } from "@/lib/data";
 import { generateTableDocument, exportToExcel } from "@/lib/docx-generator";
@@ -396,19 +396,9 @@ export const SearchAndTableSection = ({
               variant="outline"
               size="sm"
             >
-              <FileText className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
-              <span className="hidden sm:inline">Word</span>
-              <span className="sm:hidden">W</span>
-            </Button>
-            <Button
-              onClick={handleOpenExportDialog}
-              className="h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-lg flex-1 sm:flex-none"
-              variant="outline"
-              size="sm"
-            >
-              <FileSpreadsheet className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
-              <span className="hidden sm:inline">Excel</span>
-              <span className="sm:hidden">E</span>
+              <Download className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
+              <span className="hidden sm:inline">Експорт</span>
+              <span className="sm:hidden">Е</span>
             </Button>
             <Button
               onClick={handleAddPerson}
