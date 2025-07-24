@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Person } from "@/lib/data";
+import { RankFilter } from "@/components/RankFilter";
 
 interface FilterSectionProps {
   filters: {
@@ -173,64 +174,24 @@ export const FilterSection = ({
           </div>
         </div>
 
-        {/* Column 3: Military Rank Filters */}
+        {/* Column 3: Rank Filters */}
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Військові звання</Label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="officers"
-                  checked={filters.militaryRank.includes("Офіцери")}
-                  onCheckedChange={(checked) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      militaryRank: checked
-                        ? [...prev.militaryRank, "Офіцери"]
-                        : prev.militaryRank.filter(
-                            (rank) => rank !== "Офіцери"
-                          ),
-                    }))
-                  }
-                />
-                <Label htmlFor="officers">Офіцери</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="sergeants"
-                  checked={filters.militaryRank.includes("Сержанти")}
-                  onCheckedChange={(checked) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      militaryRank: checked
-                        ? [...prev.militaryRank, "Сержанти"]
-                        : prev.militaryRank.filter(
-                            (rank) => rank !== "Сержанти"
-                          ),
-                    }))
-                  }
-                />
-                <Label htmlFor="sergeants">Сержанти</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="soldiers"
-                  checked={filters.militaryRank.includes("Солдати")}
-                  onCheckedChange={(checked) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      militaryRank: checked
-                        ? [...prev.militaryRank, "Солдати"]
-                        : prev.militaryRank.filter(
-                            (rank) => rank !== "Солдати"
-                          ),
-                    }))
-                  }
-                />
-                <Label htmlFor="soldiers">Солдати</Label>
-              </div>
-            </div>
-          </div>
+          <RankFilter
+            label="Військові звання"
+            selectedRanks={filters.militaryRank}
+            onRankChange={(ranks) =>
+              setFilters((prev) => ({ ...prev, militaryRank: ranks }))
+            }
+            idPrefix="military"
+          />
+          <RankFilter
+            label="Посадові звання"
+            selectedRanks={filters.positionRank}
+            onRankChange={(ranks) =>
+              setFilters((prev) => ({ ...prev, positionRank: ranks }))
+            }
+            idPrefix="position"
+          />
         </div>
       </div>
     </Card>

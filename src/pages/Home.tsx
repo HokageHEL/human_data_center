@@ -149,6 +149,7 @@ const Home = () => {
         matchesSearch &&
         matchesBirthDate &&
         matchesMilitaryRank &&
+        matchesPositionRank &&
         matchesUnit &&
         matchesGender &&
         matchesFitnessStatus &&
