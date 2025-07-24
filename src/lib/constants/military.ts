@@ -25,6 +25,9 @@ export const MILITARY_RANKS: MilitaryRank[] = [
   { rank: "майор", color: "text-red-600" },
   { rank: "підполковник", color: "text-red-600" },
   { rank: "полковник", color: "text-red-600" },
+  { rank: "рядовий", color: "" },
+  { rank: "інше", color: "" },
+
   // { rank: "бригадний генерал", color: "" },
   // { rank: "генерал-майор", color: "" },
   // { rank: "генерал-лейтенант", color: "" },
@@ -36,7 +39,7 @@ export const MILITARY_RANKS: MilitaryRank[] = [
  * @returns Array of rank names in hierarchical order
  */
 export const getMilitaryRankNames = (): string[] => {
-  return MILITARY_RANKS.map(rank => rank.rank);
+  return MILITARY_RANKS.map((rank) => rank.rank);
 };
 
 /**
@@ -71,6 +74,9 @@ export const RANK_CATEGORIES = {
  * @param category - The category to check against
  * @returns True if the rank belongs to the category
  */
-export const isRankInCategory = (rank: string, category: keyof typeof RANK_CATEGORIES): boolean => {
+export const isRankInCategory = (
+  rank: string,
+  category: keyof typeof RANK_CATEGORIES
+): boolean => {
   return RANK_CATEGORIES[category].includes(rank.toLowerCase());
 };
