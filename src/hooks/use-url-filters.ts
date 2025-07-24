@@ -62,9 +62,10 @@ export const useUrlFilters = (): UseUrlFiltersReturn => {
 
   // Parse sort config from URL
   const parseSortConfigFromUrl = useCallback((): SortConfig => {
+    const sortOrder = searchParams.get('sortOrder');
     return {
       field: searchParams.get('sortField') || 'shpoNumber',
-      order: (searchParams.get('sortOrder') as 'asc' | 'desc' | null) || 'asc',
+      order: sortOrder === 'null' ? null : (sortOrder as 'asc' | 'desc') || 'asc',
     };
   }, [searchParams]);
 
@@ -94,7 +95,9 @@ export const useUrlFilters = (): UseUrlFiltersReturn => {
     
     // Add sort config
     if (newSortConfig.field !== 'shpoNumber') params.set('sortField', newSortConfig.field);
-    if (newSortConfig.order && newSortConfig.order !== 'asc') params.set('sortOrder', newSortConfig.order);
+    if (newSortConfig.order !== 'asc') {
+      params.set('sortOrder', newSortConfig.order === null ? 'null' : newSortConfig.order);
+    }
     
     setSearchParams(params, { replace: true });
   }, [setSearchParams]);

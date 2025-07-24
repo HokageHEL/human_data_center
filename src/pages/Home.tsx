@@ -184,6 +184,7 @@ const Home = () => {
       if (prev.order === "desc") {
         return { field, order: null };
       }
+      // If order is null or undefined, start with asc
       return { field, order: "asc" };
     });
   };
