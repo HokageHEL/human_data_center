@@ -25,22 +25,6 @@ export const DEFAULT_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
   },
-  {
-    field: "birthDate",
-    label: "Дата народження",
-    width: 150,
-    minWidth: 10,
-    maxWidth: 200,
-  },
-  { field: "age", label: "Вік", width: 61, minWidth: 10, maxWidth: 100 },
-  {
-    field: "completionPercentage",
-    label: "Заповнено",
-    width: 120,
-    minWidth: 10,
-    maxWidth: 150,
-  },
-  { field: "gender", label: "Стать", width: 100, minWidth: 10, maxWidth: 120 },
   { field: "isInPPD", label: "ППД", width: 100, minWidth: 10, maxWidth: 120 },
 ];
 
