@@ -425,7 +425,7 @@ export const SearchAndTableSection = ({
                 {localPeople.map((person) => (
                   <TableRow
                     key={person.fullName}
-                    className="cursor-pointer hover:bg-accent"
+                    className="cursor-pointer hover:bg-accent/10 dark:hover:bg-accent/5"
                     onClick={() => handlePersonClick(person)}
                   >
                     {columns.map((column) => (
