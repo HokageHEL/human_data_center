@@ -52,7 +52,7 @@ export const FormField = ({
 
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label className="block min-h-[1.25rem] leading-tight">{label}</Label>
       {type === "text" && (
         <Input
           value={value || ""}
