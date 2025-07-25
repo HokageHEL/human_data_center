@@ -25,7 +25,7 @@ export function Header() {
       <div className="container flex h-14 items-center justify-between">
         <span></span>
         <div className="flex items-center gap-2 font-bold text-xl">
-          <Logo className="h-8 w-8" />
+          <Logo className="h-10 w-10" />
           ОСА
         </div>
         <Button
