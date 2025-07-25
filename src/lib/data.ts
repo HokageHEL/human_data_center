@@ -317,7 +317,7 @@ export async function addPerson(
   }
 }
 
-// Get a person by name
+// Get a person by name (only active/non-deleted)
 export async function getPerson(fullName: string): Promise<Person | null> {
   let db: IDBDatabase | null = null;
   try {
@@ -346,6 +346,40 @@ export async function getPerson(fullName: string): Promise<Person | null> {
     });
   } catch (error) {
     console.error("Error getting person:", error);
+    if (db) db.close();
+    throw error;
+  }
+}
+
+// Get a person by name (including deleted ones)
+export async function getPersonIncludingDeleted(fullName: string): Promise<Person | null> {
+  let db: IDBDatabase | null = null;
+  try {
+    console.log("Getting person (including deleted) with fullName:", fullName);
+    console.log("URL-decoded fullName:", decodeURIComponent(fullName));
+    const decodedName = decodeURIComponent(fullName);
+    db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readonly");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(decodedName);
+
+      request.onsuccess = () => {
+        const person = request.result;
+        console.log("getPersonIncludingDeleted result for", decodedName, ":", person);
+        resolve(person || null);
+      };
+      request.onerror = () => {
+        console.error("Error in getPersonIncludingDeleted:", request.error);
+        reject(request.error);
+      };
+
+      transaction.oncomplete = () => {
+        if (db) db.close();
+      };
+    });
+  } catch (error) {
+    console.error("Error getting person including deleted:", error);
     if (db) db.close();
     throw error;
   }
@@ -398,6 +432,140 @@ export async function deletePerson(fullName: string): Promise<void> {
     }
   } catch (error) {
     console.error("Error deleting person:", error);
+    throw error;
+  }
+}
+
+// Get all archived (deleted) people
+export async function getArchivedPeople(): Promise<Person[]> {
+  let db: IDBDatabase | null = null;
+  try {
+    db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readonly");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const allPeople = request.result;
+        console.log("Total records found:", allPeople.length);
+        const archivedPeople = allPeople.filter((person) => person.deleted === true);
+        console.log("Archived (deleted) records:", archivedPeople.length);
+        console.log(
+          "Archived people names:",
+          archivedPeople.map((p) => p.fullName)
+        );
+        resolve(archivedPeople);
+      };
+
+      request.onerror = () => {
+        console.error("Error in getArchivedPeople:", request.error);
+        reject(request.error);
+      };
+
+      transaction.oncomplete = () => {
+        if (db) db.close();
+      };
+    });
+  } catch (error) {
+    console.error("Error getting archived people:", error);
+    if (db) db.close();
+    throw error;
+  }
+}
+
+// Restore a person from archive (undelete)
+export async function restorePerson(fullName: string): Promise<void> {
+  let db: IDBDatabase | null = null;
+  try {
+    console.log("Restoring person:", fullName);
+    const decodedName = decodeURIComponent(fullName);
+    db = await openDB();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const getRequest = store.get(decodedName);
+
+      getRequest.onsuccess = () => {
+        const person = getRequest.result;
+        if (person && person.deleted) {
+          const restoredPerson = { ...person, deleted: false };
+          const putRequest = store.put(restoredPerson);
+          
+          putRequest.onsuccess = () => {
+            console.log("Successfully restored person:", decodedName);
+            resolve();
+          };
+          
+          putRequest.onerror = () => {
+            console.error("Error restoring person:", putRequest.error);
+            reject(putRequest.error);
+          };
+        } else {
+          console.log("Person not found or not deleted:", decodedName);
+          resolve();
+        }
+      };
+
+      getRequest.onerror = () => {
+        console.error("Error getting person for restore:", getRequest.error);
+        reject(getRequest.error);
+      };
+
+      transaction.oncomplete = () => {
+        if (db) db.close();
+      };
+
+      transaction.onerror = () => {
+        console.error("Transaction error in restorePerson:", transaction.error);
+        if (db) db.close();
+        reject(transaction.error);
+      };
+    });
+  } catch (error) {
+    console.error("Error in restorePerson:", error);
+    if (db) db.close();
+    throw error;
+  }
+}
+
+// Permanently delete a person from database
+export async function permanentlyDeletePerson(fullName: string): Promise<void> {
+  let db: IDBDatabase | null = null;
+  try {
+    console.log("Permanently deleting person:", fullName);
+    const decodedName = decodeURIComponent(fullName);
+    db = await openDB();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const deleteRequest = store.delete(decodedName);
+
+      deleteRequest.onsuccess = () => {
+        console.log("Successfully permanently deleted person:", decodedName);
+        resolve();
+      };
+
+      deleteRequest.onerror = () => {
+        console.error("Error permanently deleting person:", deleteRequest.error);
+        reject(deleteRequest.error);
+      };
+
+      transaction.oncomplete = () => {
+        if (db) db.close();
+      };
+
+      transaction.onerror = () => {
+        console.error("Transaction error in permanentlyDeletePerson:", transaction.error);
+        if (db) db.close();
+        reject(transaction.error);
+      };
+    });
+  } catch (error) {
+    console.error("Error in permanentlyDeletePerson:", error);
+    if (db) db.close();
     throw error;
   }
 }

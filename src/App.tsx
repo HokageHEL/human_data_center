@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import EditPerson from "./pages/EditPerson";
 import NotFound from "./pages/NotFound";
 import Options from "./pages/Options";
+import Archive from "./pages/Archive";
 import { useEffect } from "react";
 
 // Initialize accent color from localStorage
@@ -42,6 +43,7 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/edit/:name" element={<EditPerson />} />
               <Route path="/options" element={<Options />} />
+              <Route path="/archive" element={<Archive />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
