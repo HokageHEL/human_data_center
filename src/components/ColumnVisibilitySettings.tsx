@@ -98,6 +98,16 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
     return ALL_TABLE_COLUMNS.filter(col => col.category === category);
   };
 
+  const getMilitarySubcategories = () => {
+    const militaryColumns = ALL_TABLE_COLUMNS.filter(col => col.category === 'military');
+    const subcategories = [...new Set(militaryColumns.map(col => col.subcategory).filter(Boolean))];
+    return subcategories.sort();
+  };
+
+  const getSubcategoryColumns = (subcategory: string) => {
+    return ALL_TABLE_COLUMNS.filter(col => col.category === 'military' && col.subcategory === subcategory);
+  };
+
   const getCategoryTitle = (category: string) => {
     switch (category) {
       case 'system': return 'Системні поля';
@@ -105,6 +115,22 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
       case 'military': return 'Військові дані';
       default: return category;
     }
+  };
+
+  const handleSelectAllSubcategory = (subcategory: string) => {
+    const columnsToSelect = getSubcategoryColumns(subcategory).map(col => col.field);
+    const newVisibleColumns = [...new Set([...visibleColumns, ...columnsToSelect])];
+    setVisibleColumns(newVisibleColumns);
+    saveVisibleColumns(newVisibleColumns);
+    onColumnsChange?.(newVisibleColumns);
+  };
+
+  const handleDeselectAllSubcategory = (subcategory: string) => {
+    const columnsToDeselect = getSubcategoryColumns(subcategory).map(col => col.field);
+    const newVisibleColumns = visibleColumns.filter(col => !columnsToDeselect.includes(col));
+    setVisibleColumns(newVisibleColumns);
+    saveVisibleColumns(newVisibleColumns);
+    onColumnsChange?.(newVisibleColumns);
   };
 
   const categories = ['system', 'personal', 'military'];
@@ -179,33 +205,99 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {categoryColumns.map((column) => (
-                  <div key={column.field} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={column.field}
-                      checked={visibleColumns.includes(column.field)}
-                      onCheckedChange={(checked) => 
-                        handleColumnToggle(column.field, checked as boolean)
-                      }
-                      disabled={column.field === 'shpoNumber' || column.field === 'fullName'}
-                    />
-                    <Label 
-                      htmlFor={column.field} 
-                      className={`text-sm cursor-pointer ${
-                        column.field === 'shpoNumber' || column.field === 'fullName' 
-                          ? 'text-muted-foreground' 
-                          : ''
-                      }`}
-                    >
-                      {column.label}
-                      {(column.field === 'shpoNumber' || column.field === 'fullName') && (
-                        <span className="ml-1 text-xs text-muted-foreground">(always visible)</span>
-                      )}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {category === 'military' ? (
+                <div className="space-y-6">
+                  {getMilitarySubcategories().map((subcategory) => {
+                    const subcategoryColumns = getSubcategoryColumns(subcategory);
+                    const selectedCount = subcategoryColumns.filter(col => visibleColumns.includes(col.field)).length;
+                    const totalCount = subcategoryColumns.length;
+                    
+                    return (
+                      <div key={subcategory} className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm text-gray-700">{subcategory}</h4>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">
+                              {selectedCount}/{totalCount}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSelectAllSubcategory(subcategory)}
+                              className="h-6 px-2 text-xs"
+                            >
+                              Вибрати всі
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeselectAllSubcategory(subcategory)}
+                              className="h-6 px-2 text-xs"
+                            >
+                              Скасувати всі
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-4">
+                          {subcategoryColumns.map((column) => (
+                            <div key={column.field} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={column.field}
+                                checked={visibleColumns.includes(column.field)}
+                                onCheckedChange={(checked) => 
+                                  handleColumnToggle(column.field, checked as boolean)
+                                }
+                                disabled={column.field === 'shpoNumber' || column.field === 'fullName'}
+                              />
+                              <Label 
+                                htmlFor={column.field} 
+                                className={`text-sm cursor-pointer ${
+                                  column.field === 'shpoNumber' || column.field === 'fullName' 
+                                    ? 'text-muted-foreground' 
+                                    : ''
+                                }`}
+                              >
+                                {column.label}
+                                {(column.field === 'shpoNumber' || column.field === 'fullName') && (
+                                  <span className="ml-1 text-xs text-muted-foreground">(always visible)</span>
+                                )}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {categoryColumns.map((column) => (
+                    <div key={column.field} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={column.field}
+                        checked={visibleColumns.includes(column.field)}
+                        onCheckedChange={(checked) => 
+                          handleColumnToggle(column.field, checked as boolean)
+                        }
+                        disabled={column.field === 'shpoNumber' || column.field === 'fullName'}
+                      />
+                      <Label 
+                        htmlFor={column.field} 
+                        className={`text-sm cursor-pointer ${
+                          column.field === 'shpoNumber' || column.field === 'fullName' 
+                            ? 'text-muted-foreground' 
+                            : ''
+                        }`}
+                      >
+                        {column.label}
+                        {(column.field === 'shpoNumber' || column.field === 'fullName') && (
+                          <span className="ml-1 text-xs text-muted-foreground">(always visible)</span>
+                        )}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              )}
               
               {category !== categories[categories.length - 1] && <Separator />}
             </div>

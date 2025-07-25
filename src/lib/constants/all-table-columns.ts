@@ -7,6 +7,7 @@ export interface TableColumn {
   minWidth?: number;
   maxWidth?: number;
   category: "military" | "personal" | "system";
+  subcategory?: string;
 }
 
 // All possible table columns based on Person interface
@@ -151,6 +152,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Посада та звання",
   },
   {
     field: "militaryRank",
@@ -159,6 +161,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 250,
     category: "military",
+    subcategory: "Посада та звання",
   },
   {
     field: "lastRankDate",
@@ -167,6 +170,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Посада та звання",
   },
   {
     field: "positionRank",
@@ -175,6 +179,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Посада та звання",
   },
   {
     field: "fitnessStatus",
@@ -183,6 +188,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Медичні дані",
   },
   {
     field: "medicalCommissionNumber",
@@ -191,6 +197,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Медичні дані",
   },
   {
     field: "medicalCommissionDate",
@@ -199,6 +206,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Медичні дані",
   },
   {
     field: "unit",
@@ -207,6 +215,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Підрозділ та спеціальність",
   },
   {
     field: "department",
@@ -215,6 +224,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Підрозділ та спеціальність",
   },
   {
     field: "militarySpecialty",
@@ -223,6 +233,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Підрозділ та спеціальність",
   },
   {
     field: "tariffCategory",
@@ -231,6 +242,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Підрозділ та спеціальність",
   },
   {
     field: "salary",
@@ -239,6 +251,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 150,
     category: "military",
+    subcategory: "Підрозділ та спеціальність",
   },
   {
     field: "serviceType",
@@ -247,6 +260,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 150,
     category: "military",
+    subcategory: "Інформація про службу",
   },
   {
     field: "serviceStartDate",
@@ -255,6 +269,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Інформація про службу",
   },
   {
     field: "servicePeriods",
@@ -263,6 +278,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Інформація про службу",
   },
   {
     field: "previousServicePlaces",
@@ -271,6 +287,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Інформація про службу",
   },
   {
     field: "contractEndDate",
@@ -279,6 +296,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Інформація про службу",
   },
   {
     field: "extendedUntilDemobilization",
@@ -287,6 +305,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 250,
     category: "military",
+    subcategory: "Інформація про службу",
   },
   {
     field: "militaryDocumentNumber",
@@ -295,6 +314,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 250,
     category: "military",
+    subcategory: "Документи та бойовий досвід",
   },
   {
     field: "combatExperienceStatus",
@@ -303,6 +323,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Документи та бойовий досвід",
   },
   {
     field: "combatExperienceNumber",
@@ -311,6 +332,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Документи та бойовий досвід",
   },
   {
     field: "combatPeriods",
@@ -319,6 +341,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Документи та бойовий досвід",
   },
   {
     field: "BMT",
@@ -327,6 +350,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 120,
     category: "military",
+    subcategory: "Навчання та підготовка",
   },
   {
     field: "professionCourse",
@@ -335,6 +359,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Навчання та підготовка",
   },
   {
     field: "professionCourseValue",
@@ -343,6 +368,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Навчання та підготовка",
   },
   // Military orders
   {
@@ -352,6 +378,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "appointmentOrderNumber",
@@ -360,6 +387,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "appointmentOrderDate",
@@ -368,6 +396,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "enrollmentOrderNumber",
@@ -376,6 +405,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "enrollmentOrderDate",
@@ -384,6 +414,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "dismissalOrderNumber",
@@ -392,6 +423,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "dismissalOrderDate",
@@ -400,6 +432,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 300,
     category: "military",
+    subcategory: "Накази та призначення",
   },
   {
     field: "status",
@@ -408,6 +441,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     minWidth: 10,
     maxWidth: 200,
     category: "military",
+    subcategory: "Інформація про службу",
   },
 ];
 
