@@ -265,14 +265,6 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     category: "military",
   },
   {
-    field: "unitStartDate",
-    label: "Початок в підрозділі",
-    width: 150,
-    minWidth: 10,
-    maxWidth: 200,
-    category: "military",
-  },
-  {
     field: "previousServicePlaces",
     label: "Попередні місця служби",
     width: 200,
@@ -334,14 +326,6 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     width: 100,
     minWidth: 10,
     maxWidth: 120,
-    category: "military",
-  },
-  {
-    field: "BMTDate",
-    label: "Дата проходження БЗВП",
-    width: 150,
-    minWidth: 10,
-    maxWidth: 200,
     category: "military",
   },
   {

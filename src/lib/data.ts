@@ -49,7 +49,6 @@ export interface Person {
   serviceType: "мобілізація" | "контракт";
   serviceStartDate: string;
   servicePeriods: string;
-  unitStartDate: string;
   previousServicePlaces: string;
   contractEndDate?: string;
   extendedUntilDemobilization?: boolean;
@@ -60,10 +59,9 @@ export interface Person {
   combatPeriods: string;
   isInPPD: boolean;
   BMT: boolean;
-  BMTDate?: string;
   professionCourse: boolean;
   professionCourseValue?: string;
-  
+
   // Military orders
   appointmentOrderNumber?: string;
   appointmentOrderDate?: string;
@@ -77,7 +75,7 @@ export interface Person {
 
 const DB_NAME = "militaryDB";
 const STORE_NAME = "people";
-const DB_VERSION = 18; // Added extendedUntilDemobilization field
+const DB_VERSION = 19; // remove redundant field
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -150,7 +148,7 @@ function openDB(): Promise<IDBDatabase> {
                 BMTDate: person.BMTDate ?? "",
                 professionCourse: person.professionCourse ?? false,
                 professionCourseValue: person.professionCourseValue ?? "",
-                
+
                 // Military orders
                 appointmentOrderNumber: person.appointmentOrderNumber ?? "",
                 appointmentOrderDate: person.appointmentOrderDate ?? "",
@@ -158,9 +156,10 @@ function openDB(): Promise<IDBDatabase> {
                 enrollmentOrderDate: person.enrollmentOrderDate ?? "",
                 dismissalOrderNumber: person.dismissalOrderNumber ?? "",
                 dismissalOrderDate: person.dismissalOrderDate ?? "",
-                
+
                 // Contract extension
-                extendedUntilDemobilization: person.extendedUntilDemobilization ?? false,
+                extendedUntilDemobilization:
+                  person.extendedUntilDemobilization ?? false,
               };
               store.put(updatedPerson);
             }

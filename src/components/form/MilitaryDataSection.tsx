@@ -18,7 +18,6 @@ interface MilitaryFormData {
   salary?: number;
   serviceType?: string;
   serviceStartDate?: string;
-  unitStartDate?: string;
   contractEndDate?: string;
   extendedUntilDemobilization?: boolean;
   servicePeriods?: string;
@@ -29,7 +28,6 @@ interface MilitaryFormData {
   combatExperienceNumber?: string;
   combatPeriods?: string;
   BMT?: boolean;
-  BMTDate?: string;
   professionCourse?: boolean;
   professionCourseValue?: string;
 
@@ -231,13 +229,6 @@ export const MilitaryDataSection = ({
           value={formData.serviceStartDate}
           onChange={onInputChange}
         />
-        <FormField
-          label="У військовій частині з"
-          field="unitStartDate"
-          type="date"
-          value={formData.unitStartDate}
-          onChange={onInputChange}
-        />
       </div>
       <FormField
         label="Періоди проходження служби"
@@ -306,15 +297,6 @@ export const MilitaryDataSection = ({
           value={formData.BMT}
           onChange={onInputChange}
         />
-        {formData.BMT && (
-          <FormField
-            label="Дата проходження БЗВП"
-            field="BMTDate"
-            type="date"
-            value={formData.BMTDate}
-            onChange={onInputChange}
-          />
-        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
