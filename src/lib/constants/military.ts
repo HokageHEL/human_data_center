@@ -9,6 +9,7 @@ export interface MilitaryRank {
 
 export const MILITARY_RANKS: MilitaryRank[] = [
   { rank: "солдат", color: "" },
+  { rank: "рядовий", color: "" },
   { rank: "старший солдат", color: "" },
   { rank: "молодший сержант", color: "text-green-600" },
   { rank: "сержант", color: "text-green-600" },
@@ -25,7 +26,6 @@ export const MILITARY_RANKS: MilitaryRank[] = [
   { rank: "майор", color: "text-red-600" },
   { rank: "підполковник", color: "text-red-600" },
   { rank: "полковник", color: "text-red-600" },
-  { rank: "рядовий", color: "" },
   { rank: "інше", color: "" },
 
   // { rank: "бригадний генерал", color: "" },
@@ -65,7 +65,7 @@ export const RANK_CATEGORIES = {
     "старший майстер-сержант",
     "головний майстер-сержант",
   ],
-  SOLDIERS: ["солдат", "старший солдат"],
+  SOLDIERS: ["солдат", "рядовий", "старший солдат"],
 };
 
 /**

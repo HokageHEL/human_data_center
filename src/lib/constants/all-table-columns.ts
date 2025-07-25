@@ -234,7 +234,7 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
   },
   {
     field: "salary",
-    label: "Зарплата",
+    label: "Оклад",
     width: 120,
     minWidth: 10,
     maxWidth: 150,
