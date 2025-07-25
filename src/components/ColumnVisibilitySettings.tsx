@@ -101,7 +101,13 @@ const ColumnVisibilitySettings: React.FC<ColumnVisibilitySettingsProps> = ({
   const getMilitarySubcategories = () => {
     const militaryColumns = ALL_TABLE_COLUMNS.filter(col => col.category === 'military');
     const subcategories = [...new Set(militaryColumns.map(col => col.subcategory).filter(Boolean))];
-    return subcategories.sort();
+    
+    // Custom order: move "Посада та звання" and "Підрозділ та спеціальність" to the top
+    const priorityOrder = ["Посада та звання", "Підрозділ та спеціальність"];
+    const prioritySubcategories = priorityOrder.filter(cat => subcategories.includes(cat));
+    const remainingSubcategories = subcategories.filter(cat => !priorityOrder.includes(cat)).sort();
+    
+    return [...prioritySubcategories, ...remainingSubcategories];
   };
 
   const getSubcategoryColumns = (subcategory: string) => {
