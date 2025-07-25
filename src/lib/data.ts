@@ -52,6 +52,7 @@ export interface Person {
   unitStartDate: string;
   previousServicePlaces: string;
   contractEndDate?: string;
+  extendedUntilDemobilization?: boolean;
   militaryDocumentNumber: string;
   shpoNumber: string;
   combatExperienceStatus: boolean;
@@ -76,7 +77,7 @@ export interface Person {
 
 const DB_NAME = "militaryDB";
 const STORE_NAME = "people";
-const DB_VERSION = 17; // Added military order fields with data preservation
+const DB_VERSION = 18; // Added extendedUntilDemobilization field
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -157,6 +158,9 @@ function openDB(): Promise<IDBDatabase> {
                 enrollmentOrderDate: person.enrollmentOrderDate ?? "",
                 dismissalOrderNumber: person.dismissalOrderNumber ?? "",
                 dismissalOrderDate: person.dismissalOrderDate ?? "",
+                
+                // Contract extension
+                extendedUntilDemobilization: person.extendedUntilDemobilization ?? false,
               };
               store.put(updatedPerson);
             }

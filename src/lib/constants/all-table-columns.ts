@@ -289,6 +289,14 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     category: "military",
   },
   {
+    field: "extendedUntilDemobilization",
+    label: "Продовжено до демобілізації",
+    width: 200,
+    minWidth: 10,
+    maxWidth: 250,
+    category: "military",
+  },
+  {
     field: "militaryDocumentNumber",
     label: "№ військового документа",
     width: 180,

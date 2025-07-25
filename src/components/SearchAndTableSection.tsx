@@ -300,6 +300,8 @@ export const SearchAndTableSection = ({
         return renderText(person.previousServicePlaces);
       case "contractEndDate":
         return renderText(formatDate(person.contractEndDate || ''));
+      case "extendedUntilDemobilization":
+        return renderBoolean(person.extendedUntilDemobilization);
       case "militaryDocumentNumber":
         return renderText(person.militaryDocumentNumber);
       case "combatExperienceStatus":

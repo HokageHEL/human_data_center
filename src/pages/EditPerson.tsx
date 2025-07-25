@@ -67,6 +67,7 @@ const EditPerson = () => {
     unitStartDate: "",
     previousServicePlaces: "",
     contractEndDate: "",
+    extendedUntilDemobilization: false,
     militaryDocumentNumber: "",
     shpoNumber: "",
     combatExperienceStatus: false,
