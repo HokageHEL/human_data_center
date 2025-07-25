@@ -38,6 +38,7 @@ const calculateCompletionPercentage = (person: Person): number => {
 type SortField =
   | "fullName"
   | "birthDate"
+  | "age"
   | "militaryRank"
   | "position"
   | "shpoNumber"
@@ -176,6 +177,13 @@ const Home = () => {
       // Special handling for completionPercentage field
       if (field === "completionPercentage") {
         return (a.completionPercentage - b.completionPercentage) * order;
+      }
+
+      // Special handling for age field
+      if (field === "age") {
+        const aAge = calculateAge(a.birthDate);
+        const bAge = calculateAge(b.birthDate);
+        return (aAge - bAge) * order;
       }
 
       if (a[field] < b[field]) return -1 * order;
