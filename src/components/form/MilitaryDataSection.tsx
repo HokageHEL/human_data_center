@@ -206,23 +206,23 @@ export const MilitaryDataSection = ({
           />
         )}
       </div>
-      {formData.serviceType === "контракт" && formData.contractEndDate && (
+      {formData.serviceType === "контракт" &&
+        formData.contractEndDate &&
         (() => {
           const today = new Date();
           const contractEnd = new Date(formData.contractEndDate);
           const isContractExpired = contractEnd < today;
-          
+
           return isContractExpired ? (
             <FormField
-              label="Продовжено до оголошення демобілізації"
+              label="Контракт продовжено до оголошення демобілізації"
               field="extendedUntilDemobilization"
               type="switch"
               value={formData.extendedUntilDemobilization}
               onChange={onInputChange}
             />
           ) : null;
-        })()
-      )}
+        })()}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           label="Дата призову / укладення контракту"
