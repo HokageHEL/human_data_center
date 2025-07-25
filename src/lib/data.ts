@@ -63,6 +63,7 @@ export interface Person {
   professionCourseValue?: string;
 
   // Military orders
+  appointedBy?: string;
   appointmentOrderNumber?: string;
   appointmentOrderDate?: string;
   enrollmentOrderNumber?: string;
@@ -75,7 +76,7 @@ export interface Person {
 
 const DB_NAME = "militaryDB";
 const STORE_NAME = "people";
-const DB_VERSION = 19; // remove redundant field
+const DB_VERSION = 20; // add appointedBy field
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -150,6 +151,7 @@ function openDB(): Promise<IDBDatabase> {
                 professionCourseValue: person.professionCourseValue ?? "",
 
                 // Military orders
+                appointedBy: person.appointedBy ?? "",
                 appointmentOrderNumber: person.appointmentOrderNumber ?? "",
                 appointmentOrderDate: person.appointmentOrderDate ?? "",
                 enrollmentOrderNumber: person.enrollmentOrderNumber ?? "",

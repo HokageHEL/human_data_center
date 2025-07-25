@@ -364,6 +364,20 @@ export const SearchAndTableSection = ({
         return renderBoolean(person.professionCourse);
       case "professionCourseValue":
         return renderText(person.professionCourseValue);
+      case "appointedBy":
+        return renderText(person.appointedBy);
+      case "appointmentOrderNumber":
+        return renderText(person.appointmentOrderNumber);
+      case "appointmentOrderDate":
+        return renderText(formatDate(person.appointmentOrderDate || ''));
+      case "enrollmentOrderNumber":
+        return renderText(person.enrollmentOrderNumber);
+      case "enrollmentOrderDate":
+        return renderText(formatDate(person.enrollmentOrderDate || ''));
+      case "dismissalOrderNumber":
+        return renderText(person.dismissalOrderNumber);
+      case "dismissalOrderDate":
+        return renderText(formatDate(person.dismissalOrderDate || ''));
       default:
         return renderText('');
     }

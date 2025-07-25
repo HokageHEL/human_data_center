@@ -21,8 +21,11 @@ import { PPDSection } from "@/components/form/PPDSection";
 import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
 import { GeneralInfoSection } from "@/components/form/GeneralInfoSection";
 import { MilitaryDataSection } from "@/components/form/MilitaryDataSection";
-import { calculateSalary, DEPARTMENTS_BY_UNIT, MILITARY_RANKS } from "@/lib/constants";
-
+import {
+  calculateSalary,
+  DEPARTMENTS_BY_UNIT,
+  MILITARY_RANKS,
+} from "@/lib/constants";
 
 const EditPerson = () => {
   const { name } = useParams();
@@ -64,7 +67,6 @@ const EditPerson = () => {
     serviceType: "мобілізація" as "мобілізація" | "контракт",
     serviceStartDate: "",
     servicePeriods: "",
-    unitStartDate: "",
     previousServicePlaces: "",
     contractEndDate: "",
     extendedUntilDemobilization: false,
@@ -74,18 +76,18 @@ const EditPerson = () => {
     combatExperienceNumber: "",
     combatPeriods: "",
     BMT: false,
-    BMTDate: "",
     professionCourse: false,
     professionCourseValue: "",
-    
+
     // Military orders
+    appointedBy: "",
     appointmentOrderNumber: "",
     appointmentOrderDate: "",
     enrollmentOrderNumber: "",
     enrollmentOrderDate: "",
     dismissalOrderNumber: "",
     dismissalOrderDate: "",
-    
+
     isInPPD: false,
     absenceStatus: "не_вказано" as
       | "не_вказано"
@@ -97,7 +99,6 @@ const EditPerson = () => {
       | "РВБД"
       | "навчання",
   });
-
 
   // Load existing data on component mount
   useEffect(() => {
@@ -186,10 +187,16 @@ const EditPerson = () => {
       }
     };
 
-    window.addEventListener('checkUnsavedChanges', handleUnsavedChangesCheck as EventListener);
-    
+    window.addEventListener(
+      "checkUnsavedChanges",
+      handleUnsavedChangesCheck as EventListener
+    );
+
     return () => {
-      window.removeEventListener('checkUnsavedChanges', handleUnsavedChangesCheck as EventListener);
+      window.removeEventListener(
+        "checkUnsavedChanges",
+        handleUnsavedChangesCheck as EventListener
+      );
     };
   }, [hasUnsavedChanges, navigate]);
 
@@ -227,13 +234,15 @@ const EditPerson = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: string | number | boolean | Document[]) => {
+  const handleInputChange = (
+    field: string,
+    value: string | number | boolean | Document[]
+  ) => {
     setFormData((prev) => {
       const newData = {
         ...prev,
         [field]: value,
       };
-
 
       if (field === "isInPPD" && value === true) {
         newData.absenceStatus = "не_вказано";
@@ -313,8 +322,6 @@ const EditPerson = () => {
     }
     return age;
   };
-
-
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background p-6">

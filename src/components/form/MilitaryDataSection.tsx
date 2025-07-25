@@ -32,6 +32,7 @@ interface MilitaryFormData {
   professionCourseValue?: string;
 
   // Military orders
+  appointedBy?: string;
   appointmentOrderNumber?: string;
   appointmentOrderDate?: string;
   enrollmentOrderNumber?: string;
@@ -319,6 +320,14 @@ export const MilitaryDataSection = ({
       </div>
 
       {/* Military Orders Section */}
+      <FormField
+        label="Ким призначений"
+        field="appointedBy"
+        type="text"
+        value={formData.appointedBy}
+        onChange={onInputChange}
+        placeholder="Командир частини"
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           label="№ наказу про призначення"
