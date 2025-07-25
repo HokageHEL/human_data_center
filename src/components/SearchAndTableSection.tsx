@@ -163,10 +163,16 @@ export const SearchAndTableSection = ({
       JSON.stringify(defaultColumns)
     );
     
+    // Reset sorting to default by shpoNumber
+    setSortConfig({
+      field: "shpoNumber",
+      order: "asc"
+    });
+    
     // Show toast notification
     toast({
       title: "Налаштування скинуто",
-      description: "Порядок та видимість стовпців повернуто до стандартних налаштувань",
+      description: "Порядок та видимість стовпців, а також сортування повернуто до стандартних налаштувань",
     });
   };
 
