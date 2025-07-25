@@ -82,8 +82,10 @@ interface SearchAndTableSectionProps {
   >;
   filteredPeople: Person[];
   handleSort: (field: SortField) => void;
-  handleDelete: (personName: string) => void;
+  handleDelete?: (personName: string) => void;
   setPeople: Dispatch<SetStateAction<Person[]>>;
+  renderActions?: (person: Person) => React.ReactNode;
+  isFromArchive?: boolean;
 }
 
 export const SearchAndTableSection = ({
@@ -95,6 +97,8 @@ export const SearchAndTableSection = ({
   handleSort,
   handleDelete,
   setPeople,
+  renderActions,
+  isFromArchive = false,
 }: SearchAndTableSectionProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -199,7 +203,8 @@ export const SearchAndTableSection = ({
     console.log("Navigating to edit page for person:", person.fullName);
     const encodedName = encodeURIComponent(person.fullName);
     console.log("Encoded name for URL:", encodedName);
-    navigate(`/edit/${encodedName}`);
+    const queryParam = isFromArchive ? "?from=archive" : "";
+    navigate(`/edit/${encodedName}${queryParam}`);
   };
 
   const renderCell = (person: Person, field: string, columnWidth: number) => {

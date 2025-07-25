@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate, useBeforeUnload } from "react-router-dom";
+import { useParams, useNavigate, useBeforeUnload, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { DocumentUpload } from "@/components/DocumentUpload";
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { PPDSection } from "@/components/form/PPDSection";
-import { addPerson, getPerson, deletePerson, Document } from "@/lib/data";
+import { addPerson, getPerson, getPersonIncludingDeleted, deletePerson, permanentlyDeletePerson, restorePerson, Document } from "@/lib/data";
 import { GeneralInfoSection } from "@/components/form/GeneralInfoSection";
 import { MilitaryDataSection } from "@/components/form/MilitaryDataSection";
 import {
@@ -32,7 +32,9 @@ const EditPerson = () => {
   const { name } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const isNewPerson = name === "new";
+  const isFromArchive = searchParams.get("from") === "archive";
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -107,7 +109,11 @@ const EditPerson = () => {
     const loadPerson = async () => {
       if (!isNewPerson && name) {
         try {
-          const person = await getPerson(name);
+          // Use getPersonIncludingDeleted if coming from archive, otherwise use regular getPerson
+          const person = isFromArchive 
+            ? await getPersonIncludingDeleted(name)
+            : await getPerson(name);
+          
           if (person) {
             setFormData({
               ...person,
@@ -120,7 +126,7 @@ const EditPerson = () => {
               description: "Особу не знайдено",
               variant: "destructive",
             });
-            navigate("/");
+            navigate(isFromArchive ? "/archive" : "/");
           }
         } catch (error) {
           console.error("Error loading person:", error);
@@ -129,12 +135,12 @@ const EditPerson = () => {
             description: "Помилка завантаження даних",
             variant: "destructive",
           });
-          navigate("/");
+          navigate(isFromArchive ? "/archive" : "/");
         }
       }
     };
     loadPerson();
-  }, [name, isNewPerson, navigate, toast]);
+  }, [name, isNewPerson, navigate, toast, isFromArchive]);
 
   const handleDocumentAdd = (document: Document) => {
     setFormData((prev) => ({
@@ -209,27 +215,39 @@ const EditPerson = () => {
           "Ви маєте незбережені зміни. Ви впевнені, що хочете залишити сторінку?"
         )
       ) {
-        navigate("/");
+        navigate(isFromArchive ? "/archive" : "/");
       }
     } else {
-      navigate("/");
+      navigate(isFromArchive ? "/archive" : "/");
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Ви впевнені, що хочете видалити цю особу?")) {
+    const confirmMessage = isFromArchive 
+      ? "Ви впевнені, що хочете остаточно видалити цю особу?"
+      : "Ви впевнені, що хочете видалити цю особу?";
+    
+    if (window.confirm(confirmMessage)) {
       try {
-        await deletePerson(formData.fullName);
-        toast({
-          title: "Успішно",
-          description: `${formData.fullName} видалено`,
-        });
-        navigate("/");
+        if (isFromArchive) {
+          await permanentlyDeletePerson(formData.fullName);
+          toast({
+            title: "Успішно",
+            description: `${formData.fullName} остаточно видалено`,
+          });
+        } else {
+          await deletePerson(formData.fullName);
+          toast({
+            title: "Успішно",
+            description: `${formData.fullName} видалено`,
+          });
+        }
+        navigate(isFromArchive ? "/archive" : "/");
       } catch (error) {
         console.error("Error deleting person:", error);
         toast({
           title: "Помилка",
-          description: "Не вдалося видалити особу",
+          description: isFromArchive ? "Не вдалося остаточно видалити особу" : "Не вдалося видалити особу",
           variant: "destructive",
         });
       }
@@ -258,6 +276,17 @@ const EditPerson = () => {
   const handleSave = async () => {
     setHasUnsavedChanges(false);
     try {
+      // If viewing from archive, restore the person instead of saving
+      if (isFromArchive && name) {
+        await restorePerson(name);
+        toast({
+          title: "Успіх",
+          description: "Особу відновлено успішно",
+        });
+        navigate("/"); // Navigate to home page after restore
+        return;
+      }
+
       if (!formData.fullName.trim()) {
         toast({
           title: "Помилка",
@@ -286,7 +315,7 @@ const EditPerson = () => {
 
       // Navigate back after a short delay
       setTimeout(() => {
-        navigate("/");
+        navigate(isFromArchive ? "/archive" : "/");
       }, 300);
     } catch (error) {
       console.error("Error saving person:", error);
@@ -384,7 +413,7 @@ const EditPerson = () => {
                 Видалити
               </Button>
             )}
-            <Button onClick={handleSave}>Зберегти</Button>
+            <Button onClick={handleSave}>{isFromArchive ? "Відновити" : "Зберегти"}</Button>
           </div>
         </div>
         <Card className="p-6 w-full">

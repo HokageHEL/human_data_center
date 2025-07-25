@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Archive } from "lucide-react";
 import { useAccentColor } from "@/hooks/use-accent-color";
 import ColumnVisibilitySettings from "@/components/ColumnVisibilitySettings";
 import ColorPicker from "@/components/ColorPicker";
@@ -27,6 +27,17 @@ const Options = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-2xl font-semibold">Налаштування</h1>
+        </div>
+
+        <div className="mb-6">
+          <Button
+            onClick={() => navigate('/archive')}
+            className="w-full sm:w-auto"
+            variant="outline"
+          >
+            <Archive className="h-4 w-4 mr-2" />
+            Архів
+          </Button>
         </div>
 
         <div className="space-y-4">

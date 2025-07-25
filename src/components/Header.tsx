@@ -20,11 +20,27 @@ export function Header() {
     }
   };
 
+  const handleLogoClick = () => {
+    // Check if we're on the edit page and if there are unsaved changes
+    if (location.pathname.startsWith("/edit/")) {
+      // Dispatch a custom event to check for unsaved changes
+      const event = new CustomEvent("checkUnsavedChanges", {
+        detail: { targetPath: "/" },
+      });
+      window.dispatchEvent(event);
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
         <span></span>
-        <div className="flex items-center gap-2 font-bold text-xl">
+        <div 
+          className="flex items-center gap-2 font-bold text-xl cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={handleLogoClick}
+        >
           <Logo className="h-10 w-10" />
           ОСА
         </div>
