@@ -94,7 +94,7 @@ export const MilitaryDataSection = ({
             onChange={onInputChange}
             placeholder="оператор"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 gap-4 items-start">
             <FormField
               label="Військове звання"
               field="militaryRank"
@@ -137,7 +137,7 @@ export const MilitaryDataSection = ({
             options={FITNESS_STATUS_OPTIONS}
           />
           {formData.fitnessStatus === "обмежено придатний" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
               <FormField
                 label="Номер висновку ВЛК"
                 field="medicalCommissionNumber"
@@ -164,7 +164,7 @@ export const MilitaryDataSection = ({
           <CardTitle className="text-lg font-semibold text-gray-800">Підрозділ та спеціальність</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="Підрозділ"
               field="unit"
@@ -195,7 +195,7 @@ export const MilitaryDataSection = ({
             onChange={onInputChange}
             placeholder="041256"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="Тарифний розряд"
               field="tariffCategory"
@@ -224,7 +224,7 @@ export const MilitaryDataSection = ({
           <CardTitle className="text-base font-medium text-gray-600">Інформація про службу</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="Тип служби"
               field="serviceType"
@@ -291,7 +291,7 @@ export const MilitaryDataSection = ({
           <CardTitle className="text-base font-medium text-gray-600">Документи та бойовий досвід</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="Номер військового документа"
               field="militaryDocumentNumber"
@@ -310,7 +310,7 @@ export const MilitaryDataSection = ({
             />
           </div>
           <Separator />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="УБД"
               field="combatExperienceStatus"
@@ -346,7 +346,7 @@ export const MilitaryDataSection = ({
           <CardTitle className="text-base font-medium text-gray-600">Навчання та підготовка</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="БЗВП"
               field="BMT"
@@ -390,7 +390,7 @@ export const MilitaryDataSection = ({
             placeholder="Командир частини"
           />
           <Separator />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="№ наказу про призначення"
               field="appointmentOrderNumber"
@@ -407,7 +407,7 @@ export const MilitaryDataSection = ({
               onChange={onInputChange}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="№ наказу (про зарахування у списки частини)"
               field="enrollmentOrderNumber"
@@ -424,7 +424,7 @@ export const MilitaryDataSection = ({
               onChange={onInputChange}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="№ наказу (про виключення з списків частини)"
               field="dismissalOrderNumber"
