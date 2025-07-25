@@ -7,6 +7,7 @@ import { generatePersonDocument } from "@/lib/docx-generator";
 import { Packer } from "docx";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -424,17 +425,15 @@ const EditPerson = () => {
             <div className="space-y-2">
               <Label>Дата народження</Label>
               <div className="flex gap-2 items-center">
-                <Input
-                  type="date"
+                <DatePicker
                   value={formData.birthDate}
-                  onChange={(e) =>
-                    handleInputChange("birthDate", e.target.value)
-                  }
+                  onChange={(value) => handleInputChange("birthDate", value)}
                   className={
                     calculateAge(formData.birthDate) >= 55
                       ? "border-red-500"
                       : ""
                   }
+                  placeholder="24.04.2003"
                 />
                 <span
                   className={`w-64 ${

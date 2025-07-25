@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -70,14 +71,13 @@ export const FormField = ({
         />
       )}
       {type === "date" && (
-        <div className="flex gap-2 items-center">
-          <Input
-            type="date"
-            value={value || ""}
-            onChange={(e) => handleChange(e.target.value)}
-            readOnly={readonly}
-          />
-        </div>
+        <DatePicker
+          value={value as string || ""}
+          onChange={(date) => handleChange(date)}
+          placeholder={placeholder || "24.04.2003"}
+          disabled={readonly}
+          id={field}
+        />
       )}
       {type === "number" && (
         <Input
