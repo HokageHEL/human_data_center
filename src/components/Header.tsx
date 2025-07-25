@@ -1,6 +1,7 @@
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Logo } from "./ui/logo";
 
 export function Header() {
   const navigate = useNavigate();
@@ -8,14 +9,14 @@ export function Header() {
 
   const handleSettingsClick = () => {
     // Check if we're on the edit page and if there are unsaved changes
-    if (location.pathname.startsWith('/edit/')) {
+    if (location.pathname.startsWith("/edit/")) {
       // Dispatch a custom event to check for unsaved changes
-      const event = new CustomEvent('checkUnsavedChanges', {
-        detail: { targetPath: '/options' }
+      const event = new CustomEvent("checkUnsavedChanges", {
+        detail: { targetPath: "/options" },
       });
       window.dispatchEvent(event);
     } else {
-      navigate('/options');
+      navigate("/options");
     }
   };
 
@@ -24,11 +25,7 @@ export function Header() {
       <div className="container flex h-14 items-center justify-between">
         <span></span>
         <div className="flex items-center gap-2 font-bold text-xl">
-          <img
-            src="/wasp-logo.png"
-            alt="WASP Logo"
-            className="h-8 w-8 object-contain"
-          />
+          <Logo className="h-8 w-8" />
           ОСА
         </div>
         <Button

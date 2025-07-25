@@ -246,7 +246,6 @@ const EditPerson = () => {
 
       if (field === "isInPPD" && value === true) {
         newData.absenceStatus = "не_вказано";
-        newData.status = "не_вказано";
       }
 
       return newData;
