@@ -358,6 +358,8 @@ export const SearchAndTableSection = ({
         );
       case "BMT":
         return renderBoolean(person.BMT);
+      case "BMTUnit":
+        return renderText(person.BMTUnit);
       case "BMTDate":
         return renderText(formatDate(person.BMTDate || ''));
       case "professionCourse":

@@ -28,6 +28,7 @@ interface FormFieldProps {
   options?: FieldOption[];
   show?: boolean;
   readonly?: boolean;
+  disabled?: boolean;
   placeholder?: string;
   onFieldChange?: (value: FormFieldValue) => void;
 }
@@ -41,6 +42,7 @@ export const FormField = ({
   options,
   show = true,
   readonly = false,
+  disabled = false,
   placeholder,
   onFieldChange,
 }: FormFieldProps) => {
@@ -60,6 +62,7 @@ export const FormField = ({
           onChange={(e) => handleChange(e.target.value)}
           placeholder={placeholder || `Введіть ${label.toLowerCase()}`}
           readOnly={readonly}
+          disabled={disabled}
         />
       )}
       {type === "textarea" && (
@@ -68,6 +71,7 @@ export const FormField = ({
           onChange={(e) => handleChange(e.target.value)}
           placeholder={placeholder || `Введіть ${label.toLowerCase()}`}
           readOnly={readonly}
+          disabled={disabled}
         />
       )}
       {type === "date" && (
@@ -75,7 +79,7 @@ export const FormField = ({
           value={value as string || ""}
           onChange={(date) => handleChange(date)}
           placeholder={placeholder || "24.04.2003"}
-          disabled={readonly}
+          disabled={readonly || disabled}
           id={field}
         />
       )}
@@ -91,11 +95,12 @@ export const FormField = ({
             handleChange(newValue);
           }}
           readOnly={readonly}
+          disabled={disabled}
           placeholder={placeholder}
         />
       )}
       {type === "select" && options && (
-        <Select value={value || ""} onValueChange={handleChange}>
+        <Select value={value || ""} onValueChange={handleChange} disabled={disabled}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder={placeholder || "Оберіть..."} />
           </SelectTrigger>
@@ -117,6 +122,7 @@ export const FormField = ({
           <Switch
             checked={value || false}
             onCheckedChange={handleChange}
+            disabled={disabled}
           />
           <span className="text-sm">{value ? "Так" : "Ні"}</span>
         </div>

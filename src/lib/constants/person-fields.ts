@@ -46,9 +46,8 @@ export const OPTIONAL_PERSON_FIELDS = [
   "deleted",
   "status",
   "combatExperienceStatus",
-  "combatPeriods",
   "BMT",
-  "BMTDate",
+  "BMTUnit",
   "professionCourse",
   "professionCourseValue",
 ] as const;

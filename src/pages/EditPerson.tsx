@@ -77,6 +77,7 @@ const EditPerson = () => {
     combatExperienceNumber: "",
     combatPeriods: "",
     BMT: false,
+    BMTUnit: "",
     professionCourse: false,
     professionCourseValue: "",
 

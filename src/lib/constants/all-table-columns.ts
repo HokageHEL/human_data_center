@@ -353,6 +353,15 @@ export const ALL_TABLE_COLUMNS: TableColumn[] = [
     subcategory: "Навчання та підготовка",
   },
   {
+    field: "BMTUnit",
+    label: "Частина БЗВП",
+    width: 200,
+    minWidth: 10,
+    maxWidth: 300,
+    category: "military",
+    subcategory: "Навчання та підготовка",
+  },
+  {
     field: "professionCourse",
     label: "ФАХ",
     width: 150,

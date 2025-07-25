@@ -59,6 +59,7 @@ export interface Person {
   combatPeriods: string;
   isInPPD: boolean;
   BMT: boolean;
+  BMTUnit?: string;
   professionCourse: boolean;
   professionCourseValue?: string;
 
@@ -76,7 +77,7 @@ export interface Person {
 
 const DB_NAME = "militaryDB";
 const STORE_NAME = "people";
-const DB_VERSION = 20; // add appointedBy field
+const DB_VERSION = 21; // add appointedBy field
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -146,7 +147,7 @@ function openDB(): Promise<IDBDatabase> {
               const updatedPerson = {
                 ...person,
                 BMT: person.BMT ?? false,
-                BMTDate: person.BMTDate ?? "",
+                BMTUnit: person.BMTUnit ?? "",
                 professionCourse: person.professionCourse ?? false,
                 professionCourseValue: person.professionCourseValue ?? "",
 

@@ -30,6 +30,7 @@ interface MilitaryFormData {
   combatExperienceNumber?: string;
   combatPeriods?: string;
   BMT?: boolean;
+  BMTUnit?: string;
   professionCourse?: boolean;
   professionCourseValue?: string;
 
@@ -354,6 +355,19 @@ export const MilitaryDataSection = ({
               value={formData.BMT}
               onChange={onInputChange}
             />
+            <div className={`transition-opacity duration-200 ${!formData.BMT ? 'opacity-50 pointer-events-none' : ''}`}>
+              <FormField
+                label="Частина на базі якої проводилось бзвп"
+                field="BMTUnit"
+                type="text"
+                value={formData.BMT ? formData.BMTUnit : ''}
+                onChange={onInputChange}
+                placeholder="Назва частини"
+                disabled={!formData.BMT}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField
               label="ФАХ"
               field="professionCourse"
@@ -361,17 +375,18 @@ export const MilitaryDataSection = ({
               value={formData.professionCourse}
               onChange={onInputChange}
             />
+            <div className={`transition-opacity duration-200 ${!formData.professionCourse ? 'opacity-50 pointer-events-none' : ''}`}>
+              <FormField
+                label="ВОС за ФАХом"
+                field="professionCourseValue"
+                type="text"
+                value={formData.professionCourse ? formData.professionCourseValue : ''}
+                onChange={onInputChange}
+                placeholder="123456"
+                disabled={!formData.professionCourse}
+              />
+            </div>
           </div>
-          {formData.professionCourse && (
-            <FormField
-              label="ВОС за ФАХом"
-              field="professionCourseValue"
-              type="text"
-              value={formData.professionCourseValue}
-              onChange={onInputChange}
-              placeholder="123456"
-            />
-          )}
         </CardContent>
       </Card>
 
