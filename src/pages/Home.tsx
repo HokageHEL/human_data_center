@@ -59,7 +59,15 @@ const calculateAge = (birthDate: string): number => {
 
 const Home = () => {
   const navigate = useNavigate();
-  const { searchTerm, setSearchTerm, filters, setFilters, sortConfig, setSortConfig, resetFilters } = useUrlFilters();
+  const {
+    searchTerm,
+    setSearchTerm,
+    filters,
+    setFilters,
+    sortConfig,
+    setSortConfig,
+    resetFilters,
+  } = useUrlFilters();
   const [showFilters, setShowFilters] = useState(false);
   const [people, setPeople] = useState<Array<Person>>([]);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -83,10 +91,13 @@ const Home = () => {
       completionPercentage: calculateCompletionPercentage(person),
     }))
     .filter((person) => {
-      const matchesSearch = searchTerm === "" || 
+      const matchesSearch =
+        searchTerm === "" ||
         person.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (person.position && person.position.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (person.militaryRank && person.militaryRank.toLowerCase().includes(searchTerm.toLowerCase()));
+        (person.position &&
+          person.position.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (person.militaryRank &&
+          person.militaryRank.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesBirthDate =
         !filters.birthDate || person.birthDate.includes(filters.birthDate);
       const matchesMilitaryRank =
@@ -137,9 +148,11 @@ const Home = () => {
       const matchesIsInPPD =
         !filters.isInPPD || (filters.isInPPD && person.isInPPD);
       const matchesCombatExperience =
-      filters.combatExperienceStatus === "all" ||
-      (filters.combatExperienceStatus === "with" && person.combatExperienceStatus) ||
-      (filters.combatExperienceStatus === "without" && !person.combatExperienceStatus);
+        filters.combatExperienceStatus === "all" ||
+        (filters.combatExperienceStatus === "with" &&
+          person.combatExperienceStatus) ||
+        (filters.combatExperienceStatus === "without" &&
+          !person.combatExperienceStatus);
 
       return (
         matchesSearch &&
@@ -230,8 +243,11 @@ const Home = () => {
     setIsExportDialogOpen(true);
   };
 
-  const handleExport = async (selectedColumns: TableColumn[], exportType: 'word' | 'excel') => {
-    if (exportType === 'word') {
+  const handleExport = async (
+    selectedColumns: TableColumn[],
+    exportType: "word" | "excel"
+  ) => {
+    if (exportType === "word") {
       const doc = generateTableDocument(filteredPeople, selectedColumns);
       const blob = await Packer.toBlob(doc);
       saveAs(blob, "people-table.docx");
@@ -398,7 +414,7 @@ const Home = () => {
           />
         </div>
       </div>
-      
+
       <ExportColumnDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}

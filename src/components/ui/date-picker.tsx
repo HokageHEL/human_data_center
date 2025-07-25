@@ -61,6 +61,13 @@ function parseDate(dateString: string): Date | undefined {
   return undefined
 }
 
+function formatDateToISO(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 function isValidDate(date: Date | undefined): boolean {
   if (!date) {
     return false
@@ -71,7 +78,7 @@ function isValidDate(date: Date | undefined): boolean {
 export function DatePicker({
   value,
   onChange,
-  placeholder = "Оберіть дату",
+  placeholder = "24.04.2003",
   disabled = false,
   className,
   id
@@ -97,18 +104,39 @@ export function DatePicker({
   }, [value])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
+    let newValue = e.target.value
+    
+    // Remove any non-numeric characters except dots
+    newValue = newValue.replace(/[^\d.]/g, '')
+    
+    // Auto-format with dots as user types
+    if (newValue.length === 2 && !newValue.includes('.')) {
+      newValue += '.'
+    } else if (newValue.length === 5 && newValue.split('.').length === 2) {
+      newValue += '.'
+    }
+    
+    // Limit to DD.MM.YYYY format (10 characters)
+    if (newValue.length > 10) {
+      newValue = newValue.substring(0, 10)
+    }
+    
     setInputValue(newValue)
     
+    // Allow partial input while typing
+    if (newValue === "") {
+      setDate(undefined)
+      setMonth(undefined)
+      onChange?.("")
+      return
+    }
+    
+    // Only validate and update when we have a complete date
     const parsedDate = parseDate(newValue)
     if (isValidDate(parsedDate)) {
       setDate(parsedDate)
       setMonth(parsedDate)
-      onChange?.(parsedDate!.toISOString().split('T')[0]) // Return yyyy-mm-dd format
-    } else if (newValue === "") {
-      setDate(undefined)
-      setMonth(undefined)
-      onChange?.("") 
+      onChange?.(formatDateToISO(parsedDate!))
     }
   }
 
@@ -118,7 +146,7 @@ export function DatePicker({
     setOpen(false)
     
     if (selectedDate) {
-      onChange?.(selectedDate.toISOString().split('T')[0]) // Return yyyy-mm-dd format
+      onChange?.(formatDateToISO(selectedDate))
     } else {
       onChange?.("") 
     }
@@ -128,6 +156,25 @@ export function DatePicker({
     if (e.key === "ArrowDown") {
       e.preventDefault()
       setOpen(true)
+    }
+    
+    // Handle Tab key for easy navigation between date parts
+    if (e.key === "Tab") {
+      const input = e.target as HTMLInputElement
+      const value = input.value
+      const cursorPos = input.selectionStart || 0
+      
+      // If we're at a dot position or just after, move to next section
+      if (value[cursorPos] === '.' || value[cursorPos - 1] === '.') {
+        e.preventDefault()
+        const nextDotIndex = value.indexOf('.', cursorPos + 1)
+        if (nextDotIndex !== -1) {
+          input.setSelectionRange(nextDotIndex + 1, nextDotIndex + 1)
+        } else {
+          // Move to end if no more dots
+          input.setSelectionRange(value.length, value.length)
+        }
+      }
     }
   }
 
@@ -167,6 +214,9 @@ export function DatePicker({
             onMonthChange={setMonth}
             onSelect={handleDateSelect}
             locale={uk}
+            startMonth={new Date(1900, 0)}
+            endMonth={new Date(2100, 11)}
+            defaultMonth={date || new Date()}
           />
         </PopoverContent>
       </Popover>
